@@ -12,7 +12,7 @@
   html,body { height:100%; }
   body {
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(170deg,#0d3b66 0%,#1b6ca8 45%,#2e9fc4 75%,#7fd1e0 100%);
+    background: radial-gradient(ellipse at 50% 32%, #16203a 0%, #0a0e1c 45%, #04050b 100%);
     background-attachment: fixed;
     color:#fff; min-height:100vh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
@@ -20,26 +20,26 @@
   }
   #app { max-width:480px; margin:0 auto; padding:16px; min-height:100vh; display:flex; flex-direction:column; }
   .card {
-    background:rgba(8,32,54,.55); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(8px);
-    border-radius:24px; padding:20px; margin-bottom:14px;
-    border:1.5px solid rgba(255,255,255,.25);
+    background:rgba(14,20,38,.72); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(8px);
+    border-radius:14px; padding:20px; margin-bottom:14px;
+    border:1px solid rgba(140,170,255,.18);
   }
-  h1 { font-size:2rem; text-align:center; text-shadow:0 2px 8px rgba(0,0,0,.25); }
+  h1 { font-size:1.75rem; text-align:center; letter-spacing:.02em; font-weight:600; text-shadow:0 0 24px rgba(120,160,255,.35); }
   h2 { font-size:1.35rem; margin-bottom:12px; text-align:center; }
   .sub { text-align:center; opacity:.9; font-size:.95rem; margin:6px 0 18px; }
   .btn {
     display:block; width:100%; border:none; cursor:pointer;
-    background:rgba(255,255,255,.92); color:#333; font-family:inherit;
-    font-size:1.15rem; font-weight:700; padding:16px 18px; border-radius:18px;
-    margin-bottom:12px; text-align:left; box-shadow:0 4px 0 rgba(0,0,0,.18);
+    background:rgba(226,232,245,.94); color:#1a1f2e; font-family:inherit;
+    font-size:1.05rem; font-weight:600; padding:15px 18px; border-radius:10px;
+    margin-bottom:12px; text-align:left; box-shadow:0 2px 0 rgba(0,0,0,.5);
     transition: transform .08s;
   }
   .btn:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.18); }
   .btn.center { text-align:center; }
-  .btn.primary { background:#FFD93D; color:#5b4400; }
-  .btn.ghost { background:rgba(255,255,255,.18); color:#fff; box-shadow:none; border:1.5px solid rgba(255,255,255,.4); }
-  .btn.correct { background:#4CAF50 !important; color:#fff !important; }
-  .btn.wrong { background:#E5533D !important; color:#fff !important; }
+  .btn.primary { background:linear-gradient(135deg,#ffb648,#ff8a3d); color:#2a1600; }
+  .btn.ghost { background:rgba(120,150,220,.12); color:#cfd9f2; box-shadow:none; border:1px solid rgba(140,170,255,.3); }
+  .btn.correct { background:#2e9e6b !important; color:#fff !important; }
+  .btn.wrong { background:#c8453a !important; color:#fff !important; }
   .btn.dim { opacity:.55; }
   .btn:disabled { cursor:default; }
   .row { display:flex; gap:10px; }
@@ -74,7 +74,7 @@
   .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
   .badge {
     width:96px; text-align:center; background:rgba(255,255,255,.15); border-radius:16px; padding:10px 4px;
-    border:1.5px solid rgba(255,255,255,.25);
+    border:1px solid rgba(140,170,255,.18);
   }
   .badge .i { font-size:2rem; }
   .badge .n { font-size:.72rem; font-weight:700; margin-top:4px; }
@@ -928,43 +928,39 @@ const DATA = {
 }
 };
 
-const LEVELS = { 4:{name:"Consultant",emoji:"🎓",sub:"Specialist level"} };
-const CATS = { nrd:{name:"Neuroradiology",emoji:"🧠"}, ent:{name:"Head & Neck Radiology",emoji:"👂"}, echo:{name:"Echocardiography",emoji:"🫀"}, mri:{name:"MRI Physics",emoji:"🧲"}, ctp:{name:"CT Physics",emoji:"📡"}, usp:{name:"Ultrasound Physics",emoji:"🔊"}, msk:{name:"MSK Radiology",emoji:"🦴"}, spi:{name:"Spinal Radiology",emoji:"🩻"}, abd:{name:"Abdominopelvic Radiology",emoji:"🫁"}, neu:{name:"Neuroanatomy",emoji:"🧠"}, air:{name:"AI in Radiology",emoji:"🤖"}, occ:{name:"Occupational Medicine",emoji:"🦺"}, ana:{name:"Anaesthetics",emoji:"💉"}, pae:{name:"Paediatric Anaesthetics",emoji:"🧸"}, mix:{name:"Mix It Up!",emoji:"🎲"} };
+const LEVELS = { 4:{name:"Consultant",emoji:"◆",sub:"Specialist level"} };
+const CATS = { nrd:{name:"Neuroradiology",emoji:"🧠"}, ent:{name:"Head & Neck Radiology",emoji:"👂"}, echo:{name:"Echocardiography",emoji:"🫀"}, mri:{name:"MRI Physics",emoji:"🧲"}, ctp:{name:"CT Physics",emoji:"📡"}, usp:{name:"Ultrasound Physics",emoji:"🔊"}, msk:{name:"MSK Radiology",emoji:"🦴"}, spi:{name:"Spinal Radiology",emoji:"🩻"}, abd:{name:"Abdominopelvic Radiology",emoji:"🫁"}, neu:{name:"Neuroanatomy",emoji:"🧠"}, air:{name:"AI in Radiology",emoji:"🤖"}, occ:{name:"Occupational Medicine",emoji:"🦺"}, ana:{name:"Anaesthetics",emoji:"💉"}, pae:{name:"Paediatric Anaesthetics",emoji:"🧸"}, mix:{name:"Random mix",emoji:"◎"} };
 const GROUPS = [
-  {name:"🩻 Diagnostic Radiology", cats:["nrd","ent","msk","spi","abd"]},
-  {name:"⚙️ Imaging Physics", cats:["mri","ctp","usp"]},
-  {name:"🧠 Anatomy", cats:["neu"]},
-  {name:"🫀 Cardiology", cats:["echo"]},
-  {name:"💉 Anaesthetics", cats:["ana","pae"]},
-  {name:"🤖 Practice & Technology", cats:["air","occ"]}
+  {name:"◈ Diagnostic Radiology", cats:["nrd","ent","msk","spi","abd"]},
+  {name:"◈ Imaging Physics", cats:["mri","ctp","usp"]},
+  {name:"◈ Anatomy", cats:["neu"]},
+  {name:"◈ Cardiology", cats:["echo"]},
+  {name:"◈ Anaesthetics", cats:["ana","pae"]},
+  {name:"◈ Practice & Technology", cats:["air"]},
+  {name:"◈ Occupational Medicine", cats:["occ"]}
 ];
-const AVATARS = ["🦁","🐼","🦊","🐧","🦄","🐯","🐨","🐙"];
+const AVATARS = ["🕹️","💾","📼","📟","📻","💿","🖥️","☎️"];
 const BADGES = [
-  {id:"first",   i:"🌟", n:"First Star",     d:"Get your first answer right"},
-  {id:"streak5", i:"🔥", n:"On Fire",        d:"5 correct in a row"},
-  {id:"streak10",i:"⚡", n:"Unstoppable",    d:"10 correct in a row"},
-  {id:"perfect", i:"🏅", n:"Perfect Round",  d:"Get every question right in a round"},
-  {id:"pts100",  i:"💯", n:"Century Club",   d:"Earn 100 points"},
-  {id:"pts500",  i:"🏆", n:"Globe Trotter",  d:"Earn 500 points"},
-  {id:"pts1000", i:"👑", n:"Geo Champion",   d:"Earn 1,000 points"},
-  {id:"allcats", i:"🧭", n:"World Explorer", d:"Play every category"},
-  {id:"expertperfect", i:"🎓", n:"Brainiac", d:"Perfect round on Expert level"}
+  {id:"first",   i:"◆", n:"First Correct",   d:"Answer your first question correctly"},
+  {id:"streak5", i:"◆◆", n:"Streak of Five",  d:"Five correct in a row"},
+  {id:"streak10",i:"◆◆◆", n:"Streak of Ten",  d:"Ten correct in a row"},
+  {id:"perfect", i:"★", n:"Clean Sweep",     d:"Every question right in one set"},
+  {id:"pts100",  i:"100", n:"Century",        d:"Reach 100 points"},
+  {id:"pts500",  i:"500", n:"Five Hundred",   d:"Reach 500 points"},
+  {id:"pts1000", i:"1K", n:"One Thousand",   d:"Reach 1,000 points"},
+  {id:"allcats", i:"◎", n:"Full Curriculum", d:"Attempt every topic"},
+  {id:"expertperfect", i:"✦", n:"Flawless",   d:"A clean sweep at consultant level"}
 ];
 const ROUND_LEN = 8;
 
-const PUFFIN=(s)=>`<svg width="${s}" height="${s*1.15}" viewBox="0 0 100 115" xmlns="http://www.w3.org/2000/svg">
-<ellipse cx="50" cy="70" rx="30" ry="36" fill="#1a1a1a"/>
-<ellipse cx="50" cy="76" rx="20" ry="27" fill="#ffffff"/>
-<circle cx="50" cy="34" r="25" fill="#1a1a1a"/>
-<ellipse cx="50" cy="40" rx="17" ry="15" fill="#f2f2f2"/>
-<circle cx="42" cy="36" r="3.4" fill="#1a1a1a"/><circle cx="58" cy="36" r="3.4" fill="#1a1a1a"/>
-<path d="M50 44c-9 0-14 5-14 10s6 9 14 9 14-4 14-9-5-10-14-10z" fill="#ff8c1a"/>
-<path d="M50 44c-5 0-8 5-8 10s3 9 8 9z" fill="#ffd93d"/>
-<path d="M36 54h28" stroke="#d1660a" stroke-width="1.6"/>
-<path d="M28 96c-4 6-2 10 4 10h6c5 0 6-5 3-8z" fill="#ff8c1a"/>
-<path d="M72 96c4 6 2 10-4 10h-6c-5 0-6-5-3-8z" fill="#ff8c1a"/>
-<ellipse cx="22" cy="72" rx="8" ry="18" fill="#111" transform="rotate(12 22 72)"/>
-<ellipse cx="78" cy="72" rx="8" ry="18" fill="#111" transform="rotate(-12 78 72)"/>
+const PUFFIN=(s)=>`<svg width="${s}" height="${s}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<defs><radialGradient id="lg" cx="50%" cy="50%" r="50%">
+ <stop offset="52%" stop-color="#000"/><stop offset="58%" stop-color="#ffb648" stop-opacity=".95"/>
+ <stop offset="70%" stop-color="#ff7a2f" stop-opacity=".35"/><stop offset="100%" stop-color="#ff7a2f" stop-opacity="0"/>
+</radialGradient></defs>
+<ellipse cx="50" cy="50" rx="46" ry="14" fill="none" stroke="#ffb648" stroke-width="4" opacity=".85"/>
+<circle cx="50" cy="50" r="42" fill="url(#lg)"/><circle cx="50" cy="50" r="21" fill="#000"/>
+<ellipse cx="50" cy="50" rx="46" ry="14" fill="none" stroke="#ffd9a0" stroke-width="1.4" opacity=".6"/>
 </svg>`;
 function puffinBackdrop(){
   if(document.querySelector('.puffbg')) return;
@@ -972,57 +968,32 @@ function puffinBackdrop(){
   d.innerHTML=`
   <svg class="seascape" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0b2b4a"/><stop offset="55%" stop-color="#1b6ca8"/><stop offset="100%" stop-color="#5fb3c9"/>
-      </linearGradient>
-      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#2b7fa8"/><stop offset="100%" stop-color="#0d3b56"/>
-      </linearGradient>
-      <radialGradient id="glow" cx="76%" cy="26%" r="34%">
-        <stop offset="0%" stop-color="#ffd98a" stop-opacity=".55"/><stop offset="100%" stop-color="#ffd98a" stop-opacity="0"/>
+      <radialGradient id="void" cx="50%" cy="42%" r="70%">
+        <stop offset="0%" stop-color="#16203a"/><stop offset="55%" stop-color="#090d1a"/><stop offset="100%" stop-color="#03040a"/>
+      </radialGradient>
+      <radialGradient id="disc" cx="50%" cy="50%" r="50%">
+        <stop offset="46%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="54%" stop-color="#ffc46b" stop-opacity=".85"/>
+        <stop offset="66%" stop-color="#ff7a2f" stop-opacity=".35"/>
+        <stop offset="100%" stop-color="#ff7a2f" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#7fa8ff" stop-opacity=".22"/><stop offset="100%" stop-color="#7fa8ff" stop-opacity="0"/>
       </radialGradient>
     </defs>
-    <rect width="1200" height="800" fill="url(#sky)"/>
-    <rect width="1200" height="800" fill="url(#glow)"/>
-    <circle cx="912" cy="208" r="46" fill="#ffe9a8" opacity=".5"/>
-    <!-- far sea stacks -->
-    <g opacity=".33" fill="#0a2740">
-      <path d="M0 470 L70 372 L112 430 L168 344 L228 470 Z"/>
-      <path d="M1010 470 L1064 382 L1104 436 L1152 366 L1200 470 Z"/>
-    </g>
-    <!-- Skellig-like twin peaks -->
-    <g opacity=".55" fill="#08243b">
-      <path d="M300 486 L392 268 L436 350 L474 300 L556 486 Z"/>
-      <path d="M596 486 L664 330 L700 392 L744 486 Z"/>
-    </g>
-    <!-- sea -->
-    <rect y="470" width="1200" height="330" fill="url(#sea)" opacity=".85"/>
-    <g stroke="#bfe6f0" stroke-opacity=".22" stroke-width="3" fill="none">
-      <path d="M0 520q60 -12 120 0t120 0 120 0 120 0 120 0 120 0 120 0 120 0 120 0"/>
-      <path d="M0 576q60 -12 120 0t120 0 120 0 120 0 120 0 120 0 120 0 120 0 120 0"/>
-      <path d="M0 636q60 -12 120 0t120 0 120 0 120 0 120 0 120 0 120 0 120 0 120 0"/>
-      <path d="M0 700q60 -12 120 0t120 0 120 0 120 0 120 0 120 0 120 0 120 0 120 0"/>
-    </g>
-    <!-- foreground cliff with beehive hut -->
-    <g fill="#061c2e" opacity=".92">
-      <path d="M0 800 L0 560 L96 468 L182 528 L268 470 L352 560 L420 800 Z"/>
-      <ellipse cx="176" cy="512" rx="26" ry="20"/>
-      <rect x="168" y="508" width="16" height="16" fill="#0b2b4a"/>
-    </g>
-    <g fill="#061c2e" opacity=".9">
-      <path d="M1200 800 L1200 596 L1120 520 L1040 596 L980 800 Z"/>
-    </g>
-    <!-- distant flying puffins -->
-    <g fill="#04141f" opacity=".5">
-      <path d="M820 300q10 -9 20 0 10 -9 20 0-10 6-20 3-10 3-20-3z"/>
-      <path d="M880 250q8 -7 16 0 8 -7 16 0-8 5-16 2-8 3-16-2z"/>
-      <path d="M760 236q7 -6 14 0 7 -6 14 0-7 4-14 2-7 2-14-2z"/>
-      <path d="M980 330q9 -8 18 0 9 -8 18 0-9 5-18 3-9 2-18-3z"/>
+    <rect width="1200" height="800" fill="url(#void)"/>
+    <g><circle cx="663" cy="154" r="1.6" fill="#fff" opacity="0.62"/><circle cx="148" cy="548" r="0.7" fill="#fff" opacity="0.43"/><circle cx="118" cy="519" r="0.9" fill="#fff" opacity="0.21"/><circle cx="888" cy="428" r="0.7" fill="#fff" opacity="0.34"/><circle cx="1128" cy="434" r="0.7" fill="#fff" opacity="0.73"/><circle cx="253" cy="228" r="0.7" fill="#fff" opacity="0.57"/><circle cx="812" cy="50" r="0.9" fill="#fff" opacity="0.21"/><circle cx="272" cy="296" r="1.6" fill="#fff" opacity="0.28"/><circle cx="241" cy="584" r="1.2" fill="#fff" opacity="0.56"/><circle cx="370" cy="105" r="0.9" fill="#fff" opacity="0.43"/><circle cx="1121" cy="729" r="0.7" fill="#fff" opacity="0.56"/><circle cx="421" cy="508" r="1.6" fill="#fff" opacity="0.70"/><circle cx="953" cy="599" r="1.6" fill="#fff" opacity="0.42"/><circle cx="508" cy="184" r="0.9" fill="#fff" opacity="0.23"/><circle cx="614" cy="537" r="1.6" fill="#fff" opacity="0.77"/><circle cx="919" cy="294" r="0.7" fill="#fff" opacity="0.26"/><circle cx="856" cy="168" r="1.2" fill="#fff" opacity="0.28"/><circle cx="1001" cy="431" r="0.7" fill="#fff" opacity="0.82"/><circle cx="158" cy="782" r="1.2" fill="#fff" opacity="0.41"/><circle cx="717" cy="608" r="1.6" fill="#fff" opacity="0.57"/><circle cx="934" cy="70" r="0.7" fill="#fff" opacity="0.81"/><circle cx="970" cy="713" r="0.7" fill="#fff" opacity="0.22"/><circle cx="634" cy="662" r="1.6" fill="#fff" opacity="0.37"/><circle cx="790" cy="684" r="1.2" fill="#fff" opacity="0.20"/><circle cx="945" cy="363" r="0.9" fill="#fff" opacity="0.59"/><circle cx="1011" cy="60" r="0.9" fill="#fff" opacity="0.69"/><circle cx="264" cy="756" r="0.9" fill="#fff" opacity="0.45"/><circle cx="1016" cy="82" r="0.9" fill="#fff" opacity="0.48"/><circle cx="1125" cy="284" r="0.9" fill="#fff" opacity="0.73"/><circle cx="1126" cy="285" r="1.6" fill="#fff" opacity="0.84"/><circle cx="779" cy="236" r="0.9" fill="#fff" opacity="0.24"/><circle cx="309" cy="237" r="0.9" fill="#fff" opacity="0.19"/><circle cx="373" cy="269" r="1.2" fill="#fff" opacity="0.18"/><circle cx="858" cy="547" r="1.2" fill="#fff" opacity="0.59"/><circle cx="652" cy="128" r="0.7" fill="#fff" opacity="0.49"/><circle cx="1145" cy="401" r="1.6" fill="#fff" opacity="0.45"/><circle cx="212" cy="493" r="1.6" fill="#fff" opacity="0.22"/><circle cx="137" cy="213" r="1.6" fill="#fff" opacity="0.29"/><circle cx="696" cy="615" r="0.7" fill="#fff" opacity="0.25"/><circle cx="1160" cy="154" r="0.7" fill="#fff" opacity="0.82"/><circle cx="52" cy="72" r="0.9" fill="#fff" opacity="0.59"/><circle cx="304" cy="649" r="1.2" fill="#fff" opacity="0.82"/><circle cx="745" cy="485" r="0.7" fill="#fff" opacity="0.26"/><circle cx="999" cy="477" r="1.6" fill="#fff" opacity="0.50"/><circle cx="175" cy="147" r="0.7" fill="#fff" opacity="0.68"/><circle cx="542" cy="490" r="0.9" fill="#fff" opacity="0.53"/><circle cx="420" cy="540" r="1.2" fill="#fff" opacity="0.28"/><circle cx="1112" cy="27" r="1.2" fill="#fff" opacity="0.84"/><circle cx="186" cy="712" r="1.2" fill="#fff" opacity="0.53"/><circle cx="342" cy="364" r="0.9" fill="#fff" opacity="0.54"/><circle cx="1029" cy="337" r="0.9" fill="#fff" opacity="0.59"/><circle cx="399" cy="245" r="1.6" fill="#fff" opacity="0.68"/><circle cx="464" cy="204" r="1.6" fill="#fff" opacity="0.42"/><circle cx="59" cy="28" r="1.2" fill="#fff" opacity="0.50"/><circle cx="396" cy="709" r="1.2" fill="#fff" opacity="0.48"/><circle cx="715" cy="373" r="0.7" fill="#fff" opacity="0.33"/><circle cx="464" cy="481" r="0.9" fill="#fff" opacity="0.41"/><circle cx="988" cy="639" r="0.7" fill="#fff" opacity="0.50"/><circle cx="704" cy="658" r="0.7" fill="#fff" opacity="0.74"/><circle cx="245" cy="397" r="0.9" fill="#fff" opacity="0.50"/><circle cx="365" cy="444" r="1.2" fill="#fff" opacity="0.24"/><circle cx="810" cy="474" r="1.6" fill="#fff" opacity="0.68"/><circle cx="173" cy="742" r="0.9" fill="#fff" opacity="0.29"/><circle cx="260" cy="28" r="0.9" fill="#fff" opacity="0.58"/><circle cx="953" cy="671" r="0.9" fill="#fff" opacity="0.59"/><circle cx="971" cy="673" r="1.2" fill="#fff" opacity="0.28"/><circle cx="1122" cy="134" r="0.7" fill="#fff" opacity="0.19"/><circle cx="210" cy="539" r="0.9" fill="#fff" opacity="0.47"/><circle cx="398" cy="216" r="0.7" fill="#fff" opacity="0.35"/><circle cx="599" cy="513" r="0.9" fill="#fff" opacity="0.69"/><circle cx="667" cy="265" r="1.6" fill="#fff" opacity="0.74"/><circle cx="124" cy="757" r="1.2" fill="#fff" opacity="0.78"/><circle cx="1194" cy="529" r="1.6" fill="#fff" opacity="0.73"/><circle cx="1027" cy="133" r="0.9" fill="#fff" opacity="0.53"/><circle cx="38" cy="450" r="0.9" fill="#fff" opacity="0.59"/><circle cx="306" cy="176" r="0.9" fill="#fff" opacity="0.50"/><circle cx="246" cy="569" r="0.7" fill="#fff" opacity="0.40"/><circle cx="1061" cy="543" r="1.6" fill="#fff" opacity="0.71"/><circle cx="217" cy="573" r="0.7" fill="#fff" opacity="0.35"/><circle cx="567" cy="43" r="0.7" fill="#fff" opacity="0.52"/><circle cx="1150" cy="28" r="0.7" fill="#fff" opacity="0.48"/><circle cx="1035" cy="620" r="0.9" fill="#fff" opacity="0.64"/><circle cx="926" cy="520" r="1.6" fill="#fff" opacity="0.52"/><circle cx="507" cy="715" r="1.2" fill="#fff" opacity="0.80"/><circle cx="414" cy="458" r="0.9" fill="#fff" opacity="0.46"/><circle cx="803" cy="452" r="1.2" fill="#fff" opacity="0.23"/><circle cx="492" cy="438" r="0.7" fill="#fff" opacity="0.32"/><circle cx="620" cy="125" r="0.9" fill="#fff" opacity="0.81"/><circle cx="749" cy="146" r="1.2" fill="#fff" opacity="0.77"/><circle cx="957" cy="224" r="0.7" fill="#fff" opacity="0.45"/><circle cx="997" cy="166" r="0.9" fill="#fff" opacity="0.29"/><circle cx="883" cy="527" r="1.6" fill="#fff" opacity="0.41"/><circle cx="400" cy="365" r="1.2" fill="#fff" opacity="0.24"/><circle cx="749" cy="19" r="1.2" fill="#fff" opacity="0.55"/><circle cx="902" cy="720" r="0.7" fill="#fff" opacity="0.44"/><circle cx="1059" cy="638" r="1.2" fill="#fff" opacity="0.52"/><circle cx="131" cy="115" r="0.9" fill="#fff" opacity="0.83"/><circle cx="214" cy="86" r="1.2" fill="#fff" opacity="0.36"/><circle cx="371" cy="276" r="0.9" fill="#fff" opacity="0.73"/><circle cx="529" cy="415" r="0.9" fill="#fff" opacity="0.54"/><circle cx="1054" cy="584" r="1.6" fill="#fff" opacity="0.65"/><circle cx="183" cy="285" r="0.7" fill="#fff" opacity="0.72"/><circle cx="375" cy="435" r="0.7" fill="#fff" opacity="0.36"/><circle cx="34" cy="649" r="0.7" fill="#fff" opacity="0.72"/><circle cx="171" cy="622" r="0.9" fill="#fff" opacity="0.22"/><circle cx="249" cy="464" r="0.7" fill="#fff" opacity="0.41"/><circle cx="1132" cy="427" r="1.2" fill="#fff" opacity="0.60"/><circle cx="88" cy="539" r="0.9" fill="#fff" opacity="0.81"/><circle cx="330" cy="268" r="0.7" fill="#fff" opacity="0.30"/><circle cx="638" cy="643" r="1.2" fill="#fff" opacity="0.54"/><circle cx="421" cy="296" r="1.6" fill="#fff" opacity="0.52"/><circle cx="364" cy="277" r="1.2" fill="#fff" opacity="0.72"/><circle cx="512" cy="37" r="0.7" fill="#fff" opacity="0.19"/><circle cx="1035" cy="564" r="0.9" fill="#fff" opacity="0.52"/><circle cx="503" cy="457" r="0.7" fill="#fff" opacity="0.62"/><circle cx="885" cy="672" r="1.6" fill="#fff" opacity="0.55"/><circle cx="805" cy="518" r="1.2" fill="#fff" opacity="0.64"/><circle cx="470" cy="350" r="0.9" fill="#fff" opacity="0.74"/><circle cx="286" cy="414" r="1.2" fill="#fff" opacity="0.84"/><circle cx="265" cy="14" r="0.7" fill="#fff" opacity="0.60"/><circle cx="523" cy="441" r="0.9" fill="#fff" opacity="0.22"/><circle cx="780" cy="518" r="1.2" fill="#fff" opacity="0.58"/><circle cx="600" cy="46" r="1.6" fill="#fff" opacity="0.30"/><circle cx="550" cy="456" r="0.7" fill="#fff" opacity="0.36"/><circle cx="673" cy="560" r="1.2" fill="#fff" opacity="0.34"/><circle cx="633" cy="223" r="1.2" fill="#fff" opacity="0.30"/><circle cx="686" cy="390" r="0.7" fill="#fff" opacity="0.50"/><circle cx="1029" cy="671" r="0.9" fill="#fff" opacity="0.35"/><circle cx="10" cy="93" r="1.2" fill="#fff" opacity="0.73"/><circle cx="294" cy="409" r="0.7" fill="#fff" opacity="0.44"/><circle cx="613" cy="311" r="0.9" fill="#fff" opacity="0.24"/><circle cx="1083" cy="768" r="0.9" fill="#fff" opacity="0.62"/><circle cx="797" cy="782" r="1.2" fill="#fff" opacity="0.66"/><circle cx="1012" cy="153" r="1.2" fill="#fff" opacity="0.67"/><circle cx="296" cy="44" r="1.6" fill="#fff" opacity="0.67"/><circle cx="1035" cy="142" r="0.7" fill="#fff" opacity="0.73"/><circle cx="1196" cy="728" r="0.9" fill="#fff" opacity="0.24"/><circle cx="85" cy="136" r="1.2" fill="#fff" opacity="0.82"/><circle cx="771" cy="462" r="0.7" fill="#fff" opacity="0.60"/><circle cx="1088" cy="697" r="0.9" fill="#fff" opacity="0.51"/><circle cx="6" cy="467" r="0.7" fill="#fff" opacity="0.68"/><circle cx="1030" cy="548" r="0.7" fill="#fff" opacity="0.62"/><circle cx="135" cy="763" r="1.6" fill="#fff" opacity="0.35"/><circle cx="152" cy="271" r="0.9" fill="#fff" opacity="0.67"/><circle cx="420" cy="236" r="1.6" fill="#fff" opacity="0.51"/><circle cx="783" cy="78" r="1.6" fill="#fff" opacity="0.79"/><circle cx="588" cy="785" r="0.7" fill="#fff" opacity="0.59"/><circle cx="406" cy="79" r="0.9" fill="#fff" opacity="0.40"/><circle cx="623" cy="636" r="0.9" fill="#fff" opacity="0.19"/><circle cx="124" cy="497" r="1.2" fill="#fff" opacity="0.83"/><circle cx="203" cy="708" r="0.9" fill="#fff" opacity="0.63"/><circle cx="595" cy="725" r="1.2" fill="#fff" opacity="0.49"/><circle cx="955" cy="785" r="0.7" fill="#fff" opacity="0.85"/><circle cx="1124" cy="204" r="1.2" fill="#fff" opacity="0.84"/><circle cx="968" cy="17" r="1.2" fill="#fff" opacity="0.49"/><circle cx="1037" cy="460" r="1.2" fill="#fff" opacity="0.44"/><circle cx="431" cy="76" r="0.7" fill="#fff" opacity="0.27"/><circle cx="1073" cy="268" r="1.2" fill="#fff" opacity="0.27"/><circle cx="1041" cy="286" r="0.7" fill="#fff" opacity="0.65"/><circle cx="473" cy="509" r="1.6" fill="#fff" opacity="0.44"/><circle cx="325" cy="3" r="1.6" fill="#fff" opacity="0.64"/><circle cx="830" cy="309" r="0.9" fill="#fff" opacity="0.46"/><circle cx="770" cy="323" r="0.7" fill="#fff" opacity="0.74"/><circle cx="3" cy="332" r="1.2" fill="#fff" opacity="0.74"/><circle cx="245" cy="200" r="0.7" fill="#fff" opacity="0.78"/><circle cx="593" cy="259" r="1.2" fill="#fff" opacity="0.22"/><circle cx="799" cy="603" r="0.7" fill="#fff" opacity="0.42"/><circle cx="876" cy="773" r="1.2" fill="#fff" opacity="0.75"/><circle cx="574" cy="104" r="0.7" fill="#fff" opacity="0.74"/><circle cx="584" cy="650" r="0.9" fill="#fff" opacity="0.35"/><circle cx="544" cy="446" r="1.2" fill="#fff" opacity="0.31"/><circle cx="764" cy="438" r="0.7" fill="#fff" opacity="0.72"/><circle cx="819" cy="567" r="0.9" fill="#fff" opacity="0.66"/><circle cx="101" cy="749" r="1.6" fill="#fff" opacity="0.48"/><circle cx="283" cy="659" r="1.2" fill="#fff" opacity="0.51"/><circle cx="1126" cy="130" r="0.9" fill="#fff" opacity="0.50"/><circle cx="703" cy="288" r="1.2" fill="#fff" opacity="0.35"/><circle cx="532" cy="415" r="0.9" fill="#fff" opacity="0.38"/><circle cx="1141" cy="684" r="1.6" fill="#fff" opacity="0.26"/><circle cx="331" cy="76" r="0.9" fill="#fff" opacity="0.52"/><circle cx="1018" cy="563" r="0.9" fill="#fff" opacity="0.48"/><circle cx="681" cy="777" r="1.6" fill="#fff" opacity="0.47"/><circle cx="1121" cy="197" r="0.9" fill="#fff" opacity="0.24"/><circle cx="700" cy="569" r="0.7" fill="#fff" opacity="0.39"/><circle cx="754" cy="264" r="0.9" fill="#fff" opacity="0.77"/><circle cx="845" cy="392" r="1.6" fill="#fff" opacity="0.68"/><circle cx="430" cy="385" r="1.2" fill="#fff" opacity="0.41"/><circle cx="127" cy="510" r="1.2" fill="#fff" opacity="0.56"/><circle cx="737" cy="128" r="0.9" fill="#fff" opacity="0.24"/><circle cx="508" cy="393" r="1.6" fill="#fff" opacity="0.61"/><circle cx="884" cy="319" r="0.7" fill="#fff" opacity="0.27"/><circle cx="870" cy="726" r="1.6" fill="#fff" opacity="0.83"/><circle cx="1003" cy="0" r="0.7" fill="#fff" opacity="0.44"/><circle cx="1081" cy="479" r="1.6" fill="#fff" opacity="0.35"/><circle cx="223" cy="229" r="0.9" fill="#fff" opacity="0.28"/><circle cx="223" cy="739" r="1.6" fill="#fff" opacity="0.24"/><circle cx="80" cy="1" r="0.9" fill="#fff" opacity="0.34"/><circle cx="76" cy="660" r="1.2" fill="#fff" opacity="0.82"/><circle cx="515" cy="540" r="1.6" fill="#fff" opacity="0.65"/><circle cx="229" cy="101" r="0.7" fill="#fff" opacity="0.38"/><circle cx="1193" cy="196" r="1.6" fill="#fff" opacity="0.35"/><circle cx="2" cy="10" r="1.2" fill="#fff" opacity="0.85"/><circle cx="570" cy="323" r="0.9" fill="#fff" opacity="0.50"/><circle cx="480" cy="560" r="0.9" fill="#fff" opacity="0.20"/><circle cx="843" cy="721" r="1.2" fill="#fff" opacity="0.22"/><circle cx="397" cy="510" r="1.6" fill="#fff" opacity="0.23"/><circle cx="466" cy="683" r="1.6" fill="#fff" opacity="0.80"/><circle cx="464" cy="504" r="0.7" fill="#fff" opacity="0.65"/><circle cx="861" cy="371" r="1.6" fill="#fff" opacity="0.31"/><circle cx="598" cy="756" r="0.7" fill="#fff" opacity="0.32"/><circle cx="410" cy="319" r="0.9" fill="#fff" opacity="0.33"/><circle cx="453" cy="271" r="1.2" fill="#fff" opacity="0.25"/><circle cx="1015" cy="624" r="0.9" fill="#fff" opacity="0.78"/><circle cx="993" cy="427" r="0.7" fill="#fff" opacity="0.82"/><circle cx="299" cy="402" r="0.7" fill="#fff" opacity="0.32"/><circle cx="290" cy="425" r="0.7" fill="#fff" opacity="0.66"/><circle cx="377" cy="402" r="1.6" fill="#fff" opacity="0.78"/><circle cx="643" cy="750" r="0.7" fill="#fff" opacity="0.85"/><circle cx="339" cy="337" r="0.9" fill="#fff" opacity="0.30"/><circle cx="1074" cy="764" r="1.6" fill="#fff" opacity="0.20"/><circle cx="775" cy="382" r="1.2" fill="#fff" opacity="0.48"/><circle cx="223" cy="2" r="0.7" fill="#fff" opacity="0.37"/><circle cx="719" cy="430" r="0.7" fill="#fff" opacity="0.56"/><circle cx="424" cy="389" r="1.2" fill="#fff" opacity="0.70"/><circle cx="632" cy="442" r="0.7" fill="#fff" opacity="0.21"/><circle cx="969" cy="200" r="1.2" fill="#fff" opacity="0.54"/><circle cx="914" cy="197" r="1.2" fill="#fff" opacity="0.42"/><circle cx="971" cy="31" r="1.6" fill="#fff" opacity="0.35"/><circle cx="828" cy="41" r="1.6" fill="#fff" opacity="0.20"/><circle cx="128" cy="63" r="1.2" fill="#fff" opacity="0.31"/><circle cx="128" cy="620" r="1.2" fill="#fff" opacity="0.42"/><circle cx="686" cy="631" r="0.7" fill="#fff" opacity="0.36"/><circle cx="648" cy="282" r="1.2" fill="#fff" opacity="0.18"/><circle cx="133" cy="24" r="0.9" fill="#fff" opacity="0.25"/><circle cx="953" cy="794" r="1.6" fill="#fff" opacity="0.71"/><circle cx="880" cy="505" r="0.9" fill="#fff" opacity="0.80"/><circle cx="374" cy="8" r="1.2" fill="#fff" opacity="0.73"/><circle cx="309" cy="621" r="0.9" fill="#fff" opacity="0.40"/><circle cx="654" cy="471" r="1.2" fill="#fff" opacity="0.71"/><circle cx="161" cy="524" r="0.9" fill="#fff" opacity="0.44"/><circle cx="327" cy="253" r="1.6" fill="#fff" opacity="0.22"/><circle cx="69" cy="493" r="1.2" fill="#fff" opacity="0.29"/><circle cx="873" cy="107" r="0.7" fill="#fff" opacity="0.36"/><circle cx="172" cy="213" r="0.7" fill="#fff" opacity="0.46"/><circle cx="915" cy="177" r="0.9" fill="#fff" opacity="0.27"/><circle cx="943" cy="635" r="0.9" fill="#fff" opacity="0.68"/><circle cx="248" cy="798" r="1.2" fill="#fff" opacity="0.38"/><circle cx="1160" cy="274" r="1.2" fill="#fff" opacity="0.35"/><circle cx="533" cy="203" r="1.6" fill="#fff" opacity="0.35"/><circle cx="502" cy="241" r="0.9" fill="#fff" opacity="0.37"/><circle cx="1184" cy="192" r="1.2" fill="#fff" opacity="0.22"/><circle cx="515" cy="251" r="0.9" fill="#fff" opacity="0.62"/><circle cx="205" cy="669" r="1.6" fill="#fff" opacity="0.84"/><circle cx="209" cy="4" r="1.6" fill="#fff" opacity="0.77"/><circle cx="473" cy="459" r="1.2" fill="#fff" opacity="0.21"/><circle cx="601" cy="238" r="0.7" fill="#fff" opacity="0.21"/><circle cx="1194" cy="198" r="0.7" fill="#fff" opacity="0.43"/><circle cx="364" cy="459" r="1.2" fill="#fff" opacity="0.70"/><circle cx="12" cy="108" r="1.2" fill="#fff" opacity="0.33"/><circle cx="755" cy="348" r="0.9" fill="#fff" opacity="0.21"/></g>
+    <ellipse cx="600" cy="330" rx="420" ry="300" fill="url(#halo)"/>
+    <g transform="translate(600,330)">
+      <ellipse rx="330" ry="86" fill="none" stroke="#ffc46b" stroke-width="10" opacity=".30"/>
+      <ellipse rx="300" ry="74" fill="none" stroke="#ffd9a0" stroke-width="4" opacity=".45"/>
+      <circle r="230" fill="url(#disc)"/>
+      <circle r="120" fill="#000"/>
+      <ellipse rx="330" ry="86" fill="none" stroke="#ffb648" stroke-width="2" opacity=".55"/>
+      <path d="M-330 0 A330 86 0 0 0 330 0" fill="none" stroke="#ffe0b0" stroke-width="3" opacity=".5"/>
     </g>
   </svg>`;
-  const spots=[[3,10,78],[80,16,58],[7,60,54],[72,66,70],[42,84,46],[26,30,40],[60,40,38],[88,74,44]];
-  d.innerHTML+=spots.map(([x,y,s])=>PUFFIN(s).replace('<svg ','<svg class="floater" style="left:'+x+'%;top:'+y+'%" ')).join('');
-  document.body.insertBefore(d, document.body.firstChild);
+  document.body.appendChild(d);
 }
 
 /* ================= STORAGE ================= */
@@ -1070,20 +1041,20 @@ function isFlagEmoji(s){ return /^[\u{1F1E6}-\u{1F1FF}]{2}$/u.test(s); }
 
 /* ================= PROFILE SCREENS ================= */
 function screenProfiles(){
-  let html = `<h1><span class="pufflogo">${PUFFIN(38)}</span>Puffin Medical</h1><p class="sub">Specialist revision — radiology, physics, anatomy and practice</p><div class="card profile-list"><h2>Who's playing?</h2>`;
+  let html = `<h1><span class="pufflogo">${PUFFIN(38)}</span>Puffin Medical</h1><p class="sub">Specialist revision · radiology, imaging physics, anatomy and practice</p><div class="card profile-list"><h2>Who is revising?</h2>`;
   profiles.forEach((p,i)=>{
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink">v1 · Puffin Medical · 639 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink">v43 · Quizzical Puffin · 8,611 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
   let selAv = AVATARS[0];
-  app.innerHTML = `<h1>Puffin Medical</h1><div class="card"><h2>Pick your avatar</h2>
+  app.innerHTML = `<h1>Puffin Medical</h1><div class="card"><h2>Choose an avatar</h2>
     <div class="avatars" id="avs">${AVATARS.map(a=>`<button data-a="${a}" class="${a===selAv?'sel':''}">${a}</button>`).join("")}</div>
     <input type="text" id="pname" maxlength="12" placeholder="Type your name">
-    <button class="btn primary center" id="mkbtn">Let's Go! 🚀</button>
+    <button class="btn primary center" id="mkbtn">Begin</button>
     <button class="btn ghost center" onclick="screenProfiles()">Back</button></div>`;
   $("#avs").addEventListener("click",e=>{
     const b=e.target.closest("button"); if(!b) return;
@@ -1106,8 +1077,8 @@ function screenHome(){
   const p=profiles[curP];
   let html = `
   <div class="topbar"><span class="pill">${p.avatar} ${esc(p.name)}</span><span class="pill">⭐ ${p.points} pts</span></div>
-  <div class="card"><h2>Pick a topic</h2>
-    <button class="btn primary" onclick="startRound('mix')">🎲 Mix It Up! <small style="opacity:.7;font-weight:600"> · all topics</small></button>
+  <div class="card"><h2>Choose a topic</h2>
+    <button class="btn primary" onclick="startRound('mix')">◎ Random mix <small style="opacity:.7;font-weight:600"> · all topics</small></button>
     ${GROUPS.map(g=>{
       const avail=g.cats.filter(k=>CATS[k]&&DATA[sel.level]&&DATA[sel.level][k]&&DATA[sel.level][k].length);
       if(!avail.length) return "";
@@ -1115,9 +1086,9 @@ function screenHome(){
     }).join("")}
   </div>
   <div class="row">
-    <button class="btn ghost center" onclick="screenBadges()">🏅 Badges</button>
-    <button class="btn ghost center" onclick="toggleSound()">${soundOn?"🔊 Sound On":"🔇 Sound Off"}</button>
-    <button class="btn ghost center" onclick="screenProfiles()">👥 Switch</button>
+    <button class="btn ghost center" onclick="screenBadges()">◆ Progress</button>
+    <button class="btn ghost center" onclick="toggleSound()">${soundOn?"♪ Sound on":"♪ Sound off"}</button>
+    <button class="btn ghost center" onclick="screenProfiles()">⇄ Switch user</button>
   </div>`;
   app.innerHTML=html;
 }
@@ -1131,7 +1102,7 @@ function screenBadges(){
   <div class="card"><div class="badges">
     ${BADGES.map(b=>`<div class="badge ${p.badges.includes(b.id)?'':'locked'}"><div class="i">${b.i}</div><div class="n">${b.n}</div><div class="n" style="opacity:.7;font-weight:500">${b.d}</div></div>`).join("")}
   </div></div>
-  <button class="btn primary center" onclick="screenHome()">Back to Revision</button>`;
+  <button class="btn primary center" onclick="screenHome()">Back to revision</button>`;
 }
 
 /* ================= QUIZ ================= */
@@ -1244,10 +1215,10 @@ function finishRound(){
   grantIf("allcats", p.cats.length>=20);
   save("qpmed_profiles",profiles);
   const pct=round.correct/ROUND_LEN;
-  const [em,txt] = pct===1?["🏆","PERFECT! You're a superstar!"]
-    : pct>=0.75?["🎉","Amazing job, explorer!"]
-    : pct>=0.5?["😃","Great effort — keep exploring!"]
-    : ["🌱","Good try! Every explorer starts somewhere!"];
+  const [em,txt] = pct===1?["🏆","Clean sweep — every one correct."]
+    : pct>=0.75?["🎉","Strong set."]
+    : pct>=0.5?["😃","Solid — worth another set."]
+    : ["🌱","Worth reviewing this topic."];
   if(pct>=0.75) confetti();
   app.innerHTML = `
   <h1>Round Complete!</h1>
