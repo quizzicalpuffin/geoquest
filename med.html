@@ -1075,6 +1075,57 @@ function screenCredits(){
   '</div><button class="btn primary center" onclick="screenHome()">Back to revision</button>';
 }
 
+
+/* ================= REVISION INSIGHTS ================= */
+let _taps=0,_tapT=0;
+function tapVersion(){
+  const now=Date.now();
+  if(now-_tapT>1500) _taps=0;
+  _tapT=now; _taps++;
+  if(_taps>=5){ _taps=0; screenInsights(); }
+}
+function screenInsights(){
+  const st=load("qpmed_stats",{});
+  const rows=Object.entries(st).filter(([k])=>CATS[k]).map(([k,v])=>({
+    name:CATS[k].name, emoji:CATS[k].emoji, r:v.r||0, q:v.q||0, c:v.c||0,
+    acc:v.q?Math.round(100*v.c/v.q):null, last:v.last||0, by:v.by||{}
+  })).sort((a,b)=>b.r-a.r);
+  const totR=rows.reduce((a,b)=>a+b.r,0), totQ=rows.reduce((a,b)=>a+b.q,0), totC=rows.reduce((a,b)=>a+b.c,0);
+  const max=rows.length?Math.max(...rows.map(r=>r.r)):1;
+  const fmt=t=>t?new Date(t).toLocaleDateString():"—";
+  const weakest=rows.filter(r=>r.q>=8).sort((a,b)=>a.acc-b.acc).slice(0,6);
+  const untouched=Object.keys(CATS).filter(k=>k!=='mix'&&!st[k]).map(k=>CATS[k].name);
+  app.innerHTML=`<h1>Insights</h1>
+  <p class="sub">${totR} sets · ${totQ} questions · ${totQ?Math.round(100*totC/totQ):0}% correct overall</p>
+  ${rows.length?`
+   <div class="card"><h2>Most revised</h2>
+    ${rows.slice(0,20).map(r=>`
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:.95rem">
+          <span>${esc(r.name)}</span><span style="opacity:.75">${r.r} ${r.r===1?"set":"sets"}${r.acc!==null?" · "+r.acc+"%":""}</span>
+        </div>
+        <div style="height:8px;background:rgba(140,170,255,.16);border-radius:4px;overflow:hidden;margin-top:4px">
+          <div style="height:100%;width:${Math.max(4,Math.round(100*r.r/max))}%;background:linear-gradient(90deg,#ffb648,#ff8a3d)"></div>
+        </div>
+      </div>`).join("")}
+   </div>
+   ${weakest.length?`<div class="card"><h2>Weakest topics</h2>
+     <p class="sub" style="margin-top:-6px">Lowest accuracy, minimum eight questions attempted</p>
+     ${weakest.map(r=>`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>${esc(r.name)}</span><span style="opacity:.75">${r.acc}% of ${r.q}</span></div>`).join("")}
+   </div>`:''}
+   <div class="card"><h2>Not yet attempted</h2>
+     ${untouched.length?untouched.map(n=>`<div style="opacity:.8;margin-bottom:5px">${esc(n)}</div>`).join(""):"<p class='sub'>Every topic has been opened.</p>"}
+   </div>
+   <div class="card"><h2>Last opened</h2>
+     ${rows.slice().sort((a,b)=>b.last-a.last).slice(0,8).map(r=>`<div style="display:flex;justify-content:space-between;font-size:.92rem;margin-bottom:5px"><span>${esc(r.name)}</span><span style="opacity:.7">${fmt(r.last)}</span></div>`).join("")}
+   </div>`
+  :`<div class="card"><p class="sub">No sets completed yet.</p></div>`}
+  <div class="row">
+    <button class="btn ghost center" onclick="if(confirm('Clear all revision data?')){save('qpmed_stats',{});screenInsights();}">Reset data</button>
+    <button class="btn primary center" onclick="screenHome()">Done</button>
+  </div>`;
+}
+
 const ROUND_LEN = 8;
 
 const PUFFIN=(s)=>`<svg width="${s}" height="${s}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -1170,7 +1221,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New user</button></div>
-  <div class="footerlink">v3 · Puffin Medical · 733 questions · Add to Home Screen in Safari to run it as an app</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v4 · Puffin Medical · 733 questions · Add to Home Screen in Safari to run it as an app</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -1264,6 +1315,12 @@ function gateCheck(){
 }
 function startRound(cat){
   sel.cat=cat;
+  try{ const st=load("qpmed_stats",{}); const k=cat;
+       st[k]=st[k]||{r:0,q:0,c:0};
+       st[k].r++; st[k].last=Date.now();
+       const who=(profiles[curP]&&profiles[curP].name)||"?";
+       st[k].by=st[k].by||{}; st[k].by[who]=(st[k].by[who]||0)+1;
+       save("qpmed_stats",st); }catch(e){}
   const bank = cat==="mix"
     ? shuffle([].concat(...Object.values(DATA[sel.level])))
     : shuffle(DATA[sel.level][cat]);
@@ -1293,6 +1350,10 @@ function showQuestion(){
 }
 function answer(btn, right, q){
   round.answered=true;
+  try{ const st=load("qpmed_stats",{}); const k=sel.cat;
+       st[k]=st[k]||{r:0,q:0,c:0};
+       st[k].q++; if(right) st[k].c++;
+       save("qpmed_stats",st); }catch(e){}
   const p=profiles[curP];
   document.querySelectorAll("#opts .btn").forEach(b=>{
     b.disabled=true;
