@@ -160,6 +160,16 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
 .pennet{transform-box:view-box;transform-origin:200px 208px}
 .pennet.ripple{animation:netbulge .55s ease-out}
 @keyframes netbulge{0%{transform:none}35%{transform:scaleY(1.07) scaleX(1.015)}100%{transform:none}}
+/* power meter — the green band is the sweet spot, the amber tail is too much */
+.powerwrap{margin:.1em 0 .2em}
+.powertrack{position:relative;height:16px;border-radius:8px;overflow:hidden;border:2px solid var(--line);
+  background:linear-gradient(90deg,
+    #E4DAC2 0 34.4%, #BFE0CB 34.4% 65.6%, #E4DAC2 65.6% 84.4%, #F0C9A6 84.4% 100%)}
+.powertrack i{display:block;height:100%;width:0;background:var(--pitch);transition:width .05s linear}
+.powertrack i.weak{background:#9AA8A0}
+.powertrack i.good{background:var(--good)}
+.powertrack i.over{background:var(--miss)}
+.powerlabel{display:flex;justify-content:space-between;font-size:.8em;font-weight:700;color:var(--ink-soft);margin-top:3px}
 .penres{font-size:1.45em;font-weight:800;text-align:center;margin:.35em 0 .1em}
 .penres.scored{color:var(--good)}
 .penres.saved{color:var(--miss)}
@@ -495,6 +505,10 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
         <circle cx="200" cy="272" r="2.6" fill="rgba(255,255,255,.85)"/>
         <g class="pball" id="penBall" style="transform:translate(200px,272px)"><use href="#ballArt2"/></g>
       </svg>
+    </div>
+    <div class="powerwrap">
+      <div class="powertrack"><i id="penPowerFill"></i></div>
+      <div class="powerlabel"><span id="penPowerTxt">Power</span></div>
     </div>
     <div class="penres" id="penRes">&nbsp;</div>
   </div>
@@ -1124,10 +1138,12 @@ function startMatch(mode, level){
 
   $("clockTxt").textContent = "";
   if(S.opts.clock){
-    M.timer=setInterval(function(){
-      var s=((Date.now()-M.t0)/1000)|0;
-      $("clockTxt").textContent = ((s/60)|0)+"′";
-    },1000);
+    var tick=function(){
+      var s=((Date.now()-M.t0)/1000)|0, mm=(s/60)|0, ss=s%60;
+      $("clockTxt").textContent = mm+":"+(ss<10?"0":"")+ss;
+    };
+    tick();                       // draw straight away, not a second later
+    M.timer=setInterval(tick,1000);
   }
   show("scMatch");
   renderQuestion();
@@ -1338,10 +1354,48 @@ function penKeeperPick(shot){
   }
   return zones[(Math.random()*zones.length)|0];
 }
-function penIsSaved(shot,keep){
-  if(shot===keep) return Math.random() < PEN_TUNING.sameZone[shot];
-  if((PEN_ADJ[shot]||[]).indexOf(keep)>=0) return Math.random() < PEN_TUNING.adjacent;
-  return Math.random() < PEN_TUNING.wrong;
+function penIsSaved(shot,keep,power){
+  var base;
+  if(shot===keep) base = PEN_TUNING.sameZone[shot];
+  else if((PEN_ADJ[shot]||[]).indexOf(keep)>=0) base = PEN_TUNING.adjacent;
+  else base = PEN_TUNING.wrong;
+  base *= powerMult(power==null?0.7:power);
+  return Math.random() < Math.min(base, 0.95);
+}
+
+/* Power bands, FC style. A weak shot is easy to save; the sweet spot beats
+   the keeper more often; belting it is only slightly worse than the sweet
+   spot, but past 100% it clears the bar entirely (handled in shoot). */
+/* The sweet band is deliberately wide and "over the bar" needs a really big
+   swipe. Swiping further also sharpens his aim, so a narrow band would have
+   pulled in two directions at once. */
+var PEN_POWER = { weak:0.34, sweetLo:0.55, sweetHi:1.05, max:1.35, scale:1.6 };
+function powerMult(p){
+  if(p < PEN_POWER.weak)    return 1.45;
+  if(p < PEN_POWER.sweetLo) return 1.15;
+  if(p <= PEN_POWER.sweetHi) return 0.80;
+  return 0.95;
+}
+function powerBand(p){
+  if(p > PEN_POWER.max)     return "over";
+  if(p < PEN_POWER.weak)    return "weak";
+  if(p >= PEN_POWER.sweetLo && p <= PEN_POWER.sweetHi) return "good";
+  return "";
+}
+var POWER_WORD = { weak:"Too soft", good:"Perfect", over:"Too much!", "":"OK" };
+
+/* Full power needs a swipe of roughly half the pitch graphic's height —
+   comfortable on a phone, and tapping a corner gives a safe 0.7 by default. */
+function powerFromDrag(dx,dy,h){
+  var dist=Math.sqrt(dx*dx+dy*dy);
+  return Math.min(dist/(h*0.45), PEN_POWER.scale);
+}
+function showPower(p){
+  var band=powerBand(p);
+  var fill=$("penPowerFill");
+  fill.style.width=Math.min(p/PEN_POWER.scale,1)*100+"%";
+  fill.className=band;
+  $("penPowerTxt").textContent = p<=0.02 ? "Power" : POWER_WORD[band];
 }
 
 var PEN = { live:false, done:null, startPt:null, aim:null, timer:null, result:false };
@@ -1357,7 +1411,9 @@ function penReset(){
   for(var i=0;i<t.length;i++) t[i].classList.remove("hot");
   $("penNet").classList.remove("ripple");
   $("penRes").innerHTML="&nbsp;"; $("penRes").className="penres";
-  $("penMsg").textContent="Swipe from the ball towards a corner of the net. Or just tap the corner you want.";
+  b.style.transitionDuration="";
+  PEN.power=0; showPower(0);
+  $("penMsg").textContent="Swipe from the ball to a corner. The further you swipe, the harder you hit it.";
 }
 function takePenalty(cb){
   PEN.done=cb; PEN.live=true;
@@ -1368,23 +1424,35 @@ function highlight(z){
   var t=$("penField").querySelectorAll(".ptarget");
   for(var i=0;i<t.length;i++) t[i].classList.toggle("hot", t[i].getAttribute("data-zone")===z);
 }
-function shoot(zone){
+function shoot(zone, power){
   if(!PEN.live) return;
   PEN.live=false;
-  highlight(zone);
+  if(power==null) power=0.7;            // a plain tap gets a safe, solid strike
+  highlight(zone); showPower(power);
   S.pens.taken++; S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;
 
+  var over = power > PEN_POWER.max;
   var keep=penKeeperPick(zone);
-  var saved=penIsSaved(zone,keep);
+  var saved = over ? false : penIsSaved(zone,keep,power);
   var k=$("penKeeper"), b=$("penBall");
 
   placeAt(k, PEN_POS[keep]);
   if(PEN_POS[keep].x < 190) k.classList.add("dive-l");
   else if(PEN_POS[keep].x > 210) k.classList.add("dive-r");
   else k.classList.add("dive-u");
-  placeAt(b, PEN_POS[zone], 0.85);
+  // harder strikes travel faster
+  b.style.transitionDuration = (0.46 - Math.min(power,1)*0.20)+"s";
+  if(over) placeAt(b, {x:PEN_POS[zone].x, y:-30}, 0.7);
+  else placeAt(b, PEN_POS[zone], 0.85);
 
   setTimeout(function(){
+    if(over){
+      $("penRes").textContent="OVER THE BAR!"; $("penRes").className="penres saved";
+      $("penMsg").textContent="Too much power — ease off a little next time.";
+      save(); PEN.result=false;
+      PEN.timer=setTimeout(penDismiss, 1300);
+      return;
+    }
     if(saved){
       placeAt(b, {x:(PEN_POS[keep].x<200?30:370), y:250}, 0.7);
       $("penRes").textContent="SAVED!"; $("penRes").className="penres saved";
@@ -1425,14 +1493,17 @@ function penDismiss(){
   f.addEventListener("pointermove", function(ev){
     if(!PEN.live || !PEN.startPt) return;
     var p=localPt(ev);
-    var z=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
-    PEN.aim=z; highlight(z);
+    var dx=p.x-PEN.startPt.x, dy=p.y-PEN.startPt.y;
+    var z=penZoneFromSwipe(dx,dy);
+    PEN.aim=z; PEN.power=powerFromDrag(dx,dy,p.h);
+    highlight(z); showPower(PEN.power);
     ev.preventDefault();
   });
   f.addEventListener("pointerup", function(ev){
     if(!PEN.live || !PEN.startPt) return;
     var p=localPt(ev);
     var dx=p.x-PEN.startPt.x, dy=p.y-PEN.startPt.y;
+    var pw=powerFromDrag(dx,dy,p.h);
     var z=penZoneFromSwipe(dx,dy);
     if(!z){
       // treat a plain tap as "aim where I tapped"
@@ -1441,13 +1512,15 @@ function penDismiss(){
         var d=Math.pow(PEN_POS[key].x-sx,2)+Math.pow(PEN_POS[key].y-sy,2);
         if(d<bd){ bd=d; best=key; }
       }
-      if(best && bd < 70*70) z=best;   // only if the tap is near a target
+      if(best && bd < 70*70){ z=best; pw=null; }  // tapping gets the safe default power
     }
     PEN.startPt=null;
-    if(z) shoot(z); else { highlight(null); $("penMsg").textContent="Scuffed it — swipe a bit further towards a corner."; }
+    if(z) shoot(z, pw);
+    else { highlight(null); showPower(0);
+           $("penMsg").textContent="Scuffed it — swipe a bit further towards a corner."; }
     ev.preventDefault();
   });
-  f.addEventListener("pointercancel", function(){ PEN.startPt=null; highlight(null); });
+  f.addEventListener("pointercancel", function(){ PEN.startPt=null; highlight(null); showPower(0); });
 
   // tap anywhere once it's resolved to skip the celebration
   $("penWrap").addEventListener("click", function(){ if(!PEN.live && PEN.done) penDismiss(); });
