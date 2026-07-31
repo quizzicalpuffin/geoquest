@@ -61,6 +61,9 @@ h3{font-size:1.05em}
 .btn.primary{background:var(--pitch);border-color:var(--pitch-dk);color:#fff;text-align:center;font-weight:700}
 .btn.gold{background:var(--gold);border-color:#C4870B;color:#3A2A00;text-align:center;font-weight:700}
 .btn.ghost{text-align:center}
+.gamebtn{display:block}
+.gamebtn b{display:block;font-size:1.05em}
+.gamebtn span{display:block;font-size:.85em;color:var(--ink-soft);margin-top:2px}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .row .btn{flex:1 1 0;min-width:130px}
 .pill{display:inline-block;background:var(--bg);border:2px solid var(--line);border-radius:999px;padding:3px 11px;font-size:.8em;font-weight:700}
@@ -94,6 +97,13 @@ h3{font-size:1.05em}
 .opt.right{border-color:var(--good);background:#E4F1E8}
 .opt.wrongpick{border-color:var(--miss);background:#FBEADB}
 .opt .tick{float:right;font-weight:800}
+.letterrow{display:flex;flex-wrap:wrap;gap:8px}
+.lettbtn{font:inherit;font-size:1.6em;font-weight:800;letter-spacing:0;
+  min-width:52px;height:60px;padding:0 10px;background:var(--panel);color:var(--ink);
+  border:2px solid var(--line);border-radius:12px;cursor:pointer;transition:transform .08s,border-color .12s,background .12s}
+.lettbtn:active{transform:scale(.96)}
+.lettbtn.right{border-color:var(--good);background:#E4F1E8}
+.lettbtn.wrongpick{border-color:var(--miss);background:#FBEADB}
 .feedback{border-radius:14px;padding:14px 16px;margin:4px 0 12px;border:2px solid}
 .feedback.ok{background:#E4F1E8;border-color:var(--good)}
 .feedback.no{background:#FBEADB;border-color:var(--miss)}
@@ -207,11 +217,13 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       </svg>
     </div>
     <div class="card">
-      <h1>Pick your match</h1>
+      <h1>Pick your game</h1>
       <p class="muted">12 attacks. Three correct in a row wins a penalty — swipe to pick your corner.</p>
-      <button class="btn primary" data-level="1">Academy &nbsp;·&nbsp; easier words</button>
-      <button class="btn primary" data-level="2">First Team &nbsp;·&nbsp; mixed</button>
-      <button class="btn primary" data-level="3">Champions League &nbsp;·&nbsp; hardest</button>
+      <button class="btn gamebtn" data-mode="syn"><b>Synonyms</b><span>Words that mean the same</span></button>
+      <button class="btn gamebtn" data-mode="ant"><b>Opposites</b><span>Words that mean the reverse</span></button>
+      <button class="btn gamebtn" data-mode="tricky"><b>Tricky Words</b><span>Words you cannot sound out</span></button>
+      <button class="btn gamebtn" data-mode="spell"><b>Set Pieces</b><span>Spelling rules that catch people out</span></button>
+      <button class="btn gamebtn" data-mode="sent"><b>Build the Move</b><span>Joining sentences that make sense</span></button>
     </div>
     <div class="card" id="seasonCard">
       <h2>Your season</h2>
@@ -221,6 +233,18 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       <button class="btn ghost" id="btnSquad">Squad list</button>
       <button class="btn ghost" id="btnParent">Parent zone</button>
     </div>
+  </section>
+
+  <!-- ================= LEVEL ================= -->
+  <section class="screen" id="scLevel">
+    <div class="card">
+      <h1 id="lvTitle">Synonyms</h1>
+      <p class="muted" id="lvSub"></p>
+      <button class="btn primary" data-level="1">Academy &nbsp;·&nbsp; easier</button>
+      <button class="btn primary" data-level="2">First Team &nbsp;·&nbsp; mixed</button>
+      <button class="btn primary" data-level="3">Champions League &nbsp;·&nbsp; hardest</button>
+    </div>
+    <button class="btn ghost" id="btnHomeLevel">Back</button>
   </section>
 
   <!-- ================= MATCH ================= -->
@@ -314,7 +338,11 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       <div id="parentSummary"></div>
     </div>
     <div class="card">
-      <h2>Weakest words</h2>
+      <h2>By game</h2>
+      <div id="parentByMode"></div>
+    </div>
+    <div class="card">
+      <h2>Weakest items</h2>
       <p class="muted small">Sorted by accuracy. These are the ones worth revisiting out loud.</p>
       <div id="parentWeak"></div>
     </div>
@@ -575,6 +603,254 @@ const SQUAD = [
 {w:"wrong",t:1,y:["incorrect","inaccurate","mistaken","erroneous","improper"],s:"He got the answer wrong."}
 ];
 
+/* ---- ANTONYMS: Rita's next step once the synonyms are learned ---- */
+const OPPOSITES = [
+{w:"amazing",t:2,a:["ordinary","unremarkable","dull"]},
+{w:"angry",t:1,a:["calm","pleased","content"]},
+{w:"answer",t:1,a:["question","ask"]},
+{w:"awful",t:1,a:["wonderful","lovely","excellent"]},
+{w:"bad",t:1,a:["good","fine","excellent"]},
+{w:"beautiful",t:1,a:["ugly","hideous","plain"]},
+{w:"begin",t:1,a:["end","finish","stop"]},
+{w:"big",t:1,a:["small","tiny","little"]},
+{w:"brave",t:2,a:["cowardly","fearful","timid"]},
+{w:"break",t:1,a:["mend","fix","repair"]},
+{w:"bright",t:2,a:["dull","dim","gloomy"]},
+{w:"calm",t:2,a:["stormy","wild","frantic"]},
+{w:"come",t:1,a:["go","leave","depart"]},
+{w:"cool",t:1,a:["warm","hot","boiling"]},
+{w:"crooked",t:2,a:["straight","level"]},
+{w:"cry",t:1,a:["laugh","giggle","chuckle"]},
+{w:"dangerous",t:2,a:["safe","harmless","secure"]},
+{w:"dark",t:1,a:["bright","light","sunny"]},
+{w:"definite",t:3,a:["uncertain","doubtful","unsure"]},
+{w:"delicious",t:2,a:["disgusting","tasteless","revolting"]},
+{w:"destroy",t:2,a:["build","create","construct"]},
+{w:"difference",t:3,a:["similarity","likeness","sameness"]},
+{w:"dull",t:2,a:["exciting","fascinating","lively"]},
+{w:"eager",t:3,a:["reluctant","unwilling","hesitant"]},
+{w:"end",t:1,a:["begin","start","commence"]},
+{w:"enjoy",t:1,a:["hate","loathe","detest"]},
+{w:"fair",t:2,a:["unfair","biased","unjust"]},
+{w:"fall",t:1,a:["rise","climb","ascend"]},
+{w:"false",t:2,a:["true","genuine","real"]},
+{w:"famous",t:2,a:["unknown","obscure","forgotten"]},
+{w:"fast",t:1,a:["slow","sluggish","unhurried"]},
+{w:"fat",t:1,a:["thin","slim","skinny"]},
+{w:"fear",t:2,a:["courage","bravery","confidence"]},
+{w:"funny",t:1,a:["serious","solemn","grave"]},
+{w:"get",t:1,a:["give","lose","surrender"]},
+{w:"go",t:1,a:["stay","remain","arrive"]},
+{w:"good",t:1,a:["bad","evil","poor"]},
+{w:"happy",t:1,a:["sad","miserable","gloomy"]},
+{w:"hate",t:1,a:["love","adore","cherish"]},
+{w:"help",t:2,a:["hinder","obstruct","block"]},
+{w:"hide",t:1,a:["show","reveal","display"]},
+{w:"hurry",t:2,a:["dawdle","dally","linger"]},
+{w:"hurt",t:1,a:["heal","soothe","comfort"]},
+{w:"important",t:2,a:["trivial","minor","unimportant"]},
+{w:"interesting",t:3,a:["boring","tedious","dreary"]},
+{w:"keep",t:1,a:["lose","discard","abandon"]},
+{w:"lazy",t:2,a:["hardworking","energetic","industrious"]},
+{w:"little",t:1,a:["big","huge","enormous"]},
+{w:"love",t:1,a:["hate","loathe","despise"]},
+{w:"make",t:1,a:["destroy","demolish","ruin"]},
+{w:"moody",t:3,a:["cheerful","even-tempered","sunny"]},
+{w:"neat",t:2,a:["messy","untidy","scruffy"]},
+{w:"new",t:1,a:["old","ancient","worn"]},
+{w:"old",t:1,a:["new","modern","fresh"]},
+{w:"popular",t:2,a:["unpopular","disliked","shunned"]},
+{w:"quiet",t:1,a:["loud","noisy","deafening"]},
+{w:"right",t:1,a:["wrong","incorrect","mistaken"]},
+{w:"scared",t:1,a:["brave","fearless","confident"]},
+{w:"show",t:1,a:["hide","conceal","cover"]},
+{w:"slow",t:1,a:["fast","quick","rapid"]},
+{w:"stop",t:1,a:["start","begin","continue"]},
+{w:"strange",t:2,a:["normal","ordinary","familiar"]},
+{w:"take",t:1,a:["give","offer","return"]},
+{w:"trouble",t:2,a:["ease","calm","peace"]},
+{w:"true",t:1,a:["false","untrue","fake"]},
+{w:"ugly",t:2,a:["beautiful","lovely","handsome"]},
+{w:"unhappy",t:1,a:["happy","cheerful","delighted"]},
+{w:"wrong",t:1,a:["right","correct","accurate"]}
+];
+
+/* ---- SPELLING: built from Tom's own Vernon errors.
+   r = rule: 'silent' (thumb->thum, honest->onest, straight->strait)
+             'double' (arrive->arive, million->milon)
+             'end'    (shovel->shuvle, length->lenth, except->exept)
+   sl = the silent letter, for the "ghost player" round. ---- */
+const SPELLS = [
+{w:"thumb",r:"silent",sl:"b",t:1,bad:["thum","thumm"]},
+{w:"lamb",r:"silent",sl:"b",t:1,bad:["lam","lamm"]},
+{w:"comb",r:"silent",sl:"b",t:1,bad:["coam","com"]},
+{w:"climb",r:"silent",sl:"b",t:1,bad:["clime","clim"]},
+{w:"crumb",r:"silent",sl:"b",t:2,bad:["crum","crumm"]},
+{w:"doubt",r:"silent",sl:"b",t:2,bad:["dout","doute"]},
+{w:"honest",r:"silent",sl:"h",t:1,bad:["onest","honnest"]},
+{w:"hour",r:"silent",sl:"h",t:1,bad:["our","howr"]},
+{w:"ghost",r:"silent",sl:"h",t:1,bad:["gost","goast"]},
+{w:"whistle",r:"silent",sl:"t",t:2,bad:["whisle","wissle"]},
+{w:"castle",r:"silent",sl:"t",t:1,bad:["casle","cassle"]},
+{w:"listen",r:"silent",sl:"t",t:1,bad:["lisen","lissen"]},
+{w:"knee",r:"silent",sl:"k",t:1,bad:["nee","kne"]},
+{w:"knife",r:"silent",sl:"k",t:1,bad:["nife","knive"]},
+{w:"knock",r:"silent",sl:"k",t:1,bad:["nock","knok"]},
+{w:"knight",r:"silent",sl:"k",t:2,bad:["nite","knite"]},
+{w:"wrist",r:"silent",sl:"w",t:1,bad:["rist","wrisst"]},
+{w:"write",r:"silent",sl:"w",t:1,bad:["rite","wright"]},
+{w:"wrong",r:"silent",sl:"w",t:1,bad:["rong","wrongg"]},
+{w:"answer",r:"silent",sl:"w",t:1,bad:["anser","ansewer"]},
+{w:"half",r:"silent",sl:"l",t:1,bad:["haf","haff"]},
+{w:"could",r:"silent",sl:"l",t:1,bad:["cood","coud"]},
+{w:"should",r:"silent",sl:"l",t:1,bad:["shood","shoud"]},
+{w:"walk",r:"silent",sl:"l",t:1,bad:["wak","wawk"]},
+{w:"sign",r:"silent",sl:"g",t:2,bad:["sine","syne"]},
+{w:"island",r:"silent",sl:"s",t:2,bad:["iland","ileand"]},
+{w:"science",r:"silent",sl:"c",t:3,bad:["sience","sciance"]},
+{w:"muscle",r:"silent",sl:"c",t:3,bad:["musle","mussle"]},
+{w:"autumn",r:"silent",sl:"n",t:2,bad:["autum","autumm"]},
+{w:"straight",r:"silent",sl:"g",t:2,bad:["strait","strate"]},
+{w:"arrive",r:"double",t:1,bad:["arive","arrivve"]},
+{w:"million",r:"double",t:1,bad:["milion","millon"]},
+{w:"appear",r:"double",t:1,bad:["apear","appeer"]},
+{w:"address",r:"double",t:2,bad:["adress","addres"]},
+{w:"accident",r:"double",t:2,bad:["acident","accidant"]},
+{w:"difficult",r:"double",t:2,bad:["dificult","difficolt"]},
+{w:"suddenly",r:"double",t:2,bad:["sudenly","suddenley"]},
+{w:"village",r:"double",t:1,bad:["vilage","villige"]},
+{w:"message",r:"double",t:1,bad:["mesage","messige"]},
+{w:"traffic",r:"double",t:1,bad:["trafic","traffick"]},
+{w:"common",r:"double",t:1,bad:["comon","commen"]},
+{w:"correct",r:"double",t:1,bad:["corect","correkt"]},
+{w:"occur",r:"double",t:3,bad:["ocur","occurr"]},
+{w:"tomorrow",r:"double",t:2,bad:["tommorow","tomorow"]},
+{w:"beginning",r:"double",t:2,bad:["begining","beginnning"]},
+{w:"shovel",r:"end",t:1,bad:["shuvle","shovle"]},
+{w:"travel",r:"end",t:1,bad:["travle","travell"]},
+{w:"tunnel",r:"end",t:1,bad:["tunnle","tunel"]},
+{w:"model",r:"end",t:1,bad:["modle","modell"]},
+{w:"level",r:"end",t:1,bad:["levle","levell"]},
+{w:"metal",r:"end",t:1,bad:["metle","mettal"]},
+{w:"hospital",r:"end",t:1,bad:["hospitle","hospitel"]},
+{w:"animal",r:"end",t:1,bad:["animle","animel"]},
+{w:"several",r:"end",t:2,bad:["severel","severle"]},
+{w:"terrible",r:"end",t:2,bad:["terrable","terribel"]},
+{w:"possible",r:"end",t:2,bad:["possable","possibel"]},
+{w:"suitable",r:"end",t:2,bad:["sootable","suitible"]},
+{w:"vegetable",r:"end",t:3,bad:["vegetible","vegtable"]},
+{w:"comfortable",r:"end",t:3,bad:["comftable","comfortible"]},
+{w:"length",r:"end",t:1,bad:["lenth","lengh"]},
+{w:"strength",r:"end",t:2,bad:["strenth","strengh"]},
+{w:"twelfth",r:"end",t:3,bad:["twelth","twelvth"]},
+{w:"except",r:"end",t:2,bad:["exept","excpet"]},
+{w:"excellent",r:"end",t:3,bad:["excelent","exellent"]}
+];
+
+/* ---- CONNECTIVES: aimed at Formulated Sentences (SS 10, age equiv 9:07)
+   and specifically at clause-order errors like Tom's
+   "Until the shop opens the girl can buy her bike." ---- */
+const JOINS = [
+{c:"because",t:1,stem:"He was out of breath",a:"because he had sprinted the whole way.",
+ d:["because he was standing still.","because the match had not started.","because he sat on the bench."]},
+{c:"so",t:1,stem:"The pitch was frozen solid,",a:"so the match was called off.",
+ d:["so they played extra time.","so the grass grew quickly.","so he wore his shorts."]},
+{c:"but",t:1,stem:"He took the shot well,",a:"but the keeper tipped it over.",
+ d:["but the ball went in.","but he scored easily.","but the crowd went home."]},
+{c:"although",t:2,stem:"Although he was exhausted,",a:"he kept chasing the ball.",
+ d:["he stopped running.","he sat down straight away.","he went home early."]},
+{c:"until",t:2,stem:"Until the referee blew the whistle,",a:"nobody was allowed to leave the pitch.",
+ d:["everybody went home.","the match was over.","they all had their dinner."]},
+{c:"unless",t:2,stem:"You cannot play on Saturday",a:"unless you come to training first.",
+ d:["unless you are the best player.","unless you want to play.","unless the sun is shining."]},
+{c:"before",t:1,stem:"He always ties his laces",a:"before he runs onto the pitch.",
+ d:["before he takes his boots off.","before he was born.","before the season ended."]},
+{c:"after",t:1,stem:"They shook hands",a:"after the final whistle went.",
+ d:["after the match kicked off.","after they arrived at the ground.","after breakfast on Monday."]},
+{c:"while",t:2,stem:"He warmed up on the touchline",a:"while he waited to come on.",
+ d:["while he was asleep in bed.","while the season was finished.","while he ate his dinner."]},
+{c:"if",t:1,stem:"If it rains again tonight,",a:"the pitch will be unplayable.",
+ d:["the sun will be very hot.","the pitch will be perfectly dry.","he will need sun cream."]},
+{c:"since",t:3,stem:"Since he hurt his ankle in January,",a:"he has not played a full match.",
+ d:["he has scored in every game.","he has never been injured.","he will play next January."]},
+{c:"however",t:3,stem:"The team played well.",a:"However, they still lost the game.",
+ d:["However, they won easily.","However, they scored four goals.","However, everyone was delighted."]},
+{c:"because",t:1,stem:"The crowd started cheering",a:"because the ball hit the back of the net.",
+ d:["because the game had not begun.","because nothing had happened.","because they were leaving."]},
+{c:"so",t:2,stem:"He forgot his boots at home,",a:"so he had to borrow a pair.",
+ d:["so he scored a hat-trick.","so he was named captain.","so he ran much faster."]},
+{c:"but",t:2,stem:"Surfing looks easy from the beach,",a:"but standing up is very hard.",
+ d:["but it is simple to do.","but anyone can do it first time.","but the sea is wet."]},
+{c:"although",t:3,stem:"Although Sligo is a small county,",a:"it has produced some fine players.",
+ d:["it is a very large county.","it has no football teams.","it is beside the sea."]},
+{c:"until",t:2,stem:"Until he learned the rule,",a:"he kept spelling the word wrongly.",
+ d:["he spelled it perfectly.","he never made mistakes.","he stopped writing."]},
+{c:"unless",t:3,stem:"The game will go ahead",a:"unless the referee decides it is too wet.",
+ d:["unless the teams turn up.","unless everyone is ready.","unless the sun comes out."]},
+{c:"before",t:2,stem:"Check the ball is on the spot",a:"before you take the penalty.",
+ d:["before the ball hits the net.","before the keeper picks it up.","before you celebrate."]},
+{c:"after",t:2,stem:"He only felt the pain",a:"after the adrenaline wore off.",
+ d:["after he woke up that morning.","after he put his boots on.","after the season started."]},
+{c:"while",t:3,stem:"While the others were still arguing,",a:"he quietly took the free kick.",
+ d:["he joined in the argument.","he had already gone home.","he was fast asleep."]},
+{c:"if",t:2,stem:"If you keep your head up,",a:"you will spot the pass sooner.",
+ d:["you will trip over the ball.","you will not see anything.","you will fall asleep."]},
+{c:"because",t:2,stem:"The keeper was furious",a:"because nobody had marked the striker.",
+ d:["because he had made a great save.","because his team were winning.","because he was very happy."]},
+{c:"so",t:1,stem:"He practised every evening,",a:"so his left foot got much stronger.",
+ d:["so he forgot how to play.","so he never improved.","so he stopped training."]},
+{c:"but",t:1,stem:"The waves looked small from the shore,",a:"but they were huge close up.",
+ d:["but they were even smaller.","but there were no waves.","but the beach was busy."]},
+{c:"although",t:2,stem:"Although the ball was wet and heavy,",a:"he struck it perfectly.",
+ d:["he could not touch it.","the ball was light and dry.","he stayed on the bench."]},
+{c:"if",t:1,stem:"If nobody tracks the runner,",a:"he will be through on goal.",
+ d:["he will stay in his own half.","he will not move at all.","he will leave the pitch."]},
+{c:"until",t:1,stem:"Keep going until",a:"the referee blows for full time.",
+ d:["you kicked off at the start.","the match had already ended.","you get to half time first."]}
+];
+
+/* ---- TRICKY WORDS: for the "limited sight vocabulary" Rita noted.
+   Every option is visually confusable, so context alone will not
+   carry him — he has to look at the letters. ---- */
+const TRICKY = [
+{t:1,s:"He could hear the crowd ___ the tunnel wall.",a:"through",d:["though","thought","trough"]},
+{t:2,s:"He ___ the ball had gone in, but it hit the post.",a:"thought",d:["through","though","taught"]},
+{t:1,s:"They put ___ boots in the changing room.",a:"their",d:["there","they're","thier"]},
+{t:1,s:"Leave the bag over ___ by the bench.",a:"there",d:["their","they're","thier"]},
+{t:1,s:"Do you know ___ the match is being played?",a:"where",d:["were","wear","whare"]},
+{t:1,s:"They ___ the best team on the day.",a:"were",d:["where","wear","weer"]},
+{t:2,s:"The stadium went completely ___ before the penalty.",a:"quiet",d:["quite","quit","quilt"]},
+{t:2,s:"That was ___ the best goal of the season.",a:"quite",d:["quiet","quit","quick"]},
+{t:1,s:"He took his boots ___ at the door.",a:"off",d:["of","offe","ov"]},
+{t:1,s:"He is the captain ___ the under-elevens.",a:"of",d:["off","ov","uv"]},
+{t:2,s:"He is taller ___ his older brother.",a:"than",d:["then","that","thin"]},
+{t:2,s:"We warmed up, and ___ the whistle went.",a:"then",d:["than","them","when"]},
+{t:3,s:"Do not ___ your gum shield again.",a:"lose",d:["loose","loos","looze"]},
+{t:3,s:"His laces were far too ___ and he tripped.",a:"loose",d:["lose","luce","looce"]},
+{t:2,s:"The ___ was too wet to play in.",a:"weather",d:["whether","wether","weathur"]},
+{t:3,s:"Nobody knew ___ the game would go ahead.",a:"whether",d:["weather","wether","wheather"]},
+{t:1,s:"Have you got ___ boots in the car?",a:"your",d:["you're","yore","yours"]},
+{t:2,s:"I think ___ playing really well today.",a:"you're",d:["your","yore","yours"]},
+{t:2,s:"He ___ his boots to the match in a bag.",a:"brought",d:["bought","brough","braught"]},
+{t:2,s:"His dad ___ him new boots for his birthday.",a:"bought",d:["brought","bough","baught"]},
+{t:2,s:"The keeper ___ the ball cleanly.",a:"caught",d:["cought","court","coughed"]},
+{t:1,s:"His best ___ plays for the other team.",a:"friend",d:["freind","frend","friund"]},
+{t:1,s:"The referee ___ that it was a penalty.",a:"said",d:["sed","saide","says"]},
+{t:1,s:"He scored ___ in the very first minute.",a:"once",d:["onse","wonce","ones"]},
+{t:1,s:"Nobody knew ___ had taken the last ball.",a:"who",d:["how","hoo","whoo"]},
+{t:2,s:"I ___ we had trained a bit harder.",a:"could",d:["cood","coud","culd"]},
+{t:1,s:"Would you like to ___ to training with me?",a:"come",d:["some","came","comme"]},
+{t:2,s:"He did not ___ to leave the pitch.",a:"want",d:["went","wont","wunt"]},
+{t:2,s:"He filled in the ___ before joining the club.",a:"form",d:["from","forme","fourm"]},
+{t:1,s:"The parents came ___ all over the county.",a:"from",d:["form","frome","fromm"]},
+{t:3,s:"He hit the ball at exactly the right ___.",a:"angle",d:["angel","anlge","angul"]},
+{t:3,s:"He waited an ___ for the bus to Sligo.",a:"hour",d:["our","howr","houre"]},
+{t:3,s:"He could not ___ that he had missed.",a:"accept",d:["except","acept","exept"]},
+{t:3,s:"Everyone played well ___ the goalkeeper.",a:"except",d:["accept","exept","acsept"]},
+{t:2,s:"He ran hard for a whole ___ without stopping.",a:"week",d:["weak","weke","weeke"]},
+{t:2,s:"He felt ___ after being ill for days.",a:"weak",d:["week","weake","wek"]}
+];
+
 
 /* =======================================================================
    Storage — Safari can block localStorage on file:// so everything is
@@ -604,6 +880,13 @@ function save(){ sSet("wordattack.v1", JSON.stringify(S)); }
    at all. A distractor is never drawn from a conflicting family, so an
    option can never accidentally be a correct answer.
    ======================================================================= */
+/* Synonym keys stay bare so progress saved before the other games existed
+   still counts; every other mode is namespaced. */
+function statKey(mode, word){ return mode==="syn" ? word : mode+":"+word; }
+function splitKey(k){
+  var i=k.indexOf(":");
+  return i<0 ? {mode:"syn", word:k} : {mode:k.slice(0,i), word:k.slice(i+1)};
+}
 var norm = function(s){ return s.toLowerCase().replace(/[^a-z]/g,""); };
 var FAM = SQUAD.map(function(e){ var s={}; s[norm(e.w)]=1; e.y.forEach(function(x){s[norm(x)]=1;}); return s; });
 var CONFLICT = SQUAD.map(function(){ return {}; });
@@ -632,7 +915,109 @@ function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=(Math.random()*(i+1))|
 var cap = function(s){ return s.charAt(0).toUpperCase()+s.slice(1); };
 
 /* =======================================================================
-   Question builders
+   MODES — every game shares the match loop, streak and penalty.
+   Each mode supplies a pool of items for a level and builds a question.
+   ======================================================================= */
+var MODES = {
+  syn:{
+    name:"Synonyms", sub:"Words that mean the same", icon:"=",
+    pool:function(lv){ var p=[]; SQUAD.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return SQUAD[i].w; },
+    build:function(i,n){ return buildQuestion(i,["single","sentence","double"][n%3]); }
+  },
+  ant:{
+    name:"Opposites", sub:"Words that mean the reverse", icon:"x",
+    pool:function(lv){ var p=[]; OPPOSITES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return OPPOSITES[i].w; },
+    build:function(i,n,lv){ return buildOpposite(i,lv); }
+  },
+  spell:{
+    name:"Set Pieces", sub:"Spelling rules that trip people up", icon:"S",
+    pool:function(lv){ var p=[]; SPELLS.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return SPELLS[i].w; },
+    build:function(i,n){ return buildSpell(i,n); }
+  },
+  sent:{
+    name:"Build the Move", sub:"Joining sentences that make sense", icon:"J",
+    pool:function(lv){ var p=[]; JOINS.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return JOINS[i].c+"-"+i; },
+    build:function(i){ return buildJoin(i); }
+  },
+  tricky:{
+    name:"Tricky Words", sub:"Words you cannot sound out", icon:"T",
+    pool:function(lv){ var p=[]; TRICKY.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return TRICKY[i].a; },
+    build:function(i){ return buildTricky(i); }
+  }
+};
+
+/* ---- Opposites. At Champions level one distractor is a SYNONYM of the
+   target, because same-versus-opposite is the confusion worth drilling. ---- */
+function buildOpposite(i, lv){
+  var e=OPPOSITES[i], ans=pick(e.a), opts=[ans], used={};
+  used[norm(e.w)]=1; e.a.forEach(function(x){ used[norm(x)]=1; });
+  var sq=null;
+  for(var s=0;s<SQUAD.length;s++) if(SQUAD[s].w===e.w){ sq=SQUAD[s]; break; }
+  if(sq) sq.y.forEach(function(x){ used[norm(x)]=1; });
+  if(lv>=3 && sq){
+    var trap=pick(sq.y);
+    opts.push(trap); used[norm(trap)]=1;
+  }
+  var guard=0;
+  while(opts.length<4 && guard++<200){
+    var o=OPPOSITES[(Math.random()*OPPOSITES.length)|0];
+    if(o.w===e.w) continue;
+    var cand=pick(o.a);
+    if(used[norm(cand)]) continue;
+    // never offer something that is also a real opposite of the target
+    if(e.a.map(norm).indexOf(norm(cand))>=0) continue;
+    used[norm(cand)]=1; opts.push(cand);
+  }
+  return { kind:"single", key:e.w, word:e.w, stem:e.w,
+    help:"Which word means the OPPOSITE of this one?",
+    opts:shuffle(opts), answers:[ans],
+    teach:cap(e.w)+" — opposites: "+e.a.join(", ")+"." };
+}
+
+/* ---- Spelling. Two rounds: choose the right spelling, or find the
+   letter you cannot hear. ---- */
+function buildSpell(i, n){
+  var e=SPELLS[i];
+  var rule = e.r==="silent" ? "Silent letter" : (e.r==="double" ? "One or two?" : "Word ending");
+  if(e.r==="silent" && n%2===1){
+    var letters=e.w.split("");
+    var ansIdx=e.w.indexOf(e.sl);
+    return { kind:"letters", key:e.w, word:e.w, stem:e.w,
+      help:"Tap the letter you cannot hear when you say this word.",
+      opts:letters, answers:[String(ansIdx)], rule:rule,
+      teach:'The "'+e.sl+'" in '+e.w+' is a ghost — it is on the pitch but you never hear it.' };
+  }
+  return { kind:"single", key:e.w, word:e.w, stem:null, spellPrompt:true,
+    help:"Which one is spelled correctly?",
+    opts:shuffle([e.w].concat(e.bad)), answers:[e.w], rule:rule,
+    teach:e.r==="double" ? "Watch the double letters in "+e.w+"."
+        : e.r==="silent" ? 'Remember the silent "'+e.sl+'" in '+e.w+'.'
+        : "Careful with the ending of "+e.w+"." };
+}
+
+function buildJoin(i){
+  var e=JOINS[i];
+  return { kind:"join", key:e.c+"-"+i, word:e.c, stem:e.stem,
+    help:"Finish the sentence so that it makes sense.",
+    opts:shuffle([e.a].concat(e.d)), answers:[e.a],
+    teach:'"'+e.c+'" has to join two halves that actually fit together.' };
+}
+
+function buildTricky(i){
+  var e=TRICKY[i];
+  return { kind:"tricky", key:e.a, word:e.a, sentence:e.s,
+    help:"These all look alike. Which one belongs in the gap?",
+    opts:shuffle([e.a].concat(e.d)), answers:[e.a],
+    teach:"Look closely at the letters — "+e.a+" is the one that fits here." };
+}
+
+/* =======================================================================
+   Synonym question builders
    ======================================================================= */
 function buildQuestion(idx, kind){
   var e = SQUAD[idx];
@@ -644,28 +1029,29 @@ function buildQuestion(idx, kind){
     // take a synonym from that unrelated family (not its headword, to vary it)
     return pick(SQUAD[n].y.concat([SQUAD[n].w]));
   }
+  var teach = cap(e.w)+" also means: "+e.y.join(", ")+".";
   if(kind==="double"){
     var correct2 = shuffle(e.y.slice()).slice(0,2);
     var opts = correct2.slice();
     for(var d=0; d<4; d++){ var x=distractor(); if(x) opts.push(x); }
-    return { kind:"double", idx:idx, word:e.w, stem:e.w,
+    return { kind:"double", idx:idx, key:e.w, word:e.w, stem:e.w,
       help:"Tap the TWO words that mean the same as this one, then shoot.",
-      opts:shuffle(opts), answers:correct2.slice() };
+      opts:shuffle(opts), answers:correct2.slice(), teach:teach };
   }
   if(kind==="sentence"){
     var ans = pick(e.y);
     var o2=[ans];
     for(var d2=0; d2<3; d2++){ var y=distractor(); if(y) o2.push(y); }
-    return { kind:"sentence", idx:idx, word:e.w, sentence:e.s,
+    return { kind:"sentence", idx:idx, key:e.w, word:e.w, sentence:e.s,
       help:"Which word could take the place of the highlighted word?",
-      opts:shuffle(o2), answers:[ans] };
+      opts:shuffle(o2), answers:[ans], teach:teach };
   }
   var ans3 = pick(e.y);
   var o3=[ans3];
   for(var d3=0; d3<3; d3++){ var z=distractor(); if(z) o3.push(z); }
-  return { kind:"single", idx:idx, word:e.w, stem:e.w,
+  return { kind:"single", idx:idx, key:e.w, word:e.w, stem:e.w,
     help:"Which word means the same as this one?",
-    opts:shuffle(o3), answers:[ans3] };
+    opts:shuffle(o3), answers:[ans3], teach:teach };
 }
 
 /* =======================================================================
@@ -709,19 +1095,16 @@ function show(id){
 var M=null;
 var ATTACKS=12;
 
-function startMatch(level){
+function startMatch(mode, level){
   // clear any penalty left pending from a match that was restarted or abandoned
   $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
-  var pool=[];
-  for(var i=0;i<SQUAD.length;i++){
-    if(level===1 && SQUAD[i].t>1) continue;
-    if(level===2 && SQUAD[i].t>2) continue;
-    pool.push(i);
-  }
-  // bias towards words he has struggled with
+  var MD=MODES[mode];
+  var pool=MD.pool(level);
+
+  // bias towards items he has struggled with
   var weighted=[];
   pool.forEach(function(i){
-    var st=S.stats[SQUAD[i].w];
+    var st=S.stats[statKey(mode, MD.key(i))];
     var reps = 1;
     if(st && st.seen>0){ var acc=st.right/st.seen; reps = acc<0.5 ? 3 : (acc<0.8 ? 2 : 1); }
     for(var r=0;r<reps;r++) weighted.push(i);
@@ -733,8 +1116,9 @@ function startMatch(level){
   }
   while(chosen.length<ATTACKS && chosen.length<pool.length) chosen.push(pick(pool));
 
-  var kinds=["single","sentence","double"];
-  M={ level:level, queue:chosen.map(function(idx,n){ return buildQuestion(idx, kinds[n%3]); }),
+  M={ mode:mode, level:level,
+      queue:chosen.map(function(idx,n){ var q=MD.build(idx,n,level); q.pidx=idx; return q; }),
+      pool:chosen.slice(),
       n:0, us:0, them:0, streak:0, missStreak:0, right:0, wrong:0, pens:0, pensScored:0,
       missed:[], retried:false, picked:[], locked:false, t0:Date.now(), timer:null };
 
@@ -756,27 +1140,43 @@ function renderQuestion(){
   $("btnNext").classList.add("hidden");
   $("attackNo").textContent = "Attack "+(M.n+1)+" of "+M.queue.length;
   $("scoreTxt").textContent = M.us+" – "+M.them;
-  $("qType").textContent = q.kind==="double" ? "Two-touch" : (q.kind==="sentence" ? "Through ball" : "Pick the pass");
+  var LABEL={ double:"Two-touch", sentence:"Through ball", join:"Build the move",
+              tricky:"Spot the difference", letters:"Find the ghost" };
+  $("qType").textContent = LABEL[q.kind] || (q.rule ? q.rule : "Pick the pass");
   $("qHelp").textContent = q.help;
   updateDots(); updateBall();
 
+  function speaker(txt,big){
+    return ' <button class="iconbtn" style="display:inline-grid;width:'+(big?38:34)+'px;height:'+
+      (big?38:34)+'px;vertical-align:middle" data-say="'+String(txt).replace(/"/g,"&quot;")+'">&#128266;</button>';
+  }
   var stem="";
   if(q.kind==="sentence"){
     var re=new RegExp("\\b("+q.word+")\\b","i");
-    stem='<div class="sentence">'+q.sentence.replace(re,"<mark>$1</mark>")+
-         ' <button class="iconbtn" style="display:inline-grid;width:38px;height:38px;vertical-align:middle" data-say="'+
-         q.sentence.replace(/"/g,"&quot;")+'">&#128266;</button></div>';
+    stem='<div class="sentence">'+q.sentence.replace(re,"<mark>$1</mark>")+speaker(q.sentence,1)+'</div>';
+  } else if(q.kind==="tricky"){
+    stem='<div class="sentence">'+q.sentence.replace("___",'<mark>&nbsp;?&nbsp;</mark>')+'</div>';
+  } else if(q.kind==="join"){
+    stem='<div class="sentence">'+q.stem+' <span class="muted">…</span>'+speaker(q.stem,1)+'</div>';
+  } else if(q.spellPrompt){
+    stem='<div class="sentence">Listen, then pick the right spelling.'+speaker(q.word,1)+'</div>';
   } else {
-    stem='<div><span class="target">'+cap(q.word)+'</span> '+
-         '<button class="iconbtn" style="display:inline-grid;width:38px;height:38px;vertical-align:middle" data-say="'+q.word+'">&#128266;</button></div>';
+    stem='<div><span class="target">'+cap(q.word)+'</span>'+speaker(q.word,1)+'</div>';
   }
   $("qStem").innerHTML=stem;
 
   var html="";
-  q.opts.forEach(function(o,i){
-    html+='<button class="btn opt" data-opt="'+i+'">'+cap(o)+
-          '<span class="say" data-say="'+o+'">&#128266;</span></button>';
-  });
+  if(q.kind==="letters"){
+    html='<div class="letterrow">';
+    q.opts.forEach(function(ch,i){ html+='<button class="lettbtn" data-opt="'+i+'">'+ch+'</button>'; });
+    html+='</div>';
+  } else {
+    q.opts.forEach(function(o,i){
+      var label = (q.kind==="join"||q.kind==="tricky") ? o : cap(o);
+      html+='<button class="btn opt" data-opt="'+i+'">'+label+
+            '<span class="say" data-say="'+String(o).replace(/"/g,"&quot;")+'">&#128266;</span></button>';
+    });
+  }
   $("qOpts").innerHTML=html;
   $("btnConfirm").classList.toggle("hidden", q.kind!=="double");
   if(q.kind==="double") $("btnConfirm").textContent="Shoot! (pick 2)";
@@ -798,6 +1198,7 @@ $("qOpts").addEventListener("click", function(ev){
   if(!b || M.locked) return;
   var q=M.queue[M.n];
   var i=+b.getAttribute("data-opt");
+  if(q.kind==="letters"){ M.picked=[i]; grade(); return; }
   if(q.kind==="double"){
     var at=M.picked.indexOf(i);
     if(at>=0){ M.picked.splice(at,1); b.classList.remove("picked"); }
@@ -817,28 +1218,39 @@ $("btnConfirm").addEventListener("click", function(){
 function grade(){
   M.locked=true;
   var q=M.queue[M.n];
-  var chosen = M.picked.map(function(i){ return q.opts[i]; });
-  var ok = chosen.length===q.answers.length &&
-           chosen.every(function(c){ return q.answers.indexOf(c)>=0; });
+  var ok, i;
 
-  var nodes=$("qOpts").children;
-  for(var i=0;i<nodes.length;i++){
-    var val=q.opts[i];
-    if(q.answers.indexOf(val)>=0) nodes[i].classList.add("right");
-    else if(M.picked.indexOf(i)>=0) nodes[i].classList.add("wrongpick");
-    nodes[i].classList.remove("picked");
+  if(q.kind==="letters"){
+    ok = M.picked.length===1 && String(M.picked[0])===q.answers[0];
+    var lb=$("qOpts").querySelectorAll(".lettbtn");
+    for(i=0;i<lb.length;i++){
+      if(String(i)===q.answers[0]) lb[i].classList.add("right");
+      else if(M.picked.indexOf(i)>=0) lb[i].classList.add("wrongpick");
+    }
+  } else {
+    var chosen = M.picked.map(function(k){ return q.opts[k]; });
+    ok = chosen.length===q.answers.length &&
+         chosen.every(function(c){ return q.answers.indexOf(c)>=0; });
+    var nodes=$("qOpts").children;
+    for(i=0;i<nodes.length;i++){
+      var val=q.opts[i];
+      if(q.answers.indexOf(val)>=0) nodes[i].classList.add("right");
+      else if(M.picked.indexOf(i)>=0) nodes[i].classList.add("wrongpick");
+      nodes[i].classList.remove("picked");
+    }
   }
 
-  var w=SQUAD[q.idx].w;
-  if(!S.stats[w]) S.stats[w]={seen:0,right:0};
-  S.stats[w].seen++; if(ok) S.stats[w].right++;
+  var w=q.key;
+  var sk=statKey(M.mode, w);
+  if(!S.stats[sk]) S.stats[sk]={seen:0,right:0};
+  S.stats[sk].seen++; if(ok) S.stats[sk].right++;
 
   if(ok){
     M.right++; M.streak++; M.missStreak=0;
     updateDots(); updateBall();
     $("fbBox").innerHTML='<div class="feedback ok"><b>'+
       pick(["Great ball.","Lovely pass.","Perfect weight on that.","Take a bow.","Straight to feet."])+
-      '</b><br><span class="small">'+cap(w)+' also means: '+SQUAD[q.idx].y.join(", ")+'.</span></div>';
+      '</b><br><span class="small">'+q.teach+'</span></div>';
     if(M.streak>=3){
       M.streak=0; M.pens++;
       $("btnConfirm").classList.add("hidden");
@@ -855,15 +1267,19 @@ function grade(){
     }
   } else {
     M.wrong++; M.streak=0; M.missStreak++;
-    if(M.missed.indexOf(q.idx)<0) M.missed.push(q.idx);
+    if(q.pidx!=null && M.missed.indexOf(q.pidx)<0) M.missed.push(q.pidx);
     updateDots(); updateBall();
     // Deliberately gentle: three misses in a row to concede, never more than
     // three against, and extra time is practice only — it can't cost a goal.
     if(M.missStreak>=3 && M.them<3 && !M.retried){ M.them++; M.missStreak=0; goalFlash("They score."); }
+    var shown = q.kind==="letters"
+      ? 'The silent letter is <b>'+q.opts[+q.answers[0]]+'</b>.'
+      : 'The answer was <b>'+q.answers.map(function(x){ return q.kind==="join"||q.kind==="tricky"?x:cap(x); }).join("</b> and <b>")+'</b>.';
     $("fbBox").innerHTML='<div class="feedback no"><b>Tackled — possession lost.</b><br>'+
-      '<span class="small">'+cap(w)+' means the same as <b>'+q.answers.map(cap).join("</b> and <b>")+
-      '</b>.<br>The full family: '+SQUAD[q.idx].y.join(", ")+'.</span></div>';
-    if(S.opts.autoSay) setTimeout(function(){ say(w+". "+q.answers.join(". ")); }, 350);
+      '<span class="small">'+shown+'<br>'+q.teach+'</span></div>';
+    if(S.opts.autoSay) setTimeout(function(){
+      say(q.kind==="letters" ? q.word : q.word+". "+q.answers.join(". "));
+    }, 350);
   }
   $("scoreTxt").textContent=M.us+" – "+M.them;
   $("btnConfirm").classList.add("hidden");
@@ -1050,9 +1466,10 @@ function nextAttack(){
     // one spaced-retrieval pass over anything missed
     if(!M.retried && M.missed.length){
       M.retried=true;
-      var kinds=["single","sentence"];
       // cap the second look at 6 so a bad day never turns into a marathon
-      M.missed.slice(0,6).forEach(function(idx,i){ M.queue.push(buildQuestion(idx, kinds[i%2])); });
+      M.missed.slice(0,6).forEach(function(idx,i){
+        M.queue.push(MODES[M.mode].build(idx, i%2===0?0:1, M.level));
+      });
       renderQuestion();
       $("fbBox").innerHTML='<div class="feedback ok"><b>Extra time.</b><br><span class="small">Second look at the ones that got away.</span></div>';
       return;
@@ -1061,6 +1478,17 @@ function nextAttack(){
     return;
   }
   renderQuestion();
+}
+
+function reviewLine(mode, idx){
+  if(mode==="syn"){ var e=SQUAD[idx]; return {title:cap(e.w), say:e.w, detail:e.y.join(", ")}; }
+  if(mode==="ant"){ var o=OPPOSITES[idx]; return {title:cap(o.w), say:o.w, detail:"Opposites: "+o.a.join(", ")}; }
+  if(mode==="spell"){ var s=SPELLS[idx];
+    return {title:s.w, say:s.w, detail:s.r==="silent" ? 'Silent "'+s.sl+'"'
+      : (s.r==="double" ? "Watch the double letters" : "Watch the ending")}; }
+  if(mode==="sent"){ var j=JOINS[idx]; return {title:j.stem, say:j.stem+" "+j.a, detail:j.a}; }
+  var t=TRICKY[idx];
+  return {title:t.a, say:t.a, detail:t.s.replace("___", t.a)};
 }
 
 function endMatch(){
@@ -1091,10 +1519,10 @@ function endMatch(){
     $("ftReviewCard").classList.remove("hidden");
     var h='';
     M.missed.forEach(function(idx){
-      var e=SQUAD[idx];
-      h+='<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+cap(e.w)+
+      var line=reviewLine(M.mode, idx);
+      h+='<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+line.title+
          '</b> <button class="iconbtn" style="display:inline-grid;width:32px;height:32px;vertical-align:middle;font-size:.8em" data-say="'+
-         e.w+'">&#128266;</button><br><span class="small muted">'+e.y.join(", ")+'</span></div>';
+         line.say.replace(/"/g,"&quot;")+'">&#128266;</button><br><span class="small muted">'+line.detail+'</span></div>';
     });
     $("ftReview").innerHTML=h;
   } else {
@@ -1160,7 +1588,7 @@ function renderParent(){
   var pc = seen?Math.round(right/seen*100):0;
   $("parentSummary").innerHTML=
     '<table>'+
-    '<tr><th>Words met</th><td class="num"><b>'+tried+'</b> of 96</td></tr>'+
+    '<tr><th>Items met</th><td class="num"><b>'+tried+'</b></td></tr>'+
     '<tr><th>Questions answered</th><td class="num"><b>'+seen+'</b></td></tr>'+
     '<tr><th>Overall accuracy</th><td class="num"><b>'+pc+'%</b></td></tr>'+
     '<tr><th>Matches played</th><td class="num"><b>'+S.season.p+'</b></td></tr>'+
@@ -1168,16 +1596,31 @@ function renderParent(){
       '</b> ('+Math.round(S.pens.scored/S.pens.taken*100)+'%)</td></tr>':'')+
     '</table>';
 
-  var rows=[];
-  for(var k in S.stats){ var st=S.stats[k]; if(st.seen>=2) rows.push({w:k,a:st.right/st.seen,s:st.seen}); }
+  var rows=[], perMode={};
+  for(var k in S.stats){
+    var st=S.stats[k], sp=splitKey(k);
+    if(!perMode[sp.mode]) perMode[sp.mode]={seen:0,right:0,items:0};
+    perMode[sp.mode].seen+=st.seen; perMode[sp.mode].right+=st.right; perMode[sp.mode].items++;
+    if(st.seen>=2) rows.push({w:sp.word,m:sp.mode,a:st.right/st.seen,s:st.seen});
+  }
+  var mh='<table><tr><th>Game</th><th class="num">Answered</th><th class="num">Accuracy</th></tr>';
+  var any=false;
+  for(var mk in MODES){ var pm=perMode[mk]; if(!pm) continue; any=true;
+    mh+='<tr><td>'+MODES[mk].name+'</td><td class="num">'+pm.seen+'</td><td class="num"><b>'+
+        Math.round(pm.right/pm.seen*100)+'%</b></td></tr>'; }
+  $("parentByMode").innerHTML = any ? mh+'</table>'
+    : '<p class="muted">Nothing played yet.</p>';
+
   rows.sort(function(a,b){ return a.a-b.a; });
   if(!rows.length){
     $("parentWeak").innerHTML='<p class="muted">Not enough data yet — play a couple of matches.</p>';
   } else {
-    var h='<table><tr><th>Word</th><th>Accuracy</th><th class="num">Seen</th></tr>';
-    rows.slice(0,15).forEach(function(r){
+    var h='<table><tr><th>Item</th><th>Game</th><th>Accuracy</th><th class="num">Seen</th></tr>';
+    rows.slice(0,18).forEach(function(r){
       var p=Math.round(r.a*100);
-      h+='<tr><td>'+cap(r.w)+'</td><td><div class="bar'+(p<60?" warn":"")+'"><i style="width:'+p+'%"></i></div></td>'+
+      var label = r.m==="sent" ? r.w.split("-")[0] : r.w;
+      h+='<tr><td>'+cap(label)+'</td><td class="small muted">'+(MODES[r.m]?MODES[r.m].name:r.m)+
+         '</td><td><div class="bar'+(p<60?" warn":"")+'"><i style="width:'+p+'%"></i></div></td>'+
          '<td class="num">'+r.s+'</td></tr>';
     });
     $("parentWeak").innerHTML=h+'</table>';
@@ -1248,10 +1691,22 @@ $("btnSound").addEventListener("click",function(){
 /* =======================================================================
    Nav
    ======================================================================= */
+var PENDING_MODE="syn";
+var modeBtns=document.querySelectorAll("[data-mode]");
+for(var mb=0;mb<modeBtns.length;mb++){
+  modeBtns[mb].addEventListener("click", function(){
+    PENDING_MODE=this.getAttribute("data-mode");
+    var MD=MODES[PENDING_MODE];
+    $("lvTitle").textContent=MD.name;
+    $("lvSub").textContent=MD.sub;
+    show("scLevel");
+  });
+}
 var lvlBtns=document.querySelectorAll("[data-level]");
 for(var b=0;b<lvlBtns.length;b++){
-  lvlBtns[b].addEventListener("click", function(){ startMatch(+this.getAttribute("data-level")); });
+  lvlBtns[b].addEventListener("click", function(){ startMatch(PENDING_MODE, +this.getAttribute("data-level")); });
 }
+$("btnHomeLevel").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnSettings").addEventListener("click",function(){ show("scSettings"); });
 $("btnHomeSet").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnSquad").addEventListener("click",function(){ renderSquad(); show("scSquad"); });
@@ -1259,7 +1714,7 @@ $("btnHomeSquad").addEventListener("click",function(){ renderHome(); show("scHom
 $("btnParent").addEventListener("click",function(){ renderParent(); show("scParent"); });
 $("btnHomeParent").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnHomeFT").addEventListener("click",function(){ renderHome(); show("scHome"); });
-$("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.level:2); });
+$("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.mode:"syn", M?M.level:2); });
 
 applyOpts();
 renderHome();
