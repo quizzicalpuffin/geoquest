@@ -1159,7 +1159,7 @@ function renderQuestion(){
   } else if(q.kind==="join"){
     stem='<div class="sentence">'+q.stem+' <span class="muted">…</span>'+speaker(q.stem,1)+'</div>';
   } else if(q.spellPrompt){
-    stem='<div class="sentence">Listen, then pick the right spelling.'+speaker(q.word,1)+'</div>';
+    stem='<div class="sentence">Only one of these is a real spelling.'+speaker(q.word,1)+'</div>';
   } else {
     stem='<div><span class="target">'+cap(q.word)+'</span>'+speaker(q.word,1)+'</div>';
   }
@@ -1172,7 +1172,8 @@ function renderQuestion(){
     html+='</div>';
   } else {
     q.opts.forEach(function(o,i){
-      var label = (q.kind==="join"||q.kind==="tricky") ? o : cap(o);
+      // spellings and sentence fragments stay exactly as they are written
+      var label = (q.kind==="join"||q.kind==="tricky"||q.spellPrompt) ? o : cap(o);
       html+='<button class="btn opt" data-opt="'+i+'">'+label+
             '<span class="say" data-say="'+String(o).replace(/"/g,"&quot;")+'">&#128266;</span></button>';
     });
