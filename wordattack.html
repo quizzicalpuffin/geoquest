@@ -1446,9 +1446,18 @@ function renderQuestion(){
       if(!stillHere()) return;
       $("listenStatus").textContent="Playing…";
       $("btnPlayPassage").disabled=true;
+      var t0=Date.now();
       say(q.passage, function(){
         if($("btnPlayPassage")) $("btnPlayPassage").disabled=false;
         reveal();
+        // If it "finished" almost instantly the audio never really played
+        // (no voice, muted, or the app in the background). Fall back to text
+        // rather than asking about a passage he never heard.
+        if(Date.now()-t0 < 1500 && stillHere()){
+          $("passageText").classList.remove("hidden");
+          $("btnShowWords").textContent="Hide the words";
+          $("listenStatus").textContent="The sound did not play, so here are the words. Check the volume and the voice in settings.";
+        }
       });
     };
     $("btnShowWords").addEventListener("click", function(){
