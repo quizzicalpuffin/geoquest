@@ -1059,7 +1059,7 @@ var MODES = {
 function buildListen(i){
   var e=PASSAGES[i], item=pick(e.q);
   return { kind:"listen", key:"p"+i, word:e.p, passage:e.p, ask:item.q,
-    help:item.q,
+    help:"Listen as many times as you like, then choose.",
     opts:shuffle([item.a].concat(item.d)), answers:[item.a],
     teach:"Tap play to hear it again — you can listen as often as you like." };
 }
