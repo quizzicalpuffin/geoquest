@@ -1505,7 +1505,7 @@ function penDismiss(){
   }
   f.addEventListener("pointerdown", function(ev){
     if(!PEN.live) return;
-    f.setPointerCapture && f.setPointerCapture(ev.pointerId);
+    try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
     PEN.startPt=localPt(ev); PEN.aim=null; PEN.downAt=Date.now();
     startCharge();                       // bar starts sweeping the moment he holds
     $("penMsg").textContent="Aim with your finger. Let go when the bar is in the green.";
@@ -1520,10 +1520,13 @@ function penDismiss(){
   });
   f.addEventListener("pointerup", function(ev){
     if(!PEN.live || !PEN.startPt) return;
-    stopCharge();
-    var p=localPt(ev);
     var held=Date.now()-PEN.downAt;
-    var pw=PEN.power;
+    // Power comes from how long he held, not from the animation frames — the
+    // bar is only the picture of it, and browsers throttle frames when a tab
+    // is not in front. Read it before stopping the loop.
+    var pw=chargePower(Date.now()-PEN.chargeT0);
+    stopCharge(); PEN.power=pw; showPower(pw);
+    var p=localPt(ev);
     var z=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y) || PEN.aim;
     if(!z){
       // a quick tap on a corner: aim there and give it a safe, solid strike
