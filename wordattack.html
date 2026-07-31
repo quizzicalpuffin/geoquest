@@ -382,6 +382,11 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
         <label for="setVoice">Read words aloud<br><span class="small muted">Tap the speaker on any word</span></label>
         <div class="switch"><input type="checkbox" id="setVoice" checked><span></span></div>
       </div>
+      <div class="setting" style="flex-wrap:wrap">
+        <label for="setVoicePick">Which voice<br><span class="small muted" id="voiceHint">Pick the best one on this device</span></label>
+        <select id="setVoicePick" style="max-width:100%;flex:1 1 180px"></select>
+        <button class="btn ghost" id="btnTestVoice" style="margin:8px 0 0;width:100%">Hear this voice</button>
+      </div>
       <div class="setting">
         <label for="setAutoSay">Say the answer after a miss<br><span class="small muted">Hearing it helps it stick</span></label>
         <div class="switch"><input type="checkbox" id="setAutoSay" checked><span></span></div>
@@ -1005,7 +1010,7 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}},
-  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:""} };
+  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:""} };
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1254,24 +1259,56 @@ function buildQuestion(idx, kind){
    Speech
    ======================================================================= */
 var VOICE=null;
+function englishVoices(){
+  if(!("speechSynthesis" in window)) return [];
+  return (speechSynthesis.getVoices()||[]).filter(function(v){ return /^en/i.test(v.lang); });
+}
+/* The flat, robotic default is usually a "compact" voice. Prefer Irish, then
+   UK, and strongly prefer enhanced/premium/neural ones where installed. */
+function voiceScore(v){
+  var n=(v.name+" "+(v.voiceURI||"")).toLowerCase(), s=0;
+  if(/en[-_]ie/i.test(v.lang)) s+=40;
+  else if(/en[-_]gb/i.test(v.lang)) s+=30;
+  else if(/en[-_](au|nz)/i.test(v.lang)) s+=20;
+  else s+=10;
+  if(/premium|enhanced|neural|siri/.test(n)) s+=30;
+  if(/compact/.test(n)) s-=20;
+  if(v.localService) s+=4;
+  return s;
+}
 function pickVoice(){
   if(!("speechSynthesis" in window)) return;
-  var v=speechSynthesis.getVoices()||[];
-  VOICE = v.filter(function(x){return /en[-_]IE/i.test(x.lang);})[0]
-       || v.filter(function(x){return /en[-_]GB/i.test(x.lang);})[0]
-       || v.filter(function(x){return /^en/i.test(x.lang);})[0] || null;
+  var v=englishVoices();
+  if(!v.length) return;
+  if(S.opts.voiceURI){
+    var chosen=v.filter(function(x){ return x.voiceURI===S.opts.voiceURI; })[0];
+    if(chosen){ VOICE=chosen; return; }
+  }
+  VOICE = v.slice().sort(function(a,b){ return voiceScore(b)-voiceScore(a); })[0] || null;
 }
-if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
-function say(text){
-  if(!S.opts.voice || !("speechSynthesis" in window)) return;
+if("speechSynthesis" in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged=function(){ pickVoice(); fillVoiceList(); };
+}
+function say(text, onend){
+  if(!S.opts.voice || !("speechSynthesis" in window)){ if(onend) onend(); return; }
   try{
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text);
     if(VOICE) u.voice=VOICE;
     u.lang = VOICE ? VOICE.lang : "en-GB";
-    u.rate=0.9; u.pitch=1;
+    u.rate=0.92; u.pitch=1;
+    if(onend){
+      u.onend=onend;
+      u.onerror=onend;
+      // belt and braces: some browsers drop onend on long utterances
+      var guard=setTimeout(onend, Math.max(4000, text.length*95));
+      var wrapped=onend;
+      u.onend=function(){ clearTimeout(guard); wrapped(); };
+      u.onerror=function(){ clearTimeout(guard); wrapped(); };
+    }
     speechSynthesis.speak(u);
-  }catch(e){}
+  }catch(e){ if(onend) onend(); }
 }
 
 /* =======================================================================
@@ -1359,9 +1396,10 @@ function renderQuestion(){
   } else if(q.kind==="listen"){
     stem='<div class="listenbox">'+
       '<button class="btn primary" id="btnPlayPassage" style="margin-bottom:8px">&#9654;&nbsp; Play the commentary</button>'+
-      '<button class="btn ghost" id="btnShowWords" style="margin-bottom:0">Show the words</button>'+
+      '<div class="small muted" id="listenStatus">Listen the whole way through. The question comes afterwards.</div>'+
+      '<button class="btn ghost hidden" id="btnShowWords" style="margin:8px 0 0">Show the words</button>'+
       '<div class="passage hidden" id="passageText">'+q.passage+'</div>'+
-      '</div><div class="sentence" style="margin-top:.6em"><b>'+q.ask+'</b></div>';
+      '</div><div class="sentence hidden" id="listenQ" style="margin-top:.7em"><b>'+q.ask+'</b></div>';
   } else if(q.plain){
     stem="";                              // the words themselves are the question
   } else if(q.spellPrompt){
@@ -1389,19 +1427,49 @@ function renderQuestion(){
   if(q.kind==="double") $("btnConfirm").textContent="Shoot! (pick 2)";
 
   if(q.kind==="listen"){
-    var speakIt=function(){ say(q.passage+" . . . "+q.ask); };
-    $("btnPlayPassage").addEventListener("click", speakIt);
+    /* CELF-5 presents the whole paragraph first and only then asks the
+       questions, so the question stays hidden until the passage has finished.
+       Seeing it first would turn listening into scanning for one fact. */
+    $("qOpts").classList.add("hidden");
+    // The passage plays on a short delay, so the question may already have
+    // moved on (he left the pitch, or answered fast). Bail out if so.
+    var stillHere=function(){ return !!($("listenQ") && $("btnPlayPassage") && $("listenStatus")); };
+    var reveal=function(){
+      if(!stillHere()) return;
+      $("listenQ").classList.remove("hidden");
+      $("qOpts").classList.remove("hidden");
+      $("btnShowWords").classList.remove("hidden");
+      $("listenStatus").textContent="Play it again as often as you need.";
+      $("btnPlayPassage").innerHTML="&#9654;&nbsp; Play it again";
+    };
+    var speakIt=function(){
+      if(!stillHere()) return;
+      $("listenStatus").textContent="Playing…";
+      $("btnPlayPassage").disabled=true;
+      say(q.passage, function(){
+        if($("btnPlayPassage")) $("btnPlayPassage").disabled=false;
+        reveal();
+      });
+    };
     $("btnShowWords").addEventListener("click", function(){
       $("passageText").classList.toggle("hidden");
       this.textContent = $("passageText").classList.contains("hidden") ? "Show the words" : "Hide the words";
     });
-    // With sound off there is nothing to listen to, so show the words instead
     if(!S.opts.voice || !("speechSynthesis" in window)){
+      // No sound: read it, then tap to bring up the question
       $("passageText").classList.remove("hidden");
-      $("btnShowWords").textContent="Hide the words";
-      $("btnPlayPassage").classList.add("hidden");
-      $("qHelp").textContent="Sound is off, so the words are shown. Turn sound on for the listening version.";
+      $("btnPlayPassage").innerHTML="I have read it &rsaquo;";
+      $("listenStatus").textContent="Sound is off, so read it instead. The question comes next.";
+      $("btnPlayPassage").addEventListener("click", function(){
+        $("passageText").classList.add("hidden");
+        $("btnShowWords").textContent="Show the words";
+        reveal();
+        $("listenStatus").textContent="You can show the words again if you need to.";
+        $("btnPlayPassage").classList.add("hidden");
+      });
+      $("qHelp").textContent="Turn sound on in settings for the listening version.";
     } else {
+      $("btnPlayPassage").addEventListener("click", speakIt);
       setTimeout(speakIt, 250);
     }
   }
@@ -1989,6 +2057,28 @@ function applyOpts(){
   var sw=$("swatches").children;
   for(var i=0;i<sw.length;i++) sw[i].setAttribute("aria-pressed", String((sw[i].getAttribute("data-theme")||"")===(o.theme||"")));
 }
+function fillVoiceList(){
+  var sel=$("setVoicePick"); if(!sel) return;
+  var v=englishVoices().slice().sort(function(a,b){ return voiceScore(b)-voiceScore(a); });
+  if(!v.length){
+    sel.innerHTML='<option>No voices found</option>';
+    $("voiceHint").textContent="This device has no speech voices available.";
+    return;
+  }
+  sel.innerHTML=v.map(function(x){
+    return '<option value="'+x.voiceURI.replace(/"/g,"&quot;")+'">'+x.name+' ('+x.lang+')</option>';
+  }).join("");
+  sel.value = (VOICE && VOICE.voiceURI) || v[0].voiceURI;
+  $("voiceHint").textContent = v.length+" voices installed. On iPhone, add better ones in Settings → Accessibility → Spoken Content → Voices.";
+}
+$("setVoicePick").addEventListener("change", function(){
+  S.opts.voiceURI=this.value; save(); pickVoice();
+  say("This is how the commentary will sound.");
+});
+$("btnTestVoice").addEventListener("click", function(){
+  say("Puffins spend most of the year far out at sea.");
+});
+
 function bindOpt(id,key){
   $(id).addEventListener("change",function(){ S.opts[key]=$(id).checked; save(); applyOpts(); });
 }
@@ -2033,6 +2123,7 @@ $("btnHomeFT").addEventListener("click",function(){ renderHome(); show("scHome")
 $("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.mode:"syn", M?M.level:2); });
 
 applyOpts();
+fillVoiceList();
 renderHome();
 </script>
 </body>
