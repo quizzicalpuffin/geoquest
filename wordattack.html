@@ -97,6 +97,9 @@ h3{font-size:1.05em}
 .opt.right{border-color:var(--good);background:#E4F1E8}
 .opt.wrongpick{border-color:var(--miss);background:#FBEADB}
 .opt .tick{float:right;font-weight:800}
+.listenbox{margin:.2em 0 .1em}
+.passage{margin-top:10px;padding:12px 14px;border-radius:12px;background:var(--bg);
+  border:2px solid var(--line);font-size:1.05em}
 .letterrow{display:flex;flex-wrap:wrap;gap:8px}
 .lettbtn{font:inherit;font-size:1.6em;font-weight:800;letter-spacing:0;
   min-width:52px;height:60px;padding:0 10px;background:var(--panel);color:var(--ink);
@@ -234,6 +237,7 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       <button class="btn gamebtn" data-mode="tricky"><b>Tricky Words</b><span>Words you cannot sound out</span></button>
       <button class="btn gamebtn" data-mode="spell"><b>Set Pieces</b><span>Spelling rules that catch people out</span></button>
       <button class="btn gamebtn" data-mode="sent"><b>Build the Move</b><span>Joining sentences that make sense</span></button>
+      <button class="btn gamebtn" data-mode="listen"><b>Commentary</b><span>Listen, then answer — no reading</span></button>
     </div>
     <div class="card" id="seasonCard">
       <h2>Your season</h2>
@@ -865,6 +869,87 @@ const TRICKY = [
 {t:2,s:"He felt ___ after being ill for days.",a:"weak",d:["week","weake","wek"]}
 ];
 
+/* ---- COMMENTARY: spoken passages, nothing to decode.
+   Understanding Spoken Paragraphs and Recalling Sentences were both SS 12
+   while reading accuracy was SS 85, so with the print taken away he can work
+   well above his reading age. Match scenes are fictional; the factual ones
+   stick to settled general knowledge. ---- */
+const PASSAGES = [
+{t:1,p:"Puffins spend most of the year far out at sea. They only come to land in spring, to nest in burrows on cliffs and islands. A puffin can carry a whole beakful of small fish at once, sometimes more than ten, without dropping any.",
+ q:[{q:"Where do puffins spend most of the year?",a:"Far out at sea",d:["In burrows on cliffs","On farmland","In forests"]},
+    {q:"When do puffins come to land?",a:"In spring",d:["In autumn","Every night","They never do"]}]},
+{t:1,p:"The waves at Strandhill roll in from the Atlantic, and on a big day they can be taller than a person. Surfers wait out beyond the break, sitting on their boards, watching the horizon. When the right wave comes they turn, paddle hard, and stand up.",
+ q:[{q:"What are the surfers watching?",a:"The horizon",d:["The beach","Their feet","The car park"]},
+    {q:"What do they do when the right wave comes?",a:"Turn, paddle hard and stand up",d:["Swim back to shore","Sit down on the board","Wave at the beach"]}]},
+{t:1,p:"Bees visit flowers to collect nectar, which they turn into honey. As a bee moves from flower to flower, yellow pollen sticks to its body and rubs off on the next plant. Without that accidental delivery, many of the fruits and vegetables we eat would never grow.",
+ q:[{q:"What do bees turn nectar into?",a:"Honey",d:["Pollen","Wax","Nectar juice"]},
+    {q:"Why does the passage call it an accidental delivery?",a:"The bee is not trying to do it",d:["The bee is careless","The pollen is heavy","The flowers ask for it"]}]},
+{t:1,p:"Hurling is one of the fastest field games in the world. Players carry a small ball, called a sliotar, on the end of a wooden stick. A good striker can send the sliotar more than eighty metres through the air, so defenders have to watch the whole pitch at once.",
+ q:[{q:"What is the ball called?",a:"A sliotar",d:["A hurley","A puck","A bas"]},
+    {q:"Why must defenders watch the whole pitch?",a:"The ball can travel a very long way",d:["There are too many players","The pitch is small","The game is slow"]}]},
+{t:1,p:"Danny had not saved a penalty all season. In the last minute of the county final, the referee pointed to the spot. Danny stood on his line, waited, and dived low to his left. The ball stuck in his gloves, and the whole ground stood up.",
+ q:[{q:"When was the penalty given?",a:"In the last minute",d:["At half time","At the start","After the final whistle"]},
+    {q:"Which way did Danny dive?",a:"Low to his left",d:["High to his right","Straight upwards","He did not dive"]},
+    {q:"How do you know the save mattered?",a:"The whole ground stood up",d:["He was wearing gloves","It was the county final","He had not saved one all season"]}]},
+{t:1,p:"Benbulben stands over the north of County Sligo like a great stone table. Its flat top and steep sides were carved by ice during the last ice age, when a glacier ground its way past. On a clear day you can see it from far out at sea.",
+ q:[{q:"What shaped Benbulben?",a:"Ice during the last ice age",d:["A river","The wind","People digging"]},
+    {q:"What is the top of it like?",a:"Flat",d:["Pointed","Rounded","Split in two"]}]},
+{t:1,p:"The Sun is a star, and eight planets travel around it. Earth is the third of those planets. The Sun is so large that more than a million Earths could fit inside it, and yet it is only an average sized star compared with others in the galaxy.",
+ q:[{q:"Which planet is Earth?",a:"The third",d:["The first","The eighth","The largest"]},
+    {q:"How does the Sun compare with other stars?",a:"It is about average sized",d:["It is the biggest of all","It is the smallest of all","It is not really a star"]}]},
+{t:1,p:"Cian was fastest off the blocks, but he breathed too often in the middle of the race and lost his rhythm. In the last length he stopped breathing altogether and drove for the wall. He touched second, a fingertip behind the boy in lane four.",
+ q:[{q:"Where did Cian finish?",a:"Second",d:["First","Third","Last"]},
+    {q:"What went wrong in the middle of the race?",a:"He breathed too often and lost his rhythm",d:["He was slow off the blocks","He swam the wrong way","He stopped completely"]}]},
+{t:1,p:"Heat from the sun turns water in the sea into vapour, which rises and cools into clouds. When the droplets in a cloud grow heavy enough, they fall as rain. Rivers then carry that water back down to the sea, and the whole journey begins again.",
+ q:[{q:"What makes the sea water rise?",a:"Heat from the sun",d:["Wind","Rivers","The clouds"]},
+    {q:"What happens when the droplets get heavy?",a:"They fall as rain",d:["They freeze solid","They disappear","They rise higher"]}]},
+{t:1,p:"Deep under the ground, rock gets so hot that it melts into a thick liquid called magma. Pressure builds until the magma forces its way upwards. Once it escapes at the surface it is given a new name: lava. As it cools, it hardens into solid rock again.",
+ q:[{q:"What is melted rock called while it is underground?",a:"Magma",d:["Lava","Ash","Crust"]},
+    {q:"When does magma become lava?",a:"Once it reaches the surface",d:["When it cools down","When it first melts","When it hardens"]}]},
+{t:1,p:"They were fourteen points down with ten minutes left, and some of the crowd had started to leave. Then the scrum-half broke away down the touchline and scored under the posts. Five minutes later they had a second try, and the ground was full of noise again.",
+ q:[{q:"How far behind were they?",a:"Fourteen points",d:["Ten points","Five points","Two points"]},
+    {q:"Why did the noise come back?",a:"They scored twice and closed the gap",d:["The match ended","It started raining","The crowd had left"]}]},
+{t:1,p:"The course ran twice around a muddy field and finished up a short, steep hill. Aoife had been lying fourth for most of the race, but she had deliberately saved something for the climb. She passed two runners on the slope and one more at the line.",
+ q:[{q:"Where did Aoife finish?",a:"First",d:["Second","Third","Fourth"]},
+    {q:"Why had she saved energy?",a:"For the steep hill at the end",d:["Because she was tired","To talk to a friend","To warm up properly"]}]},
+{t:2,p:"Atlantic salmon are born in freshwater rivers, then swim out to spend years feeding in the ocean. When they are ready to breed they return to the very river where they hatched, fighting upstream against the current and leaping waterfalls to get there.",
+ q:[{q:"Where are salmon born?",a:"In freshwater rivers",d:["In the open ocean","In lakes","At the seashore"]},
+    {q:"What is remarkable about where they return to?",a:"It is the same river they hatched in",d:["It is always warm","It is downstream","It has no water"]}]},
+{t:2,p:"The Great Wall of China was not built all at once. Different rulers added sections over many centuries, joining older walls together. It was meant to slow attackers down rather than stop them completely, giving soldiers time to gather and to signal for help.",
+ q:[{q:"How was the wall built?",a:"In sections over many centuries",d:["All in a single year","By one ruler alone","By machines"]},
+    {q:"What was the wall meant to do?",a:"Slow attackers down",d:["Stop everyone completely","Mark out a road","Hold back water"]}]},
+{t:2,p:"Antarctica is the coldest, windiest and driest continent on Earth. Although it is covered in thick ice, it counts as a desert, because almost no rain or snow falls there. The ice has simply built up over hundreds of thousands of years without melting away.",
+ q:[{q:"Why does Antarctica count as a desert?",a:"Almost no rain or snow falls there",d:["It is sandy","It is hot","It has no ice"]},
+    {q:"How did the ice build up?",a:"Slowly over hundreds of thousands of years",d:["In a single winter","From rivers","From the sea freezing"]}]},
+{t:2,p:"Every lighthouse flashes its own pattern, so that a sailor can tell one from another in the dark. Some flash twice quickly and then pause; others turn slowly all night long. Long before satellites, that pattern was often the only way to know exactly where you were.",
+ q:[{q:"Why does each lighthouse flash differently?",a:"So sailors can tell them apart",d:["To look attractive","To save electricity","To warn of storms"]},
+    {q:"What did sailors rely on before satellites?",a:"The flashing patterns",d:["Maps only","The stars only","Radio messages"]}]},
+{t:2,p:"Red squirrels were once common all over Ireland, but grey squirrels, brought over from North America, took over much of their woodland. In places where pine martens have returned, the greys have declined and the reds have started to come back.",
+ q:[{q:"Where did grey squirrels come from?",a:"North America",d:["Ireland","Britain","Asia"]},
+    {q:"What has helped the red squirrels?",a:"The return of pine martens",d:["More grey squirrels","Warmer weather","Fewer trees"]}]},
+{t:2,p:"The Great Pyramid at Giza was built more than four thousand years ago from over two million blocks of stone. For most of human history since then it was the tallest building on Earth. It is lined up with the points of the compass almost exactly.",
+ q:[{q:"How long was it the tallest building on Earth?",a:"For most of human history since it was built",d:["For about four years","For one century","It never was"]},
+    {q:"What is remarkable about how it is positioned?",a:"It lines up with the compass points",d:["It faces the sea","It leans to one side","It is perfectly round"]}]},
+{t:3,p:"In July 1969, two astronauts became the first people to walk on the Moon. Their spacecraft carried less computing power than an ordinary mobile phone has today. They left footprints in the dust which, with no wind or rain to disturb them, are still there.",
+ q:[{q:"Why are the footprints still there?",a:"There is no wind or rain to disturb them",d:["They are very deep","Nobody has visited since","The dust is sticky"]},
+    {q:"What is said about the spacecraft computer?",a:"It was weaker than a mobile phone today",d:["It was enormous","It broke down","It was the fastest ever built"]}]},
+{t:3,p:"Most liquids get denser as they freeze, but water does the opposite. As it turns to ice, the molecules lock into a structure that takes up more room, so ice is lighter than the water around it. That is why a frozen lake has ice on top and living fish beneath.",
+ q:[{q:"Why does ice float?",a:"It takes up more room than the same water",d:["It is warmer","It is heavier","It is salty"]},
+    {q:"What does this mean for the fish?",a:"They can go on living under the ice",d:["They freeze solid","They have to leave the lake","They swim on top of the ice"]}]},
+{t:3,p:"Bats hunt in complete darkness by shouting and listening. They send out high squeaks, far too high for human ears, and work out where an insect is from the echo that bounces back. Some can find a moth the size of your thumbnail on the darkest night.",
+ q:[{q:"How do bats find insects?",a:"From the echoes that bounce back",d:["By smell","By seeing in the dark","By touch"]},
+    {q:"Why can people not hear the squeaks?",a:"They are too high for human ears",d:["They are too quiet","The bats are too far away","They happen underwater"]}]},
+{t:3,p:"An octopus has no bones at all, so it can squeeze through any gap bigger than its beak. It can change the colour and even the texture of its skin in less than a second, and it can taste what it touches through the suckers along its arms.",
+ q:[{q:"What decides the smallest gap an octopus can fit through?",a:"The size of its beak",d:["The length of its arms","The size of its eyes","Its weight"]},
+    {q:"What can the suckers do?",a:"Taste whatever they touch",d:["See","Hear","Breathe"]}]},
+{t:3,p:"The Titanic was built in Belfast and launched in 1911. On her first voyage across the Atlantic she struck an iceberg late at night and sank in under three hours. There were not enough lifeboats on board for everyone who was travelling.",
+ q:[{q:"Where was the Titanic built?",a:"Belfast",d:["Liverpool","Dublin","Cork"]},
+    {q:"What was the problem with the lifeboats?",a:"There were not enough for everyone aboard",d:["They were too heavy","They leaked","There were none at all"]}]},
+{t:3,p:"Viking raiders first reached Ireland in the late seven hundreds. Over time many settled instead of returning home, and the towns they founded include Dublin, Waterford and Limerick. Their longships were light enough to be carried overland between one river and the next.",
+ q:[{q:"What did the Vikings found in Ireland?",a:"Towns including Dublin and Waterford",d:["Stone castles","Cathedrals only","The first roads"]},
+    {q:"Why did it matter that the longships were light?",a:"They could be carried overland between rivers",d:["They sailed faster","They cost less to build","They floated higher"]}]}
+];
+
 
 /* =======================================================================
    Storage — Safari can block localStorage on file:// so everything is
@@ -962,8 +1047,22 @@ var MODES = {
     pool:function(lv){ var p=[]; TRICKY.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
     key:function(i){ return TRICKY[i].a; },
     build:function(i){ return buildTricky(i); }
+  },
+  listen:{
+    name:"Commentary", sub:"Listen, then answer — no reading", icon:"L",
+    pool:function(lv){ var p=[]; PASSAGES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return "p"+i; },
+    build:function(i){ return buildListen(i); }
   }
 };
+
+function buildListen(i){
+  var e=PASSAGES[i], item=pick(e.q);
+  return { kind:"listen", key:"p"+i, word:e.p, passage:e.p, ask:item.q,
+    help:item.q,
+    opts:shuffle([item.a].concat(item.d)), answers:[item.a],
+    teach:"Tap play to hear it again — you can listen as often as you like." };
+}
 
 /* ---- Opposites. At Champions level one distractor is a SYNONYM of the
    target, because same-versus-opposite is the confusion worth drilling. ---- */
@@ -1157,7 +1256,7 @@ function renderQuestion(){
   $("attackNo").textContent = "Attack "+(M.n+1)+" of "+M.queue.length;
   $("scoreTxt").textContent = M.us+" – "+M.them;
   var LABEL={ double:"Two-touch", sentence:"Through ball", join:"Build the move",
-              tricky:"Spot the difference", letters:"Find the ghost" };
+              tricky:"Spot the difference", letters:"Find the ghost", listen:"In the studio" };
   $("qType").textContent = LABEL[q.kind] || (q.rule ? q.rule : "Pick the pass");
   $("qHelp").textContent = q.help;
   updateDots(); updateBall();
@@ -1174,6 +1273,12 @@ function renderQuestion(){
     stem='<div class="sentence">'+q.sentence.replace("___",'<mark>&nbsp;?&nbsp;</mark>')+'</div>';
   } else if(q.kind==="join"){
     stem='<div class="sentence">'+q.stem+' <span class="muted">…</span>'+speaker(q.stem,1)+'</div>';
+  } else if(q.kind==="listen"){
+    stem='<div class="listenbox">'+
+      '<button class="btn primary" id="btnPlayPassage" style="margin-bottom:8px">&#9654;&nbsp; Play the commentary</button>'+
+      '<button class="btn ghost" id="btnShowWords" style="margin-bottom:0">Show the words</button>'+
+      '<div class="passage hidden" id="passageText">'+q.passage+'</div>'+
+      '</div><div class="sentence" style="margin-top:.6em"><b>'+q.ask+'</b></div>';
   } else if(q.spellPrompt){
     stem='<div class="sentence">Only one of these is a real spelling.'+speaker(q.word,1)+'</div>';
   } else {
@@ -1197,6 +1302,24 @@ function renderQuestion(){
   $("qOpts").innerHTML=html;
   $("btnConfirm").classList.toggle("hidden", q.kind!=="double");
   if(q.kind==="double") $("btnConfirm").textContent="Shoot! (pick 2)";
+
+  if(q.kind==="listen"){
+    var speakIt=function(){ say(q.passage+" . . . "+q.ask); };
+    $("btnPlayPassage").addEventListener("click", speakIt);
+    $("btnShowWords").addEventListener("click", function(){
+      $("passageText").classList.toggle("hidden");
+      this.textContent = $("passageText").classList.contains("hidden") ? "Show the words" : "Hide the words";
+    });
+    // With sound off there is nothing to listen to, so show the words instead
+    if(!S.opts.voice || !("speechSynthesis" in window)){
+      $("passageText").classList.remove("hidden");
+      $("btnShowWords").textContent="Hide the words";
+      $("btnPlayPassage").classList.add("hidden");
+      $("qHelp").textContent="Sound is off, so the words are shown. Turn sound on for the listening version.";
+    } else {
+      setTimeout(speakIt, 250);
+    }
+  }
 }
 
 function updateDots(){
@@ -1295,7 +1418,8 @@ function grade(){
     $("fbBox").innerHTML='<div class="feedback no"><b>Tackled — possession lost.</b><br>'+
       '<span class="small">'+shown+'<br>'+q.teach+'</span></div>';
     if(S.opts.autoSay) setTimeout(function(){
-      say(q.kind==="letters" ? q.word : q.word+". "+q.answers.join(". "));
+      if(q.kind==="listen") say(q.answers.join(". "));      // not the whole passage again
+      else say(q.kind==="letters" ? q.word : q.word+". "+q.answers.join(". "));
     }, 350);
   }
   $("scoreTxt").textContent=M.us+" – "+M.them;
@@ -1589,6 +1713,8 @@ function reviewLine(mode, idx){
     return {title:s.w, say:s.w, detail:s.r==="silent" ? 'Silent "'+s.sl+'"'
       : (s.r==="double" ? "Watch the double letters" : "Watch the ending")}; }
   if(mode==="sent"){ var j=JOINS[idx]; return {title:j.stem, say:j.stem+" "+j.a, detail:j.a}; }
+  if(mode==="listen"){ var g=PASSAGES[idx];
+    return {title:g.p.split(" ").slice(0,5).join(" ")+"…", say:g.p, detail:"Listen to it again"}; }
   var t=TRICKY[idx];
   return {title:t.a, say:t.a, detail:t.s.replace("___", t.a)};
 }
@@ -1629,6 +1755,7 @@ function endMatch(){
     $("ftReview").innerHTML=h;
   } else {
     $("ftReviewCard").classList.add("hidden");
+    $("ftReview").innerHTML="";          // don't keep last match's words around
   }
   show("scFT");
 }
