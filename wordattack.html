@@ -238,6 +238,7 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       <button class="btn gamebtn" data-mode="spell"><b>Set Pieces</b><span>Spelling rules that catch people out</span></button>
       <button class="btn gamebtn" data-mode="sent"><b>Build the Move</b><span>Joining sentences that make sense</span></button>
       <button class="btn gamebtn" data-mode="listen"><b>Commentary</b><span>Listen, then answer — no reading</span></button>
+      <button class="btn gamebtn" data-mode="team"><b>Team Sheet</b><span>Which words belong together</span></button>
     </div>
     <div class="card" id="seasonCard">
       <h2>Your season</h2>
@@ -869,6 +870,48 @@ const TRICKY = [
 {t:2,s:"He felt ___ after being ill for days.",a:"weak",d:["week","weake","wek"]}
 ];
 
+/* ---- TEAM SHEET: mirrors the CELF-5 Word Classes subtest, where the
+   student picks which two words are related — by category, by what they are
+   used for, by where they are found, or by time. That subtest was SS 10,
+   his weakest content area, and it is what prompted the synonym work. ---- */
+const CLASSES = [
+{t:1,r:"are all birds",g:["robin","swallow","heron","magpie","wren"]},
+{t:1,r:"are all fish",g:["salmon","trout","mackerel","herring"]},
+{t:1,r:"are all fruit",g:["apple","banana","pear","plum"]},
+{t:1,r:"are all vegetables",g:["carrot","turnip","cabbage","parsnip"]},
+{t:1,r:"are all trees",g:["oak","ash","willow","birch"]},
+{t:1,r:"are all kinds of weather",g:["hail","drizzle","thunder","frost"]},
+{t:2,r:"are all musical instruments",g:["piano","violin","trumpet","banjo"]},
+{t:2,r:"are all metals",g:["iron","copper","silver","lead"]},
+{t:2,r:"are all pieces of furniture",g:["wardrobe","dresser","bookcase","sideboard"]},
+{t:1,r:"are all clothes",g:["jumper","trousers","scarf","jacket"]},
+{t:1,r:"are all vehicles",g:["lorry","van","bus","jeep"]},
+{t:2,r:"are all tools",g:["hammer","spanner","chisel","screwdriver"]},
+{t:2,r:"are all insects",g:["beetle","wasp","moth","earwig"]},
+{t:3,r:"are all shapes",g:["hexagon","cylinder","pyramid","cube"]},
+{t:1,r:"are all things you write with",g:["pencil","biro","chalk","crayon"]},
+{t:2,r:"are all things you cut with",g:["scissors","saw","shears","blade"]},
+{t:2,r:"are all things that measure something",g:["ruler","scales","clock","thermometer"]},
+{t:1,r:"are all things that give light",g:["torch","lamp","candle","lantern"]},
+{t:2,r:"are all things you carry things in",g:["rucksack","basket","bucket","suitcase"]},
+{t:1,r:"are all things you sit on",g:["stool","bench","couch","saddle"]},
+{t:2,r:"are all things that keep you dry",g:["umbrella","raincoat","tent","canopy"]},
+{t:3,r:"are all things that make a sound louder",g:["microphone","speaker","megaphone","amplifier"]},
+{t:1,r:"are all found in a kitchen",g:["kettle","oven","fridge","sink"]},
+{t:1,r:"are all found on a beach",g:["dune","shell","seaweed","pebble"]},
+{t:2,r:"are all found in a hospital",g:["ward","stretcher","bandage","surgeon"]},
+{t:2,r:"are all found on a farm",g:["barn","silage","byre","haystack"]},
+{t:2,r:"are all found in a forest",g:["bark","moss","fern","trunk"]},
+{t:1,r:"are all parts of a football pitch",g:["touchline","goalpost","penalty spot","dugout"]},
+{t:3,r:"are all found in a library",g:["catalogue","librarian","index","bookmark"]},
+{t:1,r:"are all times of day",g:["dawn","noon","dusk","midnight"]},
+{t:1,r:"are all seasons",g:["spring","autumn","winter","summer"]},
+{t:2,r:"are all months",g:["January","March","October","August"]},
+{t:2,r:"are all lengths of time",g:["minute","hour","decade","century"]},
+{t:3,r:"all mean very soon",g:["shortly","presently","imminently","directly"]},
+{t:3,r:"are all things that happen once a year",g:["birthday","Christmas","harvest","anniversary"]}
+];
+
 /* ---- COMMENTARY: spoken passages, nothing to decode.
    Understanding Spoken Paragraphs and Recalling Sentences were both SS 12
    while reading accuracy was SS 85, so with the print taken away he can work
@@ -1053,8 +1096,48 @@ var MODES = {
     pool:function(lv){ var p=[]; PASSAGES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
     key:function(i){ return "p"+i; },
     build:function(i){ return buildListen(i); }
+  },
+  team:{
+    name:"Team Sheet", sub:"Which words belong together", icon:"C",
+    pool:function(lv){ var p=[]; CLASSES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return CLASSES[i].r; },
+    build:function(i,n){ return buildTeam(i,n); }
   }
 };
+
+/* A word must never appear in two groups, or a distractor could quietly be a
+   correct answer. Built once at load and checked by the outsider picker. */
+var CLASS_OWNER = {};
+CLASSES.forEach(function(e,i){ e.g.forEach(function(w){ CLASS_OWNER[norm(w)]=i; }); });
+function outsiders(idx, count){
+  var out=[], guard=0, used={};
+  while(out.length<count && guard++<400){
+    var j=(Math.random()*CLASSES.length)|0;
+    if(j===idx) continue;
+    var w=pick(CLASSES[j].g);
+    if(CLASS_OWNER[norm(w)]===idx) continue;      // belongs to the target group
+    if(used[norm(w)]) continue;
+    used[norm(w)]=1; out.push(w);
+  }
+  return out;
+}
+function buildTeam(i, n){
+  var e=CLASSES[i];
+  if(n%2===1){
+    // Odd one out: three from the group, one from somewhere else
+    var three=shuffle(e.g.slice()).slice(0,3);
+    var odd=outsiders(i,1)[0];
+    return { kind:"single", label:"Odd one out", key:e.r, word:odd, stem:null, plain:true,
+      help:"Three of these belong together. Tap the one that does not.",
+      opts:shuffle(three.concat([odd])), answers:[odd],
+      teach:cap(three.join(", "))+" "+e.r+"." };
+  }
+  var two=shuffle(e.g.slice()).slice(0,2);
+  return { kind:"double", label:"Two of a kind", key:e.r, word:two[0], stem:null, plain:true,
+    help:"Tap the TWO words that belong together, then shoot.",
+    opts:shuffle(two.concat(outsiders(i,2))), answers:two.slice(),
+    teach:cap(two[0])+" and "+two[1]+" "+e.r+"." };
+}
 
 function buildListen(i){
   var e=PASSAGES[i], item=pick(e.q);
@@ -1257,7 +1340,7 @@ function renderQuestion(){
   $("scoreTxt").textContent = M.us+" – "+M.them;
   var LABEL={ double:"Two-touch", sentence:"Through ball", join:"Build the move",
               tricky:"Spot the difference", letters:"Find the ghost", listen:"In the studio" };
-  $("qType").textContent = LABEL[q.kind] || (q.rule ? q.rule : "Pick the pass");
+  $("qType").textContent = q.label || LABEL[q.kind] || (q.rule ? q.rule : "Pick the pass");
   $("qHelp").textContent = q.help;
   updateDots(); updateBall();
 
@@ -1279,6 +1362,8 @@ function renderQuestion(){
       '<button class="btn ghost" id="btnShowWords" style="margin-bottom:0">Show the words</button>'+
       '<div class="passage hidden" id="passageText">'+q.passage+'</div>'+
       '</div><div class="sentence" style="margin-top:.6em"><b>'+q.ask+'</b></div>';
+  } else if(q.plain){
+    stem="";                              // the words themselves are the question
   } else if(q.spellPrompt){
     stem='<div class="sentence">Only one of these is a real spelling.'+speaker(q.word,1)+'</div>';
   } else {
@@ -1713,6 +1798,8 @@ function reviewLine(mode, idx){
     return {title:s.w, say:s.w, detail:s.r==="silent" ? 'Silent "'+s.sl+'"'
       : (s.r==="double" ? "Watch the double letters" : "Watch the ending")}; }
   if(mode==="sent"){ var j=JOINS[idx]; return {title:j.stem, say:j.stem+" "+j.a, detail:j.a}; }
+  if(mode==="team"){ var c=CLASSES[idx];
+    return {title:cap(c.g.slice(0,2).join(", ")), say:c.g.join(", "), detail:"They "+c.r}; }
   if(mode==="listen"){ var g=PASSAGES[idx];
     return {title:g.p.split(" ").slice(0,5).join(" ")+"…", say:g.p, detail:"Listen to it again"}; }
   var t=TRICKY[idx];
