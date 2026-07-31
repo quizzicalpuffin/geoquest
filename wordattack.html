@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Word Attack FC">
+<meta name="theme-color" content="#F7F0E1">
+<title>Word Attack FC</title>
+<style>
+:root{
+  --bg:#F7F0E1; --panel:#FFFCF4; --ink:#22303D; --ink-soft:#5C6B78;
+  --line:#E2D6BE; --pitch:#2E7D4F; --pitch-dk:#24623E;
+  --gold:#E8A317; --good:#2E7D4F; --miss:#C2681A;
+  --fs:1;           /* text size multiplier */
+  --ls:0.005em;     /* letter spacing */
+  --ws:0.04em;      /* word spacing */
+  --lh:1.6;
+  --radius:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Verdana,Tahoma,sans-serif;
+  font-size:calc(17px * var(--fs));
+  letter-spacing:var(--ls); word-spacing:var(--ws); line-height:var(--lh);
+  -webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body.theme-blue{--bg:#E9F1F7;--panel:#FBFDFF;--line:#CBDCE8}
+body.theme-mint{--bg:#E8F3EC;--panel:#FAFFFB;--line:#C9E1D2}
+body.theme-grey{--bg:#EDEDEA;--panel:#FAFAF8;--line:#D8D8D3}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 40px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .18s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---------- generic bits ---------- */
+h1,h2,h3{line-height:1.25;margin:0 0 .5em}
+h1{font-size:1.75em;letter-spacing:0.01em}
+h2{font-size:1.3em}
+h3{font-size:1.05em}
+.muted{color:var(--ink-soft)}
+.small{font-size:.85em}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.hero{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;line-height:0;margin-bottom:14px}
+.hero svg{display:block;width:100%;height:auto}
+.board{background:#14251C;border:2px solid #0C1811;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;color:#EAF3ED}
+.board .bt{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:#7FBF9A}
+.board .bs{font-size:2.6em;font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;line-height:1.1}
+.board .bn{display:flex;justify-content:space-between;gap:10px;font-size:.85em;color:#B9D6C6}
+.btn{
+  display:block;width:100%;text-align:left;font:inherit;letter-spacing:inherit;word-spacing:inherit;
+  background:var(--panel);color:var(--ink);border:2px solid var(--line);
+  border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer;
+  transition:transform .08s,border-color .12s,background .12s;
+}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:var(--pitch);border-color:var(--pitch-dk);color:#fff;text-align:center;font-weight:700}
+.btn.gold{background:var(--gold);border-color:#C4870B;color:#3A2A00;text-align:center;font-weight:700}
+.btn.ghost{text-align:center}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .btn{flex:1 1 0;min-width:130px}
+.pill{display:inline-block;background:var(--bg);border:2px solid var(--line);border-radius:999px;padding:3px 11px;font-size:.8em;font-weight:700}
+
+/* ---------- header ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.crest{display:flex;align-items:center;gap:10px}
+.crest .badge{width:36px;height:40px;flex:none;display:block}
+.crest b{font-size:1.05em;letter-spacing:.02em}
+.iconbtn{width:44px;height:44px;flex:none;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15em;cursor:pointer;display:grid;place-items:center}
+
+/* ---------- pitch ---------- */
+.pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
+  margin-bottom:12px;line-height:0;background:#3E8F5C}
+.pitch svg{display:block;width:100%;height:auto}
+.mball{transition:transform .45s cubic-bezier(.2,.8,.3,1);transform-box:view-box;transform-origin:0 0}
+.scoreline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
+.scoreline .sc{font-size:1.5em;letter-spacing:.04em}
+.streakdots{display:flex;gap:6px}
+.streakdots i{width:12px;height:12px;border-radius:50%;background:var(--line);display:block}
+.streakdots i.lit{background:var(--gold)}
+
+/* ---------- question ---------- */
+.qtype{font-size:.8em;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--pitch)}
+.target{font-size:2.1em;font-weight:800;letter-spacing:.01em;margin:.15em 0 .1em;display:inline-block}
+.sentence{font-size:1.18em;margin:.3em 0 .1em}
+.sentence mark{background:#FFE9A8;color:inherit;padding:2px 5px;border-radius:6px;font-weight:800}
+.opt{position:relative;padding-right:52px}
+.opt .say{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:10px;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font-size:.95em}
+.opt.picked{border-color:var(--gold);background:#FFF6DF}
+.opt.right{border-color:var(--good);background:#E4F1E8}
+.opt.wrongpick{border-color:var(--miss);background:#FBEADB}
+.opt .tick{float:right;font-weight:800}
+.feedback{border-radius:14px;padding:14px 16px;margin:4px 0 12px;border:2px solid}
+.feedback.ok{background:#E4F1E8;border-color:var(--good)}
+.feedback.no{background:#FBEADB;border-color:var(--miss)}
+.feedback b{font-size:1.1em}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:.92em}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)}
+td.num,th.num{text-align:right}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--pitch)}
+.bar.warn i{background:var(--miss)}
+
+/* ---------- settings ---------- */
+.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.setting:last-child{border-bottom:none}
+.setting label{flex:1}
+.switch{position:relative;width:54px;height:32px;flex:none}
+.switch input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer;position:relative;z-index:2}
+.switch span{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:.15s;pointer-events:none}
+.switch span:after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked + span{background:var(--pitch)}
+.switch input:checked + span:after{transform:translateX(22px)}
+input[type=range]{width:150px;accent-color:var(--pitch)}
+.swatches{display:flex;gap:8px}
+.swatches button{width:38px;height:38px;border-radius:10px;border:3px solid var(--line);cursor:pointer}
+.swatches button[aria-pressed=true]{border-color:var(--ink)}
+.hidden{display:none !important}
+.gridwords{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.gridwords span{border:2px solid var(--line);border-radius:8px;padding:5px 6px;font-size:.8em;text-align:center;background:var(--panel)}
+.gridwords span.s2{background:#E4F1E8;border-color:var(--good)}
+.gridwords span.s1{background:#FFF6DF;border-color:var(--gold)}
+.gridwords span.s0{background:#FBEADB;border-color:var(--miss)}
+.clockbox{font-weight:800;font-variant-numeric:tabular-nums}
+.goalflash{position:fixed;inset:0;background:rgba(46,125,79,.94);color:#fff;display:grid;place-items:center;z-index:99;font-size:2.6em;font-weight:800;letter-spacing:.06em;text-align:center;padding:20px}
+
+/* ---------- penalty ---------- */
+.penwrap{position:fixed;inset:0;background:rgba(18,28,22,.80);z-index:80;display:none;align-items:center;justify-content:center;padding:12px}
+.penwrap.on{display:flex}
+.pencard{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:14px 16px 16px;width:100%;max-width:520px;max-height:96vh;overflow:auto}
+.penhead{font-size:.8em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--pitch)}
+.penfield{position:relative;border-radius:12px;overflow:hidden;line-height:0;cursor:crosshair;
+  touch-action:none;user-select:none;-webkit-user-select:none;margin:.5em 0}
+.penfield svg{display:block;width:100%;height:auto}
+.ptarget{fill:rgba(255,255,255,.10);stroke:rgba(255,255,255,.85);stroke-width:2.5;stroke-dasharray:5 4;
+  transition:fill .14s,stroke .14s,r .14s}
+.ptarget.hot{fill:#E8A317;stroke:#fff;stroke-dasharray:none;stroke-width:3}
+.pkeeper,.pball{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:view-box;transform-origin:0 0}
+.kbody{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:fill-box;transform-origin:50% 68%}
+.pkeeper.dive-l .kbody{transform:rotate(-42deg)}
+.pkeeper.dive-r .kbody{transform:rotate(42deg)}
+.pkeeper.dive-u .kbody{transform:translateY(-3px) scale(1.04)}
+.pennet{transform-box:view-box;transform-origin:200px 208px}
+.pennet.ripple{animation:netbulge .55s ease-out}
+@keyframes netbulge{0%{transform:none}35%{transform:scaleY(1.07) scaleX(1.015)}100%{transform:none}}
+.penres{font-size:1.45em;font-weight:800;text-align:center;margin:.35em 0 .1em}
+.penres.scored{color:var(--good)}
+.penres.saved{color:var(--miss)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="crest">
+      <svg class="badge" viewBox="0 0 40 44" role="img" aria-label="Word Attack FC crest">
+        <path d="M20 1 L38 7 V24 C38 34 30 40 20 43 C10 40 2 34 2 24 V7 Z" fill="#2E7D4F" stroke="#1C5836" stroke-width="2"/>
+        <path d="M20 1 L38 7 V13 H2 V7 Z" fill="#E8A317"/>
+        <circle cx="20" cy="26" r="8.5" fill="#FFFFFF" stroke="#1C5836" stroke-width="1.6"/>
+        <path d="M20 21 L24.8 24.4 L23 30 L17 30 L15.2 24.4 Z" fill="#1C5836"/>
+        <text x="20" y="11.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#3A2A00"
+              font-family="-apple-system,BlinkMacSystemFont,sans-serif">WA</text>
+      </svg>
+      <b>WORD&nbsp;ATTACK&nbsp;FC</b>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="iconbtn" id="btnSound" title="Sound">&#128266;</button>
+      <button class="iconbtn" id="btnSettings" title="Settings">&#9881;</button>
+    </div>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen on" id="scHome">
+    <div class="hero">
+      <svg viewBox="0 0 400 120" role="img" aria-label="Floodlit stadium with a ball on the centre spot">
+        <rect width="400" height="120" fill="#1D5E3C"/>
+        <rect width="400" height="52" fill="url(#crowd2)"/>
+        <rect y="48" width="400" height="6" fill="#5C0A14"/>
+        <rect y="54" width="400" height="18" fill="#46A167"/>
+        <rect y="72" width="400" height="18" fill="#3E8F5C"/>
+        <rect y="90" width="400" height="16" fill="#46A167"/>
+        <rect y="106" width="400" height="14" fill="#3E8F5C"/>
+        <defs>
+          <pattern id="crowd2" width="10" height="10" patternUnits="userSpaceOnUse">
+            <rect width="10" height="10" fill="#8A1220"/>
+            <circle cx="2.5" cy="2.5" r="1.5" fill="#C5303C"/>
+            <circle cx="7.5" cy="7" r="1.5" fill="#E24B57"/>
+          </pattern>
+        </defs>
+        <g stroke="rgba(255,255,255,.6)" stroke-width="2" fill="none">
+          <circle cx="200" cy="88" r="26"/><path d="M200 54 V120"/>
+          <path d="M0 66 H40 V110 H0"/><path d="M400 66 H360 V110 H400"/>
+        </g>
+        <g fill="#C9D3DC"><rect x="52" y="14" width="4" height="36"/><rect x="344" y="14" width="4" height="36"/></g>
+        <g fill="#FFF6D8"><circle cx="54" cy="11" r="4"/><circle cx="346" cy="11" r="4"/></g>
+        <g transform="translate(200,88)">
+          <circle r="11" fill="#fff" stroke="#1B2430" stroke-width="2"/>
+          <path d="M0 -6.4 L6 -2 L3.7 5.2 L-3.7 5.2 L-6 -2 Z" fill="#1B2430"/>
+        </g>
+      </svg>
+    </div>
+    <div class="card">
+      <h1>Pick your match</h1>
+      <p class="muted">12 attacks. Three correct in a row wins a penalty — swipe to pick your corner.</p>
+      <button class="btn primary" data-level="1">Academy &nbsp;·&nbsp; easier words</button>
+      <button class="btn primary" data-level="2">First Team &nbsp;·&nbsp; mixed</button>
+      <button class="btn primary" data-level="3">Champions League &nbsp;·&nbsp; hardest</button>
+    </div>
+    <div class="card" id="seasonCard">
+      <h2>Your season</h2>
+      <div id="seasonBody"></div>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="btnSquad">Squad list</button>
+      <button class="btn ghost" id="btnParent">Parent zone</button>
+    </div>
+  </section>
+
+  <!-- ================= MATCH ================= -->
+  <section class="screen" id="scMatch">
+    <div class="scoreline">
+      <div><span class="pill" id="attackNo">Attack 1 of 12</span></div>
+      <div class="sc" id="scoreTxt">0 – 0</div>
+      <div class="clockbox" id="clockTxt"></div>
+    </div>
+    <div class="pitch" id="pitch">
+      <svg viewBox="0 0 300 68" role="img" aria-label="Pitch showing how far your attack has advanced">
+        <defs>
+          <g id="ballArt">
+            <circle r="9" fill="#FFFFFF" stroke="#1B2430" stroke-width="1.8"/>
+            <path d="M0 -5.2 L4.9 -1.6 L3 4.2 L-3 4.2 L-4.9 -1.6 Z" fill="#1B2430"/>
+            <path d="M0 -9 L0 -5.2 M4.9 -1.6 L8.6 -2.8 M3 4.2 L5.3 7.3 M-3 4.2 L-5.3 7.3 M-4.9 -1.6 L-8.6 -2.8"
+                  stroke="#1B2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </g>
+        </defs>
+        <rect width="300" height="68" fill="#3E8F5C"/>
+        <rect x="0"   width="50" height="68" fill="#46A167"/>
+        <rect x="100" width="50" height="68" fill="#46A167"/>
+        <rect x="200" width="50" height="68" fill="#46A167"/>
+        <g stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none">
+          <path d="M150 2 V66"/>
+          <circle cx="150" cy="34" r="12"/>
+          <path d="M300 10 H268 V58 H300"/>
+          <path d="M300 24 H286 V44 H300"/>
+          <path d="M0 10 H32 V58 H0"/>
+        </g>
+        <circle cx="150" cy="34" r="2" fill="rgba(255,255,255,.7)"/>
+        <circle cx="278" cy="34" r="2" fill="rgba(255,255,255,.7)"/>
+        <g class="mball" id="ball" style="transform:translate(36px,34px)"><use href="#ballArt"/></g>
+      </svg>
+    </div>
+    <div class="streakdots" id="streakDots" style="margin-bottom:12px"><i></i><i></i><i></i></div>
+
+    <div class="card" id="qCard">
+      <div class="qtype" id="qType">Pick the pass</div>
+      <div id="qStem"></div>
+      <div id="qHelp" class="small muted" style="margin:.4em 0 .9em"></div>
+      <div id="qOpts"></div>
+      <button class="btn gold hidden" id="btnConfirm">Shoot!</button>
+    </div>
+
+    <div id="fbBox"></div>
+    <button class="btn primary hidden" id="btnNext">Next attack &rsaquo;</button>
+    <button class="btn ghost" id="btnQuit">Leave the pitch</button>
+  </section>
+
+  <!-- ================= FULL TIME ================= -->
+  <section class="screen" id="scFT">
+    <div class="board">
+      <div class="bt">Full time</div>
+      <div class="bn"><span>Word Attack FC</span><span id="ftOpp">Visitors</span></div>
+      <div class="bs" id="ftScore">0 – 0</div>
+    </div>
+    <div class="card">
+      <h1 id="ftHead">Full time</h1>
+      <p id="ftLine" class="muted"></p>
+      <div id="ftStats"></div>
+    </div>
+    <div class="card" id="ftReviewCard">
+      <h2>Words to work on</h2>
+      <div id="ftReview"></div>
+    </div>
+    <button class="btn primary" id="btnPlayAgain">Play again</button>
+    <button class="btn ghost" id="btnHomeFT">Back to home</button>
+  </section>
+
+  <!-- ================= SQUAD ================= -->
+  <section class="screen" id="scSquad">
+    <div class="card">
+      <h1>Squad list</h1>
+      <p class="muted small">All 96 words from your report. Tap any word to hear it and see its synonyms.</p>
+      <div class="small" style="margin-bottom:10px">
+        <span class="pill" style="background:#E4F1E8;border-color:var(--good)">Strong</span>
+        <span class="pill" style="background:#FFF6DF;border-color:var(--gold)">Getting there</span>
+        <span class="pill" style="background:#FBEADB;border-color:var(--miss)">Needs work</span>
+      </div>
+      <div class="gridwords" id="squadGrid"></div>
+    </div>
+    <div class="card hidden" id="squadDetail"></div>
+    <button class="btn ghost" id="btnHomeSquad">Back to home</button>
+  </section>
+
+  <!-- ================= PARENT ================= -->
+  <section class="screen" id="scParent">
+    <div class="card">
+      <h1>Parent zone</h1>
+      <div id="parentSummary"></div>
+    </div>
+    <div class="card">
+      <h2>Weakest words</h2>
+      <p class="muted small">Sorted by accuracy. These are the ones worth revisiting out loud.</p>
+      <div id="parentWeak"></div>
+    </div>
+    <div class="card">
+      <h2>Recent matches</h2>
+      <div id="parentHistory"></div>
+    </div>
+    <div class="card">
+      <h3>Data</h3>
+      <p class="muted small" id="storageNote"></p>
+      <button class="btn ghost" id="btnExport">Export progress (text)</button>
+      <button class="btn ghost" id="btnReset">Reset all progress</button>
+    </div>
+    <button class="btn ghost" id="btnHomeParent">Back to home</button>
+  </section>
+
+  <!-- ================= SETTINGS ================= -->
+  <section class="screen" id="scSettings">
+    <div class="card">
+      <h1>Settings</h1>
+      <div class="setting">
+        <label for="setVoice">Read words aloud<br><span class="small muted">Tap the speaker on any word</span></label>
+        <div class="switch"><input type="checkbox" id="setVoice" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setAutoSay">Say the answer after a miss<br><span class="small muted">Hearing it helps it stick</span></label>
+        <div class="switch"><input type="checkbox" id="setAutoSay" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setClock">Match clock<br><span class="small muted">Off by default — no time pressure</span></label>
+        <div class="switch"><input type="checkbox" id="setClock"><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setSpace">Extra letter spacing<br><span class="small muted">Wider gaps between letters and words</span></label>
+        <div class="switch"><input type="checkbox" id="setSpace" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setSize">Text size</label>
+        <input type="range" id="setSize" min="90" max="145" step="5" value="105">
+      </div>
+      <div class="setting">
+        <label>Background colour<br><span class="small muted">Some readers find tinted paper easier</span></label>
+        <div class="swatches" id="swatches">
+          <button data-theme="" style="background:#F7F0E1" aria-pressed="true" title="Cream"></button>
+          <button data-theme="theme-blue" style="background:#E9F1F7" aria-pressed="false" title="Blue"></button>
+          <button data-theme="theme-mint" style="background:#E8F3EC" aria-pressed="false" title="Mint"></button>
+          <button data-theme="theme-grey" style="background:#EDEDEA" aria-pressed="false" title="Grey"></button>
+        </div>
+      </div>
+    </div>
+    <button class="btn primary" id="btnHomeSet">Done</button>
+  </section>
+
+</div>
+
+<!-- ================= PENALTY ================= -->
+<div class="penwrap" id="penWrap">
+  <div class="pencard">
+    <div class="penhead">Penalty</div>
+    <h2 style="margin:.1em 0 .2em">Three in a row — you're on the spot.</h2>
+    <p class="small muted" id="penMsg" style="margin:0">Swipe from the ball towards a corner of the net. Or just tap the corner you want.</p>
+    <div class="penfield" id="penField">
+      <svg viewBox="0 0 400 320" role="img" aria-label="Penalty scene: goal, goalkeeper and ball on the spot">
+        <defs>
+          <pattern id="crowd" width="12" height="12" patternUnits="userSpaceOnUse">
+            <rect width="12" height="12" fill="#8A1220"/>
+            <circle cx="3"  cy="3"  r="1.9" fill="#C5303C"/>
+            <circle cx="9"  cy="8"  r="1.9" fill="#E24B57"/>
+            <circle cx="9"  cy="2"  r="1.6" fill="#A61E2C"/>
+            <circle cx="2"  cy="9"  r="1.6" fill="#D93B47"/>
+          </pattern>
+          <pattern id="netmesh" width="11" height="11" patternUnits="userSpaceOnUse">
+            <path d="M11 0 H0 V11" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.1"/>
+          </pattern>
+          <g id="ballArt2">
+            <circle r="11" fill="#FFFFFF" stroke="#1B2430" stroke-width="2"/>
+            <path d="M0 -6.4 L6 -2 L3.7 5.2 L-3.7 5.2 L-6 -2 Z" fill="#1B2430"/>
+            <path d="M0 -11 L0 -6.4 M6 -2 L10.5 -3.4 M3.7 5.2 L6.5 9 M-3.7 5.2 L-6.5 9 M-6 -2 L-10.5 -3.4"
+                  stroke="#1B2430" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          </g>
+        </defs>
+
+        <rect width="400" height="94" fill="url(#crowd)"/>
+        <rect y="86" width="400" height="10" fill="#5C0A14"/>
+
+        <rect y="96"  width="400" height="46" fill="#46A167"/>
+        <rect y="142" width="400" height="44" fill="#3E8F5C"/>
+        <rect y="186" width="400" height="46" fill="#46A167"/>
+        <rect y="232" width="400" height="44" fill="#3E8F5C"/>
+        <rect y="276" width="400" height="44" fill="#46A167"/>
+
+        <g stroke="rgba(255,255,255,.75)" stroke-width="2.4" fill="none" stroke-linejoin="round">
+          <path d="M36 318 L92 212 L308 212 L364 318"/>
+          <path d="M122 250 L142 212 L258 212 L278 250"/>
+          <path d="M0 208 H400"/>
+        </g>
+
+        <rect x="67" y="107" width="266" height="101" fill="rgba(10,25,15,.30)"/>
+        <rect id="penNet" class="pennet" x="67" y="107" width="266" height="101" fill="url(#netmesh)"/>
+
+        <rect x="58" y="98" width="284" height="10" rx="3" fill="#FFFFFF"/>
+        <rect x="58" y="98" width="10" height="112" rx="3" fill="#FFFFFF"/>
+        <rect x="332" y="98" width="10" height="112" rx="3" fill="#FFFFFF"/>
+        <path d="M68 208 L52 224 M332 208 L348 224" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+
+        <g id="floodL"><rect x="16" y="30" width="5" height="64" fill="#7C8894"/>
+          <rect x="6" y="18" width="25" height="14" rx="3" fill="#C9D3DC"/>
+          <circle cx="12" cy="25" r="3" fill="#FFF6D8"/><circle cx="19" cy="25" r="3" fill="#FFF6D8"/><circle cx="26" cy="25" r="3" fill="#FFF6D8"/></g>
+        <g id="floodR"><rect x="379" y="30" width="5" height="64" fill="#7C8894"/>
+          <rect x="369" y="18" width="25" height="14" rx="3" fill="#C9D3DC"/>
+          <circle cx="375" cy="25" r="3" fill="#FFF6D8"/><circle cx="382" cy="25" r="3" fill="#FFF6D8"/><circle cx="389" cy="25" r="3" fill="#FFF6D8"/></g>
+
+        <g stroke="#D8D8D0" stroke-width="3" stroke-linecap="round">
+          <path d="M14 300 V262"/><path d="M386 300 V262"/>
+        </g>
+        <path d="M14 262 l16 5 -16 5 z" fill="#E8A317"/>
+        <path d="M386 262 l-16 5 16 5 z" fill="#E8A317"/>
+
+        <circle class="ptarget" data-zone="TL" cx="118" cy="128" r="19"/>
+        <circle class="ptarget" data-zone="C"  cx="200" cy="128" r="19"/>
+        <circle class="ptarget" data-zone="TR" cx="282" cy="128" r="19"/>
+        <circle class="ptarget" data-zone="BL" cx="100" cy="190" r="19"/>
+        <circle class="ptarget" data-zone="BR" cx="300" cy="190" r="19"/>
+
+        <g class="pkeeper" id="penKeeper" style="transform:translate(200px,182px)">
+          <ellipse cx="0" cy="37" rx="17" ry="4" fill="rgba(0,0,0,.20)"/>
+          <g class="kbody">
+            <rect x="-40" y="-21" width="27" height="10" rx="5" fill="#B8E31E"/>
+            <rect x="-40" y="-21" width="9"  height="10" rx="5" fill="#8FBE0F"/>
+            <circle cx="-41" cy="-16" r="8" fill="#F7F7F5" stroke="#C8102E" stroke-width="2.5"/>
+            <rect x="13" y="-21" width="27" height="10" rx="5" fill="#B8E31E"/>
+            <rect x="31" y="-21" width="9"  height="10" rx="5" fill="#8FBE0F"/>
+            <circle cx="41" cy="-16" r="8" fill="#F7F7F5" stroke="#C8102E" stroke-width="2.5"/>
+            <rect x="-11" y="10" width="9" height="21" rx="3" fill="#E9C39C"/>
+            <rect x="2"   y="10" width="9" height="21" rx="3" fill="#E9C39C"/>
+            <rect x="-11" y="21" width="9" height="10" rx="2" fill="#B8E31E"/>
+            <rect x="2"   y="21" width="9" height="10" rx="2" fill="#B8E31E"/>
+            <rect x="-15" y="30" width="14" height="5.5" rx="2.5" fill="#14151A"/>
+            <rect x="1"   y="30" width="14" height="5.5" rx="2.5" fill="#14151A"/>
+            <rect x="-14" y="2" width="28" height="13" rx="4" fill="#14151A"/>
+            <rect x="-15" y="-27" width="30" height="31" rx="8" fill="#B8E31E"/>
+            <path d="M-15 -21 h30 v6 h-30 z" fill="#8FBE0F" opacity=".6"/>
+            <text x="0" y="-4" text-anchor="middle" font-size="13" font-weight="800" fill="#14151A"
+                  font-family="-apple-system,BlinkMacSystemFont,sans-serif">1</text>
+            <circle cx="0" cy="-36" r="9.5" fill="#E9C39C"/>
+            <path d="M-9.5 -37 a9.5 9.5 0 0 1 19 0 q-9.5 -5.5 -19 0 z" fill="#2B2118"/>
+          </g>
+        </g>
+
+        <circle cx="200" cy="272" r="2.6" fill="rgba(255,255,255,.85)"/>
+        <g class="pball" id="penBall" style="transform:translate(200px,272px)"><use href="#ballArt2"/></g>
+      </svg>
+    </div>
+    <div class="penres" id="penRes">&nbsp;</div>
+  </div>
+</div>
+
+<script>
+/* Squad data: 96 headwords from Rita Treacy's "Synonyms 96 most common" list.
+   Synonyms filtered to age-appropriate options. t = tier (1 easy, 2 mid, 3 hard).
+   s = example sentence containing the headword (used for the through-ball round). */
+const SQUAD = [
+{w:"amazing",t:1,y:["incredible","unbelievable","wonderful","fantastic","astonishing"],s:"That save by the keeper was amazing."},
+{w:"anger",t:3,y:["enrage","infuriate","madden","exasperate"],s:"The unfair penalty began to anger the crowd."},
+{w:"angry",t:1,y:["mad","furious","enraged","annoyed","raging"],s:"The manager was angry about the late goal."},
+{w:"answer",t:1,y:["reply","respond","retort","acknowledge"],s:"Tom put up his hand to answer the question."},
+{w:"ask",t:1,y:["question","enquire","request","query","quiz"],s:"He wanted to ask the coach about training."},
+{w:"awful",t:1,y:["dreadful","terrible","horrible","unpleasant"],s:"The weather was awful for the match."},
+{w:"bad",t:1,y:["evil","wicked","rotten","poor","harmful"],s:"That was a bad tackle and he saw red."},
+{w:"beautiful",t:1,y:["pretty","lovely","gorgeous","stunning","elegant"],s:"It was a beautiful pass across the pitch."},
+{w:"begin",t:1,y:["start","open","launch","commence","initiate"],s:"The second half will begin in ten minutes."},
+{w:"big",t:1,y:["enormous","huge","immense","gigantic","vast"],s:"There was a big crowd at the stadium."},
+{w:"brave",t:2,y:["courageous","fearless","daring","heroic","bold"],s:"It was a brave header in a crowded box."},
+{w:"break",t:1,y:["fracture","shatter","smash","snap","wreck"],s:"Careful, or you might break the window."},
+{w:"bright",t:2,y:["shining","gleaming","brilliant","vivid","glowing"],s:"The floodlights were very bright."},
+{w:"calm",t:2,y:["peaceful","tranquil","serene","composed","unruffled"],s:"He stayed calm and slotted the penalty home."},
+{w:"come",t:1,y:["approach","advance","arrive","near","reach"],s:"Watch the defender come towards you."},
+{w:"cool",t:1,y:["chilly","cold","frosty","icy","wintry"],s:"The evening air was cool on the pitch."},
+{w:"crooked",t:2,y:["bent","twisted","curved","hooked","zigzag"],s:"The old goalpost looked crooked after the storm."},
+{w:"cry",t:1,y:["weep","sob","wail","bawl","howl"],s:"He tried not to cry when they lost."},
+{w:"cut",t:1,y:["slash","slice","carve","chop","gash"],s:"He fell and got a cut on his knee."},
+{w:"dangerous",t:2,y:["risky","unsafe","perilous","hazardous"],s:"The wet steps can be dangerous."},
+{w:"dark",t:1,y:["gloomy","dim","murky","shadowy","dusky"],s:"It was too dark to keep playing."},
+{w:"decide",t:1,y:["choose","settle","determine","resolve","pick"],s:"The referee had to decide quickly."},
+{w:"definite",t:3,y:["certain","sure","positive","clear","obvious"],s:"That was a definite penalty."},
+{w:"delicious",t:1,y:["tasty","appetising","scrumptious","luscious"],s:"The pasta after training was delicious."},
+{w:"describe",t:2,y:["portray","recount","narrate","depict","relate"],s:"Can you describe the winning goal?"},
+{w:"destroy",t:2,y:["ruin","demolish","flatten","raze","wreck"],s:"The storm could destroy the old stand."},
+{w:"difference",t:3,y:["contrast","gap","distinction","dissimilarity"],s:"There was a big difference between the two teams."},
+{w:"do",t:1,y:["perform","complete","accomplish","achieve","execute"],s:"He had a lot of training to do."},
+{w:"dull",t:2,y:["boring","tiresome","dreary","tedious","humdrum"],s:"The first half was a dull game."},
+{w:"eager",t:2,y:["keen","enthusiastic","fervent","raring"],s:"He was eager to get on the pitch."},
+{w:"end",t:1,y:["finish","conclude","close","halt","terminate"],s:"The whistle brought the game to an end."},
+{w:"enjoy",t:1,y:["relish","savour","appreciate","delight in"],s:"He really does enjoy playing in the rain."},
+{w:"explain",t:2,y:["clarify","define","interpret","justify"],s:"The coach had to explain the new formation."},
+{w:"fair",t:2,y:["just","impartial","unbiased","even-handed"],s:"The referee was fair to both sides."},
+{w:"fall",t:1,y:["drop","descend","tumble","topple","plunge"],s:"He watched the ball fall into the net."},
+{w:"false",t:2,y:["fake","untrue","counterfeit","fraudulent","bogus"],s:"That was a false start in the race."},
+{w:"famous",t:2,y:["well-known","renowned","celebrated","eminent"],s:"He met a famous footballer at the ground."},
+{w:"fast",t:1,y:["quick","rapid","speedy","swift","fleet"],s:"The winger is incredibly fast."},
+{w:"fat",t:1,y:["plump","stout","chubby","tubby","rotund"],s:"The cat had grown fat over the winter."},
+{w:"fear",t:2,y:["fright","dread","terror","alarm","panic"],s:"He played without any fear at all."},
+{w:"fly",t:1,y:["soar","glide","hover","sail","skim"],s:"He watched the ball fly over the bar."},
+{w:"funny",t:1,y:["humorous","amusing","comical","droll","hilarious"],s:"His story about the goalkeeper was funny."},
+{w:"get",t:1,y:["obtain","acquire","gain","procure","secure"],s:"Go and get your boots from the car."},
+{w:"go",t:1,y:["depart","leave","proceed","withdraw","exit"],s:"It is time to go to training."},
+{w:"good",t:1,y:["excellent","fine","superb","splendid","first-rate"],s:"That was a good first touch."},
+{w:"great",t:2,y:["remarkable","outstanding","mighty","grand","noteworthy"],s:"It was a great save in the last minute."},
+{w:"gross",t:3,y:["crude","coarse","vulgar","indecent","uncouth"],s:"He thought the joke was a bit gross."},
+{w:"happy",t:1,y:["pleased","delighted","cheerful","joyful","glad"],s:"He was happy with the result."},
+{w:"hate",t:1,y:["despise","loathe","detest","abhor"],s:"He began to hate losing."},
+{w:"have",t:1,y:["possess","own","hold","contain","bear"],s:"They have a match on Saturday."},
+{w:"help",t:1,y:["aid","assist","support","serve","befriend"],s:"The captain came over to help him up."},
+{w:"hide",t:1,y:["conceal","cover","mask","screen","camouflage"],s:"He tried to hide his disappointment."},
+{w:"hurry",t:1,y:["rush","hasten","bustle","scurry"],s:"They had to hurry to catch the bus."},
+{w:"hurt",t:1,y:["injure","harm","damage","wound","afflict"],s:"He did not want to hurt his ankle again."},
+{w:"idea",t:2,y:["thought","notion","concept","belief","opinion"],s:"He had a clever idea for a free kick."},
+{w:"important",t:2,y:["vital","essential","significant","crucial","principal"],s:"It was an important match for the league."},
+{w:"interesting",t:3,y:["fascinating","engaging","gripping","intriguing","absorbing"],s:"The book about surfing was interesting."},
+{w:"keep",t:1,y:["retain","preserve","maintain","withhold","sustain"],s:"You can keep the match ball."},
+{w:"kill",t:2,y:["slay","assassinate","murder","exterminate"],s:"A hard frost can kill the young plants."},
+{w:"lazy",t:2,y:["idle","inactive","sluggish","slothful"],s:"He was too lazy to warm up properly."},
+{w:"little",t:1,y:["tiny","small","minute","petite","miniature"],s:"There was only a little time left."},
+{w:"look",t:1,y:["gaze","stare","glance","peer","behold"],s:"Look at the space on the right wing."},
+{w:"love",t:1,y:["adore","cherish","treasure","worship","admire"],s:"He would love to play at Croke Park."},
+{w:"make",t:1,y:["create","build","form","produce","construct"],s:"They can make a chance out of nothing."},
+{w:"mark",t:2,y:["label","tag","stamp","brand","imprint"],s:"There was a mark on the new ball."},
+{w:"mischievous",t:3,y:["naughty","playful","prankish","impish","roguish"],s:"His little sister had a mischievous grin."},
+{w:"move",t:1,y:["travel","shift","budge","stir","journey"],s:"He had to move quickly into space."},
+{w:"moody",t:3,y:["grumpy","sulky","irritable","touchy","peevish"],s:"He gets moody when he is tired."},
+{w:"neat",t:2,y:["tidy","orderly","trim","spruce","shipshape"],s:"That was a neat bit of skill."},
+{w:"new",t:1,y:["fresh","modern","recent","novel","current"],s:"He got new boots for his birthday."},
+{w:"old",t:1,y:["ancient","aged","elderly","antique","veteran"],s:"The old stand was falling apart."},
+{w:"part",t:1,y:["portion","share","piece","section","fragment"],s:"He only played part of the match."},
+{w:"place",t:1,y:["spot","area","location","site","region"],s:"The beach is his favourite place."},
+{w:"plan",t:2,y:["scheme","design","blueprint","strategy","arrangement"],s:"The coach had a plan for the second half."},
+{w:"popular",t:2,y:["well-liked","favoured","accepted","approved"],s:"Surfing is popular in Strandhill."},
+{w:"predicament",t:3,y:["dilemma","quandary","plight","pickle","scrape"],s:"Losing his boots was a real predicament."},
+{w:"put",t:1,y:["place","set","lay","position","deposit"],s:"Put your kit in the bag."},
+{w:"quiet",t:1,y:["silent","still","hushed","soundless","mute"],s:"The whole stadium went quiet."},
+{w:"right",t:1,y:["correct","accurate","factual","proper","precise"],s:"He gave the right answer."},
+{w:"run",t:1,y:["sprint","race","dash","bolt","gallop"],s:"He can run the length of the pitch."},
+{w:"say",t:1,y:["state","declare","utter","remark","mention"],s:"He did not say a word at half time."},
+{w:"scared",t:1,y:["afraid","frightened","alarmed","terrified","fearful"],s:"He was scared of the big defender."},
+{w:"show",t:1,y:["display","exhibit","present","reveal","demonstrate"],s:"Show me your new trick."},
+{w:"slow",t:1,y:["unhurried","gradual","leisurely","sluggish","slack"],s:"It was a slow start to the game."},
+{w:"stop",t:1,y:["cease","halt","pause","discontinue","quit"],s:"The referee had to stop the match."},
+{w:"story",t:1,y:["tale","myth","legend","fable","anecdote"],s:"He wrote a funny story about a bird."},
+{w:"strange",t:1,y:["odd","peculiar","unusual","weird","outlandish"],s:"It was a strange bounce off the post."},
+{w:"take",t:1,y:["grab","seize","grasp","capture","snatch"],s:"He will take the free kick."},
+{w:"tell",t:1,y:["inform","notify","reveal","disclose","divulge"],s:"Tell me what happened in the second half."},
+{w:"think",t:1,y:["believe","consider","reckon","judge","contemplate"],s:"I think we can win this one."},
+{w:"trouble",t:2,y:["difficulty","distress","bother","hardship","misfortune"],s:"The defence was in serious trouble."},
+{w:"true",t:1,y:["genuine","real","actual","authentic","truthful"],s:"That story is actually true."},
+{w:"ugly",t:2,y:["hideous","unsightly","grotesque","repulsive","monstrous"],s:"It was an ugly challenge from behind."},
+{w:"unhappy",t:1,y:["sad","miserable","gloomy","downhearted","sorrowful"],s:"He was unhappy about being subbed."},
+{w:"use",t:2,y:["employ","utilise","expend","consume","exercise"],s:"Use your left foot more often."},
+{w:"wrong",t:1,y:["incorrect","inaccurate","mistaken","erroneous","improper"],s:"He got the answer wrong."}
+];
+
+
+/* =======================================================================
+   Storage — Safari can block localStorage on file:// so everything is
+   wrapped and falls back to memory for the session.
+   ======================================================================= */
+var STORE_OK = true;
+var MEM = {};
+function sGet(k){ try{ return localStorage.getItem(k); }catch(e){ STORE_OK=false; return MEM[k]||null; } }
+function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; MEM[k]=v; } }
+
+var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
+  pens:{taken:0,scored:0,zones:{}},
+  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:""} };
+var S = load();
+function load(){
+  try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
+    return Object.assign({},DEFAULT_STATE,o,{
+      opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
+      pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{})
+    }); } }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+function save(){ sSet("wordattack.v1", JSON.stringify(S)); }
+
+/* =======================================================================
+   Conflict map — two headwords "conflict" if their word families overlap
+   at all. A distractor is never drawn from a conflicting family, so an
+   option can never accidentally be a correct answer.
+   ======================================================================= */
+var norm = function(s){ return s.toLowerCase().replace(/[^a-z]/g,""); };
+var FAM = SQUAD.map(function(e){ var s={}; s[norm(e.w)]=1; e.y.forEach(function(x){s[norm(x)]=1;}); return s; });
+var CONFLICT = SQUAD.map(function(){ return {}; });
+for(var i=0;i<SQUAD.length;i++){
+  for(var j=i+1;j<SQUAD.length;j++){
+    var hit=false;
+    for(var k in FAM[i]){ if(FAM[j][k]){ hit=true; break; } }
+    if(hit){ CONFLICT[i][j]=1; CONFLICT[j][i]=1; }
+  }
+}
+function safeIdx(targetIdx, used){
+  var pool=[];
+  for(var n=0;n<SQUAD.length;n++){
+    if(n===targetIdx) continue;
+    if(CONFLICT[targetIdx][n]) continue;
+    if(used.indexOf(n)>=0) continue;
+    var bad=false;
+    for(var u=0;u<used.length;u++){ if(CONFLICT[used[u]][n]){ bad=true; break; } }
+    if(bad) continue;
+    pool.push(n);
+  }
+  return pool.length ? pool[(Math.random()*pool.length)|0] : -1;
+}
+function pick(a){ return a[(Math.random()*a.length)|0]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+var cap = function(s){ return s.charAt(0).toUpperCase()+s.slice(1); };
+
+/* =======================================================================
+   Question builders
+   ======================================================================= */
+function buildQuestion(idx, kind){
+  var e = SQUAD[idx];
+  var used=[idx];
+  function distractor(){
+    var n = safeIdx(idx, used);
+    if(n<0) return null;
+    used.push(n);
+    // take a synonym from that unrelated family (not its headword, to vary it)
+    return pick(SQUAD[n].y.concat([SQUAD[n].w]));
+  }
+  if(kind==="double"){
+    var correct2 = shuffle(e.y.slice()).slice(0,2);
+    var opts = correct2.slice();
+    for(var d=0; d<4; d++){ var x=distractor(); if(x) opts.push(x); }
+    return { kind:"double", idx:idx, word:e.w, stem:e.w,
+      help:"Tap the TWO words that mean the same as this one, then shoot.",
+      opts:shuffle(opts), answers:correct2.slice() };
+  }
+  if(kind==="sentence"){
+    var ans = pick(e.y);
+    var o2=[ans];
+    for(var d2=0; d2<3; d2++){ var y=distractor(); if(y) o2.push(y); }
+    return { kind:"sentence", idx:idx, word:e.w, sentence:e.s,
+      help:"Which word could take the place of the highlighted word?",
+      opts:shuffle(o2), answers:[ans] };
+  }
+  var ans3 = pick(e.y);
+  var o3=[ans3];
+  for(var d3=0; d3<3; d3++){ var z=distractor(); if(z) o3.push(z); }
+  return { kind:"single", idx:idx, word:e.w, stem:e.w,
+    help:"Which word means the same as this one?",
+    opts:shuffle(o3), answers:[ans3] };
+}
+
+/* =======================================================================
+   Speech
+   ======================================================================= */
+var VOICE=null;
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return;
+  var v=speechSynthesis.getVoices()||[];
+  VOICE = v.filter(function(x){return /en[-_]IE/i.test(x.lang);})[0]
+       || v.filter(function(x){return /en[-_]GB/i.test(x.lang);})[0]
+       || v.filter(function(x){return /^en/i.test(x.lang);})[0] || null;
+}
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function say(text){
+  if(!S.opts.voice || !("speechSynthesis" in window)) return;
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    if(VOICE) u.voice=VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate=0.9; u.pitch=1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* =======================================================================
+   Screens
+   ======================================================================= */
+var $ = function(id){ return document.getElementById(id); };
+function show(id){
+  var all=document.querySelectorAll(".screen");
+  for(var i=0;i<all.length;i++) all[i].classList.remove("on");
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+}
+
+/* =======================================================================
+   Match state
+   ======================================================================= */
+var M=null;
+var ATTACKS=12;
+
+function startMatch(level){
+  // clear any penalty left pending from a match that was restarted or abandoned
+  $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
+  var pool=[];
+  for(var i=0;i<SQUAD.length;i++){
+    if(level===1 && SQUAD[i].t>1) continue;
+    if(level===2 && SQUAD[i].t>2) continue;
+    pool.push(i);
+  }
+  // bias towards words he has struggled with
+  var weighted=[];
+  pool.forEach(function(i){
+    var st=S.stats[SQUAD[i].w];
+    var reps = 1;
+    if(st && st.seen>0){ var acc=st.right/st.seen; reps = acc<0.5 ? 3 : (acc<0.8 ? 2 : 1); }
+    for(var r=0;r<reps;r++) weighted.push(i);
+  });
+  shuffle(weighted);
+  var chosen=[], seen={};
+  for(var k=0;k<weighted.length && chosen.length<ATTACKS;k++){
+    if(!seen[weighted[k]]){ seen[weighted[k]]=1; chosen.push(weighted[k]); }
+  }
+  while(chosen.length<ATTACKS && chosen.length<pool.length) chosen.push(pick(pool));
+
+  var kinds=["single","sentence","double"];
+  M={ level:level, queue:chosen.map(function(idx,n){ return buildQuestion(idx, kinds[n%3]); }),
+      n:0, us:0, them:0, streak:0, missStreak:0, right:0, wrong:0, pens:0, pensScored:0,
+      missed:[], retried:false, picked:[], locked:false, t0:Date.now(), timer:null };
+
+  $("clockTxt").textContent = "";
+  if(S.opts.clock){
+    M.timer=setInterval(function(){
+      var s=((Date.now()-M.t0)/1000)|0;
+      $("clockTxt").textContent = ((s/60)|0)+"′";
+    },1000);
+  }
+  show("scMatch");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  var q=M.queue[M.n];
+  M.picked=[]; M.locked=false;
+  $("fbBox").innerHTML="";
+  $("btnNext").classList.add("hidden");
+  $("attackNo").textContent = "Attack "+(M.n+1)+" of "+M.queue.length;
+  $("scoreTxt").textContent = M.us+" – "+M.them;
+  $("qType").textContent = q.kind==="double" ? "Two-touch" : (q.kind==="sentence" ? "Through ball" : "Pick the pass");
+  $("qHelp").textContent = q.help;
+  updateDots(); updateBall();
+
+  var stem="";
+  if(q.kind==="sentence"){
+    var re=new RegExp("\\b("+q.word+")\\b","i");
+    stem='<div class="sentence">'+q.sentence.replace(re,"<mark>$1</mark>")+
+         ' <button class="iconbtn" style="display:inline-grid;width:38px;height:38px;vertical-align:middle" data-say="'+
+         q.sentence.replace(/"/g,"&quot;")+'">&#128266;</button></div>';
+  } else {
+    stem='<div><span class="target">'+cap(q.word)+'</span> '+
+         '<button class="iconbtn" style="display:inline-grid;width:38px;height:38px;vertical-align:middle" data-say="'+q.word+'">&#128266;</button></div>';
+  }
+  $("qStem").innerHTML=stem;
+
+  var html="";
+  q.opts.forEach(function(o,i){
+    html+='<button class="btn opt" data-opt="'+i+'">'+cap(o)+
+          '<span class="say" data-say="'+o+'">&#128266;</span></button>';
+  });
+  $("qOpts").innerHTML=html;
+  $("btnConfirm").classList.toggle("hidden", q.kind!=="double");
+  if(q.kind==="double") $("btnConfirm").textContent="Shoot! (pick 2)";
+}
+
+function updateDots(){
+  var d=$("streakDots").children;
+  for(var i=0;i<3;i++) d[i].className = i<M.streak ? "lit" : "";
+}
+function updateBall(){
+  var x=[36,110,190,262][Math.min(M.streak,3)];
+  $("ball").style.transform="translate("+x+"px,34px)";
+}
+
+$("qOpts").addEventListener("click", function(ev){
+  var sayEl = ev.target.closest("[data-say]");
+  if(sayEl && sayEl.classList.contains("say")){ ev.stopPropagation(); say(sayEl.getAttribute("data-say")); return; }
+  var b = ev.target.closest("[data-opt]");
+  if(!b || M.locked) return;
+  var q=M.queue[M.n];
+  var i=+b.getAttribute("data-opt");
+  if(q.kind==="double"){
+    var at=M.picked.indexOf(i);
+    if(at>=0){ M.picked.splice(at,1); b.classList.remove("picked"); }
+    else if(M.picked.length<2){ M.picked.push(i); b.classList.add("picked"); }
+    $("btnConfirm").textContent = M.picked.length===2 ? "Shoot!" : "Shoot! (pick "+(2-M.picked.length)+" more)";
+  } else {
+    M.picked=[i]; grade();
+  }
+});
+$("qStem").addEventListener("click", function(ev){
+  var s=ev.target.closest("[data-say]"); if(s) say(s.getAttribute("data-say"));
+});
+$("btnConfirm").addEventListener("click", function(){
+  if(M.picked.length===2 && !M.locked) grade();
+});
+
+function grade(){
+  M.locked=true;
+  var q=M.queue[M.n];
+  var chosen = M.picked.map(function(i){ return q.opts[i]; });
+  var ok = chosen.length===q.answers.length &&
+           chosen.every(function(c){ return q.answers.indexOf(c)>=0; });
+
+  var nodes=$("qOpts").children;
+  for(var i=0;i<nodes.length;i++){
+    var val=q.opts[i];
+    if(q.answers.indexOf(val)>=0) nodes[i].classList.add("right");
+    else if(M.picked.indexOf(i)>=0) nodes[i].classList.add("wrongpick");
+    nodes[i].classList.remove("picked");
+  }
+
+  var w=SQUAD[q.idx].w;
+  if(!S.stats[w]) S.stats[w]={seen:0,right:0};
+  S.stats[w].seen++; if(ok) S.stats[w].right++;
+
+  if(ok){
+    M.right++; M.streak++; M.missStreak=0;
+    updateDots(); updateBall();
+    $("fbBox").innerHTML='<div class="feedback ok"><b>'+
+      pick(["Great ball.","Lovely pass.","Perfect weight on that.","Take a bow.","Straight to feet."])+
+      '</b><br><span class="small">'+cap(w)+' also means: '+SQUAD[q.idx].y.join(", ")+'.</span></div>';
+    if(M.streak>=3){
+      M.streak=0; M.pens++;
+      $("btnConfirm").classList.add("hidden");
+      setTimeout(function(){
+        takePenalty(function(scored){
+          if(scored){ M.us++; M.pensScored++; }
+          $("scoreTxt").textContent=M.us+" – "+M.them;
+          updateDots(); updateBall();
+          nextAttack();          // straight back into the questions
+        });
+      }, 700);
+      save();
+      return;                       // Next appears only after the penalty
+    }
+  } else {
+    M.wrong++; M.streak=0; M.missStreak++;
+    if(M.missed.indexOf(q.idx)<0) M.missed.push(q.idx);
+    updateDots(); updateBall();
+    // Deliberately gentle: three misses in a row to concede, never more than
+    // three against, and extra time is practice only — it can't cost a goal.
+    if(M.missStreak>=3 && M.them<3 && !M.retried){ M.them++; M.missStreak=0; goalFlash("They score."); }
+    $("fbBox").innerHTML='<div class="feedback no"><b>Tackled — possession lost.</b><br>'+
+      '<span class="small">'+cap(w)+' means the same as <b>'+q.answers.map(cap).join("</b> and <b>")+
+      '</b>.<br>The full family: '+SQUAD[q.idx].y.join(", ")+'.</span></div>';
+    if(S.opts.autoSay) setTimeout(function(){ say(w+". "+q.answers.join(". ")); }, 350);
+  }
+  $("scoreTxt").textContent=M.us+" – "+M.them;
+  $("btnConfirm").classList.add("hidden");
+  $("btnNext").classList.remove("hidden");
+  save();
+}
+
+/* =======================================================================
+   PENALTY SHOOT-OUT
+   Swipe from the ball towards a corner (or tap a corner). The keeper is
+   tuned so roughly one in three is saved — see PEN_TUNING below.
+   ======================================================================= */
+/* Target positions are spread so that adjacent zones are at least 21 degrees
+   apart as seen from the ball — a sloppy swipe still lands where he meant. */
+var PEN_POS = {                      // SVG user units inside the 400x320 scene
+  TL:{x:118,y:128}, TR:{x:282,y:128}, C:{x:200,y:128}, BL:{x:100,y:190}, BR:{x:300,y:190}
+};
+var PEN_KEEPER_HOME={x:200,y:182}, PEN_BALL_HOME={x:200,y:272};
+/* Tuned by simulation to land on roughly one save in three:
+     mixed shooter 33% saved · same corner every time 42% · top corners only 32%
+   The keeper leans a little on where you've put your past penalties, so
+   hammering the same corner all night starts to get punished — but only mildly. */
+var PEN_TUNING = {
+  reflex:0.10,        // he simply reads the shot
+  readHistory:0.15,   // else: guesses from your past penalties
+  sameZone:{TL:0.74,TR:0.74,C:0.77,BL:0.80,BR:0.80},  // save odds when he guesses right
+  adjacent:0.30,      // got a hand to it (same side, wrong height)
+  wrong:0.07          // freak save
+};
+var PEN_ADJ = { TL:["BL"], BL:["TL","C"], TR:["BR"], BR:["TR","C"], C:["BL","BR"] };
+
+/* Map a swipe onto whichever corner it actually points at on screen.
+   Uses the real pixel geometry of the goal rather than fixed angle bands,
+   so "swipe towards the corner you can see" always does what it looks like. */
+function penZoneFromSwipe(dx,dy){
+  if(Math.sqrt(dx*dx+dy*dy) < 20) return null;      // too short — let him retake
+  // The SVG scales uniformly, so on-screen angles match scene angles exactly.
+  var swipe = Math.atan2(-dy, dx), best=null, bd=1e9;
+  for(var z in PEN_POS){
+    var tx = PEN_POS[z].x - PEN_BALL_HOME.x;
+    var ty = PEN_POS[z].y - PEN_BALL_HOME.y;
+    var d = Math.abs(Math.atan2(-ty, tx) - swipe);
+    if(d > Math.PI) d = 2*Math.PI - d;
+    if(d < bd){ bd = d; best = z; }
+  }
+  return best;
+}
+function penKeeperPick(shot){
+  var zones=["TL","TR","C","BL","BR"];
+  if(Math.random() < PEN_TUNING.reflex) return shot;          // read it
+  if(Math.random() < PEN_TUNING.readHistory){                 // study the taker
+    var hist=S.pens.zones, tot=0, w=zones.map(function(z){ var v=(hist[z]||0)+0.6; tot+=v; return v; });
+    var r=Math.random()*tot, acc=0;
+    for(var i=0;i<zones.length;i++){ acc+=w[i]; if(r<=acc) return zones[i]; }
+  }
+  return zones[(Math.random()*zones.length)|0];
+}
+function penIsSaved(shot,keep){
+  if(shot===keep) return Math.random() < PEN_TUNING.sameZone[shot];
+  if((PEN_ADJ[shot]||[]).indexOf(keep)>=0) return Math.random() < PEN_TUNING.adjacent;
+  return Math.random() < PEN_TUNING.wrong;
+}
+
+var PEN = { live:false, done:null, startPt:null, aim:null, timer:null, result:false };
+
+function placeAt(el,p,scale){ el.style.transform="translate("+p.x+"px,"+p.y+"px)"+(scale?" scale("+scale+")":""); }
+function penReset(){
+  var k=$("penKeeper"), b=$("penBall");
+  k.className="pkeeper"; k.style.transition="none"; b.style.transition="none";
+  placeAt(k,PEN_KEEPER_HOME); placeAt(b,PEN_BALL_HOME);
+  void k.getBoundingClientRect();
+  k.style.transition=""; b.style.transition="";
+  var t=$("penField").querySelectorAll(".ptarget");
+  for(var i=0;i<t.length;i++) t[i].classList.remove("hot");
+  $("penNet").classList.remove("ripple");
+  $("penRes").innerHTML="&nbsp;"; $("penRes").className="penres";
+  $("penMsg").textContent="Swipe from the ball towards a corner of the net. Or just tap the corner you want.";
+}
+function takePenalty(cb){
+  PEN.done=cb; PEN.live=true;
+  penReset();
+  $("penWrap").classList.add("on");
+}
+function highlight(z){
+  var t=$("penField").querySelectorAll(".ptarget");
+  for(var i=0;i<t.length;i++) t[i].classList.toggle("hot", t[i].getAttribute("data-zone")===z);
+}
+function shoot(zone){
+  if(!PEN.live) return;
+  PEN.live=false;
+  highlight(zone);
+  S.pens.taken++; S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;
+
+  var keep=penKeeperPick(zone);
+  var saved=penIsSaved(zone,keep);
+  var k=$("penKeeper"), b=$("penBall");
+
+  placeAt(k, PEN_POS[keep]);
+  if(PEN_POS[keep].x < 190) k.classList.add("dive-l");
+  else if(PEN_POS[keep].x > 210) k.classList.add("dive-r");
+  else k.classList.add("dive-u");
+  placeAt(b, PEN_POS[zone], 0.85);
+
+  setTimeout(function(){
+    if(saved){
+      placeAt(b, {x:(PEN_POS[keep].x<200?30:370), y:250}, 0.7);
+      $("penRes").textContent="SAVED!"; $("penRes").className="penres saved";
+      $("penMsg").textContent="The keeper went the right way.";
+    } else {
+      S.pens.scored++;
+      placeAt(b, {x:PEN_POS[zone].x, y:PEN_POS[zone].y+6}, 0.62);
+      $("penNet").classList.add("ripple");
+      $("penRes").textContent="GOAL!"; $("penRes").className="penres scored";
+      $("penMsg").textContent=pick(["Buried it.","Unstoppable.","Right in the corner.","No chance."]);
+    }
+    save();
+    PEN.result = !saved;
+    // straight back to the questions — no button to press
+    PEN.timer=setTimeout(penDismiss, saved?1250:1450);
+  }, 430);
+}
+function penDismiss(){
+  if(PEN.timer){ clearTimeout(PEN.timer); PEN.timer=null; }
+  if(!PEN.done) return;
+  $("penWrap").classList.remove("on");
+  var cb=PEN.done; PEN.done=null;
+  cb(PEN.result);
+}
+
+(function bindPenalty(){
+  var f=$("penField");
+  function localPt(ev){
+    var r=f.getBoundingClientRect();
+    return { x:ev.clientX-r.left, y:ev.clientY-r.top, w:r.width, h:r.height };
+  }
+  f.addEventListener("pointerdown", function(ev){
+    if(!PEN.live) return;
+    f.setPointerCapture && f.setPointerCapture(ev.pointerId);
+    PEN.startPt=localPt(ev); PEN.aim=null;
+    ev.preventDefault();
+  });
+  f.addEventListener("pointermove", function(ev){
+    if(!PEN.live || !PEN.startPt) return;
+    var p=localPt(ev);
+    var z=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
+    PEN.aim=z; highlight(z);
+    ev.preventDefault();
+  });
+  f.addEventListener("pointerup", function(ev){
+    if(!PEN.live || !PEN.startPt) return;
+    var p=localPt(ev);
+    var dx=p.x-PEN.startPt.x, dy=p.y-PEN.startPt.y;
+    var z=penZoneFromSwipe(dx,dy);
+    if(!z){
+      // treat a plain tap as "aim where I tapped"
+      var sx=p.x/p.w*400, sy=p.y/p.h*320, best=null, bd=1e9;
+      for(var key in PEN_POS){
+        var d=Math.pow(PEN_POS[key].x-sx,2)+Math.pow(PEN_POS[key].y-sy,2);
+        if(d<bd){ bd=d; best=key; }
+      }
+      if(best && bd < 70*70) z=best;   // only if the tap is near a target
+    }
+    PEN.startPt=null;
+    if(z) shoot(z); else { highlight(null); $("penMsg").textContent="Scuffed it — swipe a bit further towards a corner."; }
+    ev.preventDefault();
+  });
+  f.addEventListener("pointercancel", function(){ PEN.startPt=null; highlight(null); });
+
+  // tap anywhere once it's resolved to skip the celebration
+  $("penWrap").addEventListener("click", function(){ if(!PEN.live && PEN.done) penDismiss(); });
+})();
+
+function goalFlash(txt){
+  var d=document.createElement("div");
+  d.className="goalflash"; d.textContent=txt;
+  document.body.appendChild(d);
+  setTimeout(function(){ d.remove(); }, 850);
+}
+
+$("btnNext").addEventListener("click", nextAttack);
+function nextAttack(){
+  M.n++;
+  if(M.n>=M.queue.length){
+    // one spaced-retrieval pass over anything missed
+    if(!M.retried && M.missed.length){
+      M.retried=true;
+      var kinds=["single","sentence"];
+      // cap the second look at 6 so a bad day never turns into a marathon
+      M.missed.slice(0,6).forEach(function(idx,i){ M.queue.push(buildQuestion(idx, kinds[i%2])); });
+      renderQuestion();
+      $("fbBox").innerHTML='<div class="feedback ok"><b>Extra time.</b><br><span class="small">Second look at the ones that got away.</span></div>';
+      return;
+    }
+    endMatch();
+    return;
+  }
+  renderQuestion();
+}
+
+function endMatch(){
+  if(M.timer) clearInterval(M.timer);
+  var res = M.us>M.them ? "w" : (M.us===M.them ? "d" : "l");
+  S.season.p++; S.season[res]++;
+  S.season.gf+=M.us; S.season.ga+=M.them;
+  S.season.pts += res==="w"?3:(res==="d"?1:0);
+  var total=M.right+M.wrong;
+  S.history.unshift({ d:new Date().toISOString().slice(0,10), us:M.us, them:M.them,
+    right:M.right, total:total, lvl:M.level });
+  S.history=S.history.slice(0,12);
+  save();
+
+  $("ftHead").textContent = res==="w" ? "You won." : (res==="d" ? "Honours even." : "Not this time.");
+  $("ftScore").textContent = M.us+" – "+M.them;
+  $("ftOpp").textContent = ["Anfield Road","Strandhill Rovers","Sligo Town","Croke Park XI","The Rockies"][S.season.p % 5];
+  var pc = total ? Math.round(M.right/total*100) : 0;
+  $("ftLine").textContent = M.right+" of "+total+" correct ("+pc+"%). "+
+    (res==="w" ? "Three points." : res==="d" ? "One point." : "No points — but every miss is a word learned.");
+  $("ftStats").innerHTML='<div class="bar'+(pc<60?" warn":"")+'"><i style="width:'+pc+'%"></i></div>'+
+    (M.pens ? '<p class="small" style="margin-top:.7em">Penalties won: <b>'+M.pens+
+              '</b> · scored: <b>'+M.pensScored+'</b>'+
+              (M.pens-M.pensScored ? ' · saved: <b>'+(M.pens-M.pensScored)+'</b>' : '')+'</p>'
+            : '<p class="small muted" style="margin-top:.7em">No penalties this match — three correct in a row wins you one.</p>');
+
+  if(M.missed.length){
+    $("ftReviewCard").classList.remove("hidden");
+    var h='';
+    M.missed.forEach(function(idx){
+      var e=SQUAD[idx];
+      h+='<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+cap(e.w)+
+         '</b> <button class="iconbtn" style="display:inline-grid;width:32px;height:32px;vertical-align:middle;font-size:.8em" data-say="'+
+         e.w+'">&#128266;</button><br><span class="small muted">'+e.y.join(", ")+'</span></div>';
+    });
+    $("ftReview").innerHTML=h;
+  } else {
+    $("ftReviewCard").classList.add("hidden");
+  }
+  show("scFT");
+}
+$("ftReview").addEventListener("click",function(ev){ var s=ev.target.closest("[data-say]"); if(s) say(s.getAttribute("data-say")); });
+
+$("btnQuit").addEventListener("click", function(){
+  if(M && M.timer) clearInterval(M.timer);
+  $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
+  renderHome(); show("scHome");
+});
+
+/* =======================================================================
+   Home / season
+   ======================================================================= */
+function renderHome(){
+  var s=S.season;
+  if(!s.p){
+    $("seasonBody").innerHTML='<p class="muted">No matches played yet. Your league table will build up here.</p>';
+  } else {
+    $("seasonBody").innerHTML=
+      '<table><tr><th>Played</th><th class="num">W</th><th class="num">D</th><th class="num">L</th>'+
+      '<th class="num">Goals</th><th class="num">Points</th></tr><tr>'+
+      '<td>'+s.p+'</td><td class="num">'+s.w+'</td><td class="num">'+s.d+'</td><td class="num">'+s.l+
+      '</td><td class="num">'+s.gf+':'+s.ga+'</td><td class="num"><b>'+s.pts+'</b></td></tr></table>';
+  }
+}
+
+/* =======================================================================
+   Squad screen
+   ======================================================================= */
+function renderSquad(){
+  var h="";
+  SQUAD.forEach(function(e,i){
+    var st=S.stats[e.w], cls="";
+    if(st && st.seen){ var a=st.right/st.seen; cls = a>=0.8?"s2":(a>=0.5?"s1":"s0"); }
+    h+='<span data-sq="'+i+'">'+cap(e.w)+'</span>';
+  });
+  $("squadGrid").innerHTML=h;
+  $("squadDetail").classList.add("hidden");
+}
+$("squadGrid").addEventListener("click",function(ev){
+  var t=ev.target.closest("[data-sq]"); if(!t) return;
+  var e=SQUAD[+t.getAttribute("data-sq")];
+  var st=S.stats[e.w];
+  $("squadDetail").innerHTML='<h2>'+cap(e.w)+' <button class="iconbtn" style="display:inline-grid;width:38px;height:38px;vertical-align:middle" data-say="'+
+    e.w+'">&#128266;</button></h2><p>'+e.y.map(cap).join(" · ")+'</p><p class="muted small">Example: '+e.s+'</p>'+
+    (st&&st.seen?'<p class="small">Seen '+st.seen+' times · '+Math.round(st.right/st.seen*100)+'% correct</p>':'<p class="small muted">Not tested yet.</p>');
+  $("squadDetail").classList.remove("hidden");
+  if($("squadDetail").scrollIntoView) $("squadDetail").scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+$("squadDetail").addEventListener("click",function(ev){ var s=ev.target.closest("[data-say]"); if(s) say(s.getAttribute("data-say")); });
+
+/* =======================================================================
+   Parent zone
+   ======================================================================= */
+function renderParent(){
+  var seen=0, right=0, tried=0;
+  for(var w in S.stats){ tried++; seen+=S.stats[w].seen; right+=S.stats[w].right; }
+  var pc = seen?Math.round(right/seen*100):0;
+  $("parentSummary").innerHTML=
+    '<table>'+
+    '<tr><th>Words met</th><td class="num"><b>'+tried+'</b> of 96</td></tr>'+
+    '<tr><th>Questions answered</th><td class="num"><b>'+seen+'</b></td></tr>'+
+    '<tr><th>Overall accuracy</th><td class="num"><b>'+pc+'%</b></td></tr>'+
+    '<tr><th>Matches played</th><td class="num"><b>'+S.season.p+'</b></td></tr>'+
+    (S.pens.taken?'<tr><th>Penalties scored</th><td class="num"><b>'+S.pens.scored+' of '+S.pens.taken+
+      '</b> ('+Math.round(S.pens.scored/S.pens.taken*100)+'%)</td></tr>':'')+
+    '</table>';
+
+  var rows=[];
+  for(var k in S.stats){ var st=S.stats[k]; if(st.seen>=2) rows.push({w:k,a:st.right/st.seen,s:st.seen}); }
+  rows.sort(function(a,b){ return a.a-b.a; });
+  if(!rows.length){
+    $("parentWeak").innerHTML='<p class="muted">Not enough data yet — play a couple of matches.</p>';
+  } else {
+    var h='<table><tr><th>Word</th><th>Accuracy</th><th class="num">Seen</th></tr>';
+    rows.slice(0,15).forEach(function(r){
+      var p=Math.round(r.a*100);
+      h+='<tr><td>'+cap(r.w)+'</td><td><div class="bar'+(p<60?" warn":"")+'"><i style="width:'+p+'%"></i></div></td>'+
+         '<td class="num">'+r.s+'</td></tr>';
+    });
+    $("parentWeak").innerHTML=h+'</table>';
+  }
+
+  if(!S.history.length){ $("parentHistory").innerHTML='<p class="muted">No matches yet.</p>'; }
+  else {
+    var lv={1:"Academy",2:"First Team",3:"Champions"};
+    var t='<table><tr><th>Date</th><th>Level</th><th>Score</th><th class="num">Correct</th></tr>';
+    S.history.forEach(function(m){
+      t+='<tr><td>'+m.d+'</td><td>'+(lv[m.lvl]||"")+'</td><td>'+m.us+'–'+m.them+'</td>'+
+         '<td class="num">'+m.right+'/'+m.total+'</td></tr>';
+    });
+    $("parentHistory").innerHTML=t+'</table>';
+  }
+  $("storageNote").textContent = STORE_OK
+    ? "Progress is saved on this device in this browser."
+    : "Heads up: this browser is blocking saved data (common when opening a file directly). Progress will only last for this session — use Export below, or add the app to your Home Screen.";
+}
+$("btnExport").addEventListener("click",function(){
+  var lines=["Word Attack FC — progress export","Date: "+new Date().toLocaleString(),"",
+    "Season: P"+S.season.p+" W"+S.season.w+" D"+S.season.d+" L"+S.season.l+" Pts"+S.season.pts,"","Word,Seen,Correct,Accuracy%"];
+  for(var k in S.stats){ var st=S.stats[k]; lines.push(k+","+st.seen+","+st.right+","+Math.round(st.right/st.seen*100)); }
+  var txt=lines.join("\n");
+  try{
+    var b=new Blob([txt],{type:"text/plain"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(b);
+    a.download="word-attack-progress.txt"; a.click();
+  }catch(e){ alert(txt); }
+});
+$("btnReset").addEventListener("click",function(){
+  if(confirm("Erase all progress and start the season again?")){
+    S=JSON.parse(JSON.stringify(DEFAULT_STATE)); save(); applyOpts(); renderParent(); renderHome();
+  }
+});
+
+/* =======================================================================
+   Settings
+   ======================================================================= */
+function applyOpts(){
+  var o=S.opts;
+  document.documentElement.style.setProperty("--fs", (o.size/100));
+  document.documentElement.style.setProperty("--ls", o.space?"0.055em":"0.005em");
+  document.documentElement.style.setProperty("--ws", o.space?"0.20em":"0.04em");
+  document.documentElement.style.setProperty("--lh", o.space?"1.75":"1.5");
+  document.body.className = o.theme||"";
+  $("setVoice").checked=o.voice; $("setAutoSay").checked=o.autoSay;
+  $("setClock").checked=o.clock; $("setSpace").checked=o.space; $("setSize").value=o.size;
+  $("btnSound").innerHTML = o.voice ? "&#128266;" : "&#128263;";
+  var sw=$("swatches").children;
+  for(var i=0;i<sw.length;i++) sw[i].setAttribute("aria-pressed", String((sw[i].getAttribute("data-theme")||"")===(o.theme||"")));
+}
+function bindOpt(id,key){
+  $(id).addEventListener("change",function(){ S.opts[key]=$(id).checked; save(); applyOpts(); });
+}
+bindOpt("setVoice","voice"); bindOpt("setAutoSay","autoSay");
+bindOpt("setClock","clock"); bindOpt("setSpace","space");
+$("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(); applyOpts(); });
+$("swatches").addEventListener("click",function(ev){
+  var b=ev.target.closest("[data-theme]"); if(!b) return;
+  S.opts.theme=b.getAttribute("data-theme")||""; save(); applyOpts();
+});
+$("btnSound").addEventListener("click",function(){
+  S.opts.voice=!S.opts.voice; save(); applyOpts();
+  if(S.opts.voice) say("Sound on");
+});
+
+/* =======================================================================
+   Nav
+   ======================================================================= */
+var lvlBtns=document.querySelectorAll("[data-level]");
+for(var b=0;b<lvlBtns.length;b++){
+  lvlBtns[b].addEventListener("click", function(){ startMatch(+this.getAttribute("data-level")); });
+}
+$("btnSettings").addEventListener("click",function(){ show("scSettings"); });
+$("btnHomeSet").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnSquad").addEventListener("click",function(){ renderSquad(); show("scSquad"); });
+$("btnHomeSquad").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnParent").addEventListener("click",function(){ renderParent(); show("scParent"); });
+$("btnHomeParent").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnHomeFT").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.level:2); });
+
+applyOpts();
+renderHome();
+</script>
+</body>
+</html>
