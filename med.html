@@ -1045,8 +1045,8 @@ function screenProfiles(){
   profiles.forEach((p,i)=>{
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
-  html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink">v43 · Quizzical Puffin · 8,611 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New user</button></div>
+  <div class="footerlink">v1 · Puffin Medical · 639 questions · Add to Home Screen in Safari to run it as an app</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
