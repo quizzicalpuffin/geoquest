@@ -1854,9 +1854,10 @@ function penDismiss(){
   f.addEventListener("pointerdown", function(ev){
     if(!PEN.live) return;
     try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
-    PEN.startPt=localPt(ev); PEN.aim=null; PEN.downAt=Date.now();
+    PEN.startPt=localPt(ev); PEN.downAt=Date.now();
+    PEN.aim="C"; highlight("C");         // show the default so it is never a surprise
     startCharge();                       // bar starts sweeping the moment he holds
-    $("penMsg").textContent="Aim with your finger. Let go when the bar is in the green.";
+    $("penMsg").textContent="Drag to a corner to aim. Let go when the bar is in the green.";
     ev.preventDefault();
   });
   f.addEventListener("pointermove", function(ev){
@@ -1875,7 +1876,8 @@ function penDismiss(){
     var pw=chargePower(Date.now()-PEN.chargeT0);
     stopCharge(); PEN.power=pw; showPower(pw);
     var p=localPt(ev);
-    var z=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y) || PEN.aim;
+    var swiped=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
+    var z=swiped, straight=false;
     if(!z){
       // a quick tap on a corner: aim there and give it a safe, solid strike
       var sx=p.x/p.w*400, sy=p.y/p.h*320, best=null, bd=1e9;
@@ -1885,14 +1887,23 @@ function penDismiss(){
       }
       if(best && bd < 70*70){ z=best; if(held<260) pw=null; }
     }
+    // Held it long enough to build power but never picked a corner — take the
+    // shot anyway rather than throwing the charge away. Straight down the middle.
+    if(!z && held>=260){ z = PEN.aim || "C"; straight=!swiped; }
     PEN.startPt=null;
-    if(z) shoot(z, pw);
-    else { highlight(null); showPower(0);
-           $("penMsg").textContent="Hold the ball, drag towards a corner, then let go."; }
+    if(z){
+      if(straight) $("penMsg").textContent="No aim given — straight down the middle.";
+      shoot(z, pw);
+    } else {
+      highlight(null); showPower(0);
+      $("penMsg").textContent="Hold the ball, drag towards a corner, then let go.";
+    }
     ev.preventDefault();
   });
   f.addEventListener("pointercancel", function(){
+    // iOS can take the touch away mid-hold; say so rather than failing silently
     stopCharge(); PEN.startPt=null; highlight(null); showPower(0);
+    if(PEN.live) $("penMsg").textContent="Lost your grip — hold the ball again.";
   });
 
   // tap to skip the celebration — but not for the first moment, so the tap
