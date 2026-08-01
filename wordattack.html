@@ -2412,6 +2412,27 @@ $("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.mode:"syn"
 applyOpts();
 fillVoiceList();
 renderHome();
+
+/* Add ?play=run or ?play=pen to the address to drop straight into a minigame
+   and keep replaying it. Handy for testing the feel without answering
+   twelve questions first. Practice runs are not counted in the season. */
+(function testHook(){
+  var m=/[?&]play=(run|pen)/.exec(location.search);
+  if(!m) return;
+  var isRun = m[1]==="run";
+  var again=function(){
+    setTimeout(function(){
+      var before = isRun ? {t:S.runs.taken,s:S.runs.scored} : {t:S.pens.taken,s:S.pens.scored};
+      (isRun?takeRun:takePenalty)(function(){
+        // roll the counters back so practice does not skew the parent zone
+        if(isRun){ S.runs.taken=before.t; S.runs.scored=before.s; }
+        else { S.pens.taken=before.t; S.pens.scored=before.s; }
+        save(); again();
+      });
+    }, 450);
+  };
+  again();
+})();
 </script>
 </body>
 </html>
