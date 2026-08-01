@@ -59,6 +59,9 @@ h3{font-size:1.05em}
 }
 .btn:active{transform:scale(.985)}
 .btn.primary{background:var(--pitch);border-color:var(--pitch-dk);color:#fff;text-align:center;font-weight:700}
+/* Next sits right under the answers and stays pinned to the bottom of the
+   screen, so it never needs scrolling to reach. */
+#btnNext{position:sticky;bottom:12px;z-index:6;box-shadow:0 4px 14px rgba(20,40,28,.28)}
 .btn.gold{background:var(--gold);border-color:#C4870B;color:#3A2A00;text-align:center;font-weight:700}
 .btn.ghost{text-align:center}
 .gamebtn{display:block}
@@ -308,8 +311,8 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       <button class="btn gold hidden" id="btnConfirm">Shoot!</button>
     </div>
 
-    <div id="fbBox"></div>
     <button class="btn primary hidden" id="btnNext">Next attack &rsaquo;</button>
+    <div id="fbBox"></div>
     <button class="btn ghost" id="btnQuit">Leave the pitch</button>
   </section>
 
@@ -426,7 +429,7 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
   <div class="pencard">
     <div class="penhead">Counter attack</div>
     <h2 style="margin:.1em 0 .2em">You're through — take it up the pitch.</h2>
-    <p class="small muted" id="runMsg" style="margin:0">Swipe left and right to change channel. Swipe up to jump a tackle, down to slide under one.</p>
+    <p class="small muted" id="runMsg" style="margin:0">Swipe left or right for the free channel. Swipe up to hurdle the sliding tackle.</p>
     <div class="runfield"><canvas id="runCanvas" width="360" height="520"></canvas></div>
     <div class="penres" id="runRes">&nbsp;</div>
   </div>
@@ -1867,21 +1870,22 @@ function penDismiss(){
    ======================================================================= */
 var RUN = { live:false, done:null, raf:null, timer:null, result:false, resolvedAt:0 };
 var RUN_W=360, RUN_H=520, RUN_GROUND=402, RUN_LANES=[86,180,274];
+var RUN_KIT = "#C8102E";          // every defender in the same kit
 var RUN_CFG = {
-  rows:8, gap:220, gapVar:80, lead:430, runIn:250,
-  speed:250, speedEnd:310,
-  jumpMs:640, slideMs:640, jumpH:52, laneMs:150
+  rows:8, gap:250, gapVar:70, lead:430, runIn:260, goalAhead:200,
+  speed:250, speedEnd:300,
+  jumpMs:660, slideMs:640, jumpH:56, laneMs:150,
+  shootMs:900
 };
 
+/* Every row has the same shape: one defender sliding in on the ground that
+   can be hurdled, one standing defender who has to be gone round, and one
+   clear channel. So there are always two ways through. */
 function makeCourse(){
   var rows=[], z=RUN_CFG.lead;
   for(var i=0;i<RUN_CFG.rows;i++){
-    var type = ["block","low","high"][(Math.random()*3)|0];
-    var pool=shuffle([0,1,2]);
-    // First three are single obstacles so he can learn the move; never all
-    // three channels blocked, so there is always a way through.
-    var n = i<3 ? 1 : (Math.random()<0.45 ? 2 : 1);
-    rows.push({ z:z, type:type, lanes:pool.slice(0,n), done:false });
+    var p=shuffle([0,1,2]);
+    rows.push({ z:z, slide:p[0], block:p[1], free:p[2], done:false });
     z += RUN_CFG.gap + Math.random()*RUN_CFG.gapVar;
   }
   return { rows:rows, end:z+RUN_CFG.runIn };
@@ -1892,9 +1896,9 @@ function takeRun(cb){
   RUN.course=makeCourse();
   RUN.dist=0; RUN.lane=1; RUN.laneFrom=1; RUN.laneT=1;
   RUN.state="run"; RUN.stateT=0; RUN.hit=false; RUN.last=0;
-  RUN.startPt=null;
+  RUN.startPt=null; RUN.phase="run"; RUN.shootT=0;
   $("runRes").innerHTML="&nbsp;"; $("runRes").className="penres";
-  $("runMsg").textContent="Swipe left and right to change channel. Swipe up to jump a tackle, down to slide under one.";
+  $("runMsg").textContent="Swipe left or right for the free channel. Swipe up to hurdle the sliding tackle.";
   $("runWrap").classList.add("on");
 
   var cv=$("runCanvas");
@@ -1925,34 +1929,47 @@ function runStep(ts){
     if(RUN.stateT>=dur){ RUN.state="run"; RUN.stateT=0; }
   }
 
-  // obstacles he has just reached
+  // defenders he has just reached
   for(var i=0;i<RUN.course.rows.length;i++){
     var r=RUN.course.rows[i];
     if(!r.done && r.z-RUN.dist <= 0){
       r.done=true;
-      if(r.lanes.indexOf(RUN.lane)>=0){
-        var safe = (r.type==="low"  && RUN.state==="jump")
-                || (r.type==="high" && RUN.state==="slide");
-        if(!safe){
-          RUN.hit=true; RUN.live=false;
-          runDraw();
-          var why = r.type==="block" ? "He blocked you off — go round next time."
-                  : r.type==="low"   ? "Sliding tackle. Swipe up to hurdle it."
-                                     : "High challenge. Swipe down to slide under.";
-          runFinish(false, "TACKLED", why);
-          return;
-        }
+      if(RUN.lane===r.block){
+        RUN.hit=true; RUN.live=false; runDraw();
+        runFinish(false, "TACKLED", "He stood you up — take the clear channel.");
+        return;
+      }
+      if(RUN.lane===r.slide && RUN.state!=="jump"){
+        RUN.hit=true; RUN.live=false; runDraw();
+        runFinish(false, "TACKLED", "Sliding tackle. Swipe up to hurdle it, or go round.");
+        return;
       }
     }
   }
 
   if(RUN.dist >= RUN.course.end){
-    RUN.live=false; runDraw();
-    runFinish(true, "GOAL!", "All the way through. Lovely.");
+    // he has reached the penalty spot — now finish it
+    RUN.dist=RUN.course.end;
+    RUN.phase="shoot"; RUN.shootT=0; RUN.state="run";
+    RUN.raf=requestAnimationFrame(runShoot);
     return;
   }
   runDraw();
   RUN.raf=requestAnimationFrame(runStep);
+}
+
+/* On the spot: he strikes it, the ball flies past the post-height into the
+   corner of the net, and the net bulges. */
+function runShoot(ts){
+  if(!RUN.last) RUN.last=ts;
+  var dt=Math.min(50, ts-RUN.last); RUN.last=ts;
+  RUN.shootT += dt;
+  runDraw();
+  if(RUN.shootT >= RUN_CFG.shootMs){
+    runFinish(true, "GOAL!", "All the way through, and buried it.");
+    return;
+  }
+  RUN.raf=requestAnimationFrame(runShoot);
 }
 
 function runFinish(scored, title, msg){
@@ -1997,59 +2014,97 @@ function runDraw(){
   c.clearRect(0,0,RUN_W,RUN_H);
   // grass with mown bands scrolling towards the viewer
   c.fillStyle="#3E8F5C"; c.fillRect(0,0,RUN_W,RUN_H);
-  var band=70, off=d%(band*2);
+  var band=64, off=d%(band*2);
   c.fillStyle="#46A167";
   for(var y=-band*2+off; y<RUN_H+band; y+=band*2) c.fillRect(0,y,RUN_W,band);
-  // channel lines
-  c.strokeStyle="rgba(255,255,255,.45)"; c.lineWidth=2; c.setLineDash([16,14]);
-  c.lineDashOffset=-(d%30);
+  // touchlines and channel guides
+  c.strokeStyle="rgba(255,255,255,.55)"; c.lineWidth=3;
+  c.beginPath(); c.moveTo(14,0); c.lineTo(14,RUN_H); c.moveTo(RUN_W-14,0); c.lineTo(RUN_W-14,RUN_H); c.stroke();
+  c.strokeStyle="rgba(255,255,255,.30)"; c.lineWidth=2; c.setLineDash([16,16]);
+  c.lineDashOffset=-(d%32);
   [133,227].forEach(function(x){ c.beginPath(); c.moveTo(x,0); c.lineTo(x,RUN_H); c.stroke(); });
   c.setLineDash([]);
-  // the goal, once it is in sight
-  var goalY = RUN_GROUND - (RUN.course.end - d);
-  if(goalY > -120){
-    c.strokeStyle="#FFFFFF"; c.lineWidth=9;
-    c.strokeRect(52, goalY-70, RUN_W-104, 70);
-    c.strokeStyle="rgba(255,255,255,.35)"; c.lineWidth=1;
-    for(var gx=60; gx<RUN_W-56; gx+=14){ c.beginPath(); c.moveTo(gx,goalY-70); c.lineTo(gx,goalY); c.stroke(); }
+
+  var spotY = RUN_GROUND - (RUN.course.end - d);
+  var goalY = RUN_GROUND - ((RUN.course.end + RUN_CFG.goalAhead) - d);
+  // penalty area, D and spot
+  if(spotY > -260){
+    c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=3;
+    var boxTop=goalY, boxBot=spotY+96;
+    c.beginPath(); c.moveTo(30,boxBot); c.lineTo(30,boxTop); c.moveTo(RUN_W-30,boxBot); c.lineTo(RUN_W-30,boxTop);
+    c.moveTo(30,boxBot); c.lineTo(RUN_W-30,boxBot); c.stroke();
+    c.beginPath(); c.arc(RUN_W/2, spotY, 56, 0.15*Math.PI, 0.85*Math.PI); c.stroke();
+    c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(RUN_W/2, spotY, 4, 0, 6.3); c.fill();
   }
-  // obstacles
+  // the goal
+  if(goalY > -140){
+    var gh=78, gx0=58, gx1=RUN_W-58;
+    c.fillStyle="rgba(12,30,20,.30)"; c.fillRect(gx0,goalY-gh,gx1-gx0,gh);
+    c.strokeStyle="rgba(255,255,255,.40)"; c.lineWidth=1;
+    for(var nx=gx0+8; nx<gx1; nx+=12){ c.beginPath(); c.moveTo(nx,goalY-gh); c.lineTo(nx,goalY); c.stroke(); }
+    for(var ny=goalY-gh+9; ny<goalY; ny+=11){ c.beginPath(); c.moveTo(gx0,ny); c.lineTo(gx1,ny); c.stroke(); }
+    c.strokeStyle="#FFFFFF"; c.lineWidth=8; c.lineJoin="round";
+    c.beginPath(); c.moveTo(gx0,goalY); c.lineTo(gx0,goalY-gh); c.lineTo(gx1,goalY-gh); c.lineTo(gx1,goalY); c.stroke();
+  }
+  // defenders
   RUN.course.rows.forEach(function(r){
     var sy = RUN_GROUND - (r.z-d);
-    if(sy < -60 || sy > RUN_H+40) return;
-    r.lanes.forEach(function(ln){ runDrawObstacle(c, RUN_LANES[ln], sy, r.type); });
+    if(sy < -70 || sy > RUN_H+50) return;
+    runDrawSlider(c, RUN_LANES[r.slide], sy);
+    runDrawStander(c, RUN_LANES[r.block], sy);
   });
-  runDrawPlayer(c);
+
+  if(RUN.phase==="shoot") runDrawShot(c, spotY, goalY);
+  else runDrawPlayer(c);
 }
 
-function runDrawObstacle(c,x,y,type){
-  if(type==="block"){
-    c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(x,y+4,26,7,0,0,6.3); c.fill();
-    c.fillStyle="#C8102E"; c.fillRect(x-17,y-44,34,32);            // body
-    c.fillStyle="#14151A"; c.fillRect(x-15,y-14,12,16); c.fillRect(x+3,y-14,12,16);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x,y-54,10,0,6.3); c.fill();
-    c.fillStyle="#2B2118"; c.beginPath(); c.arc(x,y-57,10,3.4,6.0); c.fill();
-    c.fillStyle="#C8102E"; c.fillRect(x-31,y-42,14,9); c.fillRect(x+17,y-42,14,9);
-  } else if(type==="low"){
-    // a sliding tackle along the ground: jump it
-    c.fillStyle="rgba(0,0,0,.15)"; c.fillRect(x-40,y+2,80,6);
-    c.fillStyle="#E0492F"; c.fillRect(x-40,y-16,80,18);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x-46,y-7,9,0,6.3); c.fill();
-    c.fillStyle="#14151A"; c.fillRect(x+30,y-16,14,18);
-    runArrow(c,x,y-40,"up");
-  } else {
-    // a high challenge: slide under it
-    c.fillStyle="#1F6FB2"; c.fillRect(x-40,y-72,80,18);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x,y-84,10,0,6.3); c.fill();
-    c.fillStyle="#1F6FB2"; c.fillRect(x-8,y-54,16,22);
-    runArrow(c,x,y-18,"down");
-  }
+function runShadow(c,x,y,rx,a){
+  c.fillStyle="rgba(0,0,0,"+a+")"; c.beginPath(); c.ellipse(x,y,rx,6,0,0,6.3); c.fill();
+}
+function runHead(c,x,y,r){
+  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
+  c.fillStyle="#2B2118"; c.beginPath(); c.arc(x,y-r*0.28,r,3.35,6.07); c.fill();
+}
+
+/* Standing defender — arms out, blocking the channel. */
+function runDrawStander(c,x,y){
+  runShadow(c,x,y+4,24,.20);
+  c.fillStyle=RUN_KIT;
+  c.fillRect(x-32,y-42,64,10);                    // outstretched arms
+  c.fillRect(x-18,y-48,36,34);                    // shirt
+  c.fillStyle="rgba(0,0,0,.14)"; c.fillRect(x-18,y-48,36,7);
+  c.fillStyle="#14151A"; c.fillRect(x-16,y-16,13,14); c.fillRect(x+3,y-16,13,14);
+  c.fillStyle=RUN_KIT; c.fillRect(x-16,y-6,13,6); c.fillRect(x+3,y-6,13,6);
+  c.fillStyle="#14151A"; c.fillRect(x-19,y-2,16,5); c.fillRect(x+3,y-2,16,5);
+  runHead(c,x,y-58,10);
+}
+
+/* Sliding defender — low along the ground, hurdle him. */
+function runDrawSlider(c,x,y){
+  c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+5,42,7,0,0,6.3); c.fill();
+  c.fillStyle=RUN_KIT;
+  c.fillRect(x-34,y-19,54,19);                    // body along the turf
+  c.fillStyle="rgba(255,255,255,.16)"; c.fillRect(x-34,y-19,54,5);
+  c.fillStyle="#14151A"; c.fillRect(x+18,y-19,16,10);   // trailing leg
+  c.fillRect(x+30,y-22,14,7);                          // boot
+  runHead(c,x-40,y-10,9);
+  c.fillStyle=RUN_KIT; c.fillRect(x-30,y-27,26,9);      // trailing arm
+  runArrow(c,x,y-44,"up");
 }
 function runArrow(c,x,y,dir){
-  c.fillStyle="rgba(255,255,255,.92)";
+  c.fillStyle="rgba(255,255,255,.95)";
   c.beginPath();
-  if(dir==="up"){ c.moveTo(x,y-9); c.lineTo(x+8,y+4); c.lineTo(x-8,y+4); }
-  else          { c.moveTo(x,y+9); c.lineTo(x+8,y-4); c.lineTo(x-8,y-4); }
+  if(dir==="up"){ c.moveTo(x,y-10); c.lineTo(x+9,y+4); c.lineTo(x-9,y+4); }
+  else          { c.moveTo(x,y+10); c.lineTo(x+9,y-4); c.lineTo(x-9,y-4); }
+  c.closePath(); c.fill();
+}
+
+function runBall(c,x,y,r){
+  c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
+  c.strokeStyle="#1B2430"; c.lineWidth=2; c.stroke();
+  c.fillStyle="#1B2430"; c.beginPath();
+  for(var i=0;i<5;i++){ var a=-Math.PI/2+i*2*Math.PI/5;
+    c[i?"lineTo":"moveTo"](x+Math.cos(a)*r*0.52, y+Math.sin(a)*r*0.52); }
   c.closePath(); c.fill();
 }
 
@@ -2059,26 +2114,52 @@ function runDrawPlayer(c){
     var t=Math.min(1, RUN.stateT/RUN_CFG.jumpMs);
     lift = RUN_CFG.jumpH * Math.sin(Math.PI*t);
   }
-  c.fillStyle="rgba(0,0,0,"+(0.20-lift/400)+")";
-  c.beginPath(); c.ellipse(x,y+4,22-lift/8,6,0,0,6.3); c.fill();
+  runShadow(c,x,y+4,Math.max(10,22-lift/6),Math.max(0.06,0.20-lift/380));
   var by=y-lift;
   if(sliding){
-    c.fillStyle="#FFFFFF"; c.fillRect(x-24,by-20,48,20);
-    c.fillStyle="#14151A"; c.fillRect(x+14,by-20,10,20);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x-30,by-11,9,0,6.3); c.fill();
-    c.fillStyle="#2B2118"; c.beginPath(); c.arc(x-30,by-14,9,3.4,6.0); c.fill();
+    c.fillStyle="#FFFFFF"; c.fillRect(x-26,by-20,52,20);
+    c.fillStyle="#14151A"; c.fillRect(x+16,by-20,14,10);
+    runHead(c,x-32,by-11,9);
   } else {
-    c.fillStyle="#FFFFFF"; c.fillRect(x-16,by-46,32,32);
-    c.fillStyle="#14151A"; c.fillRect(x-14,by-16,12,16); c.fillRect(x+2,by-16,12,16);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x,by-56,10,0,6.3); c.fill();
-    c.fillStyle="#2B2118"; c.beginPath(); c.arc(x,by-59,10,3.4,6.0); c.fill();
-    c.fillStyle="#FFFFFF"; c.fillRect(x-30,by-44,14,9); c.fillRect(x+16,by-44,14,9);
+    // legs pump while running; tuck up in the air
+    var stride=Math.sin(RUN.dist/13)*7, air=lift>4;
+    c.fillStyle="#14151A";
+    c.fillRect(x-15,by-16,13,air?11:14+stride);
+    c.fillRect(x+2,by-16,13,air?11:14-stride);
+    c.fillStyle="#FFFFFF"; c.fillRect(x-15,by-16,13,6); c.fillRect(x+2,by-16,13,6);
+    c.fillStyle="#14151A";
+    c.fillRect(x-18,by-(air?5:2),16,5); c.fillRect(x+2,by-(air?5:2),16,5);
+    c.fillStyle="#FFFFFF"; c.fillRect(x-17,by-48,34,34);            // shirt
+    c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(x-17,by-48,34,7);
+    c.fillStyle="#FFFFFF";
+    c.fillRect(x-31,by-46,15,10); c.fillRect(x+16,by-46,15,10);     // arms
+    runHead(c,x,by-58,10);
   }
-  // the ball at his feet
-  var bx=x+(sliding?26:20), byy=by-(sliding?6:4);
-  c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(bx,byy,9,0,6.3); c.fill();
-  c.strokeStyle="#1B2430"; c.lineWidth=2; c.stroke();
-  c.fillStyle="#1B2430"; c.beginPath(); c.arc(bx,byy,3.4,0,6.3); c.fill();
+  runBall(c, x+(sliding?28:21), by-(sliding?7:5), 9);
+}
+
+/* The finish: he strikes it from the spot and it flies into the top corner. */
+function runDrawShot(c, spotY, goalY){
+  var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs);
+  var x=RUN_W/2, planted=RUN_GROUND;
+  // the striker, having followed through
+  runShadow(c,x-16,planted+4,22,.20);
+  c.fillStyle="#14151A"; c.fillRect(x-30,planted-16,14,16);
+  c.fillStyle="#FFFFFF"; c.fillRect(x-30,planted-16,14,6);
+  c.fillStyle="#14151A"; c.fillRect(x-6,planted-22,22,8); c.fillRect(x+14,planted-26,14,6);
+  c.fillStyle="#FFFFFF"; c.fillRect(x-31,planted-48,34,34);
+  c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(x-31,planted-48,34,7);
+  c.fillStyle="#FFFFFF"; c.fillRect(x-45,planted-44,15,10); c.fillRect(x+2,planted-52,15,10);
+  runHead(c,x-14,planted-58,10);
+  // ball from the spot into the top corner, rising then dipping into the net
+  var bx0=x+6, by0=planted-8, bx1=RUN_W-84, by1=goalY-52;
+  var bx=bx0+(bx1-bx0)*t, by=by0+(by1-by0)*t - Math.sin(Math.PI*t)*26;
+  runBall(c,bx,by,9-t*1.5);
+  if(t>0.82){                                     // net takes the pace out of it
+    c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=2;
+    var rr=(t-0.82)*90;
+    c.beginPath(); c.arc(bx1,by1,rr,0,6.3); c.stroke();
+  }
 }
 
 (function bindRun(){
