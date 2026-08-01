@@ -88,6 +88,13 @@
   .profile-list .pts { margin-left:auto; font-size:.85rem; opacity:.7; font-weight:600; }
   .footerlink { text-align:center; opacity:.75; font-size:.85rem; margin-top:auto; padding:12px 0; }
   .grouphdr { font-weight:800; font-size:1.05rem; margin:16px 0 8px; padding-bottom:5px; border-bottom:2px solid rgba(255,255,255,.3); opacity:.95; }
+  .quitbar { margin-top:18px; padding-bottom:6px; text-align:center; }
+  .quitbar button {
+    font-family:inherit; font-weight:800; font-size:1rem; cursor:pointer;
+    background:rgba(0,0,0,.28); color:#fff; border:2px solid rgba(255,255,255,.35);
+    border-radius:999px; padding:11px 22px;
+  }
+  .quitbar button:active { transform:scale(.96); }
 
   /* ---- puffin theme ---- */
   .puffbg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
@@ -1648,6 +1655,72 @@ const DATA = {
     ["What happens if you stay in the storm too long?","You lose health",["You win","You fly","You get coins"],"Keep moving to stay safe!"],
     ["What is the goal of a Fortnite match?","To be the last one standing",["To bake a cake","To do homework","To go to sleep"],"That's a Victory Royale!"],
     ["Is Fortnite free to download?","Yes",["No","Only on Sundays","Never"],"It makes money from selling skins!"]
+  ],
+  igeo: [
+    ["What is the capital city of Ireland?","Dublin",["Cork, in the south of the country","Galway, on the western coast","Belfast, in the north of the island"],"Dublin's name comes from the Irish 'Dubh Linn', meaning black pool."],
+    ["What is the longest river in Ireland?","The Shannon",["The Liffey, which flows through Dublin","The Lee, which flows through Cork","The Boyne, which flows through Meath"],"It runs for about 360 km through eleven counties."],
+    ["What is the highest mountain in Ireland?","Carrauntoohil",["Croagh Patrick, in County Mayo","Slieve Donard, in County Down","Lugnaquilla, in County Wicklow"],"It stands 1,038 metres high in County Kerry."],
+    ["How many counties are there on the island of Ireland?","Thirty-two",["Twenty-six counties in total","Twenty-eight counties in total","Thirty-six counties in total"],"Twenty-six are in the Republic and six in Northern Ireland."],
+    ["Which sea lies between Ireland and Britain?","The Irish Sea",["The North Sea, further to the east","The Celtic Sea, to the far south","The Atlantic Ocean, to the west"],"At its narrowest it is only about 20 km across."],
+    ["What is the largest lake in Ireland?","Lough Neagh",["Lough Corrib, in County Galway","Lough Derg, on the River Shannon","Lough Erne, in County Fermanagh"],"It is the largest lake anywhere in Britain or Ireland."],
+    ["In which county are the Cliffs of Moher?","Clare",["Kerry, in the far south west","Donegal, in the far north west","Galway, beside Galway Bay"],"They rise more than 200 metres above the Atlantic."],
+    ["In which county is the Giant's Causeway?","Antrim",["Down, on the eastern coast","Derry, further to the west","Donegal, across the border"],"Its 40,000 stone columns formed from cooling lava."],
+    ["What is the largest island off the Irish coast?","Achill Island",["The Aran Islands, off Galway","Valentia Island, off Kerry","Rathlin Island, off Antrim"],"It is joined to County Mayo by a bridge."],
+    ["Which river flows through Dublin city?","The Liffey",["The Lee, which reaches the sea at Cork","The Corrib, which flows through Galway","The Boyne, which passes Drogheda"],"The Ha'penny Bridge has crossed it since 1816."],
+    ["What is the second largest city in the Republic of Ireland?","Cork",["Galway, on the western seaboard","Limerick, on the River Shannon","Waterford, in the south east"],"Corkonians cheerfully call it the real capital."],
+    ["How many provinces does Ireland have?","Four",["Three provinces in total","Five provinces in total","Six provinces in total"],"Leinster, Munster, Connacht and Ulster."],
+    ["Off which county are the Aran Islands?","Galway",["Mayo, further up the coast","Clare, just to the south","Kerry, in the far south west"],"Irish is still the everyday language on all three islands."],
+    ["In which county would you kiss the Blarney Stone?","Cork",["Kerry, in the neighbouring county","Tipperary, further inland","Limerick, along the Shannon"],"Legend says it gives you the gift of eloquent speech."],
+    ["Where is the Rock of Cashel?","Tipperary",["Kilkenny, the next county over","Limerick, to the west","Waterford, to the south"],"Saint Patrick is said to have preached there."],
+    ["In which county is Croagh Patrick?","Mayo",["Sligo, just to the north","Galway, to the south","Donegal, further north again"],"Thousands climb it every year on Reek Sunday."],
+    ["Where is the ancient tomb of Newgrange?","Meath",["Louth, the smallest county","Kildare, beside Dublin","Wicklow, south of Dublin"],"It is older than both Stonehenge and the pyramids."],
+    ["Which scenic driving route follows Ireland's west coast?","The Wild Atlantic Way",["The Ring of Kerry loop road","The Causeway Coastal Route","The Ancient East trail"],"It runs for about 2,500 km from Donegal to Cork."],
+    ["Off which county is Skellig Michael?","Kerry",["Cork, around the coast","Clare, further north","Waterford, in the south east"],"Monks built stone beehive huts there over a thousand years ago."],
+    ["What is the capital city of Northern Ireland?","Belfast",["Derry, in the north west","Armagh, the ancient church city","Lisburn, near Belfast Lough"],"The Titanic was built in its shipyards."]
+  ],
+  isci: [
+    ["Which Irish scientist has a famous law about gases?","Robert Boyle",["Isaac Newton, who studied gravity","John Dalton, who studied atoms","Michael Faraday, who studied magnets"],"Boyle's Law says squeezing a gas makes its pressure rise."],
+    ["Which Irishman helped split the atom and won a Nobel Prize?","Ernest Walton",["Robert Boyle, the chemist from Lismore","John Tyndall, who studied sunlight","William Rowan Hamilton, the mathematician"],"He is still the only Irish-born science Nobel laureate."],
+    ["Which Irish engineer built an early successful submarine?","John Philip Holland",["Harry Ferguson, the tractor designer","Charles Parsons, the turbine engineer","Louis Brennan, the torpedo inventor"],"The United States Navy bought his design in 1900."],
+    ["Which Irishman invented the modern tractor linkage?","Harry Ferguson",["John Philip Holland, the submarine builder","Aeneas Coffey, the whiskey still designer","James Martin, the ejection seat maker"],"His three-point hitch is still used on tractors today."],
+    ["Which Irish mathematician gave his name to Boolean logic?","George Boole",["William Rowan Hamilton, of quaternions fame","Robert Mallet, who founded seismology","John Joly, the Trinity College geologist"],"Every computer on Earth runs on his true-and-false logic."],
+    ["Which Irish scientist explained why the sky is blue?","John Tyndall",["Robert Boyle, who studied gases","Nicholas Callan, who made induction coils","Agnes Clerke, the astronomy writer"],"Light scattering off tiny particles is named after him."],
+    ["Which Irish admiral created a famous wind scale?","Francis Beaufort",["Robert Mallet, the earthquake scientist","John Joly, who dated the Earth","Charles Parsons, the turbine engineer"],"The Beaufort scale runs from calm at zero to hurricane at twelve."],
+    ["Which Irish priest invented a powerful induction coil?","Nicholas Callan",["John Tyndall, who studied the atmosphere","Robert Boyle, the chemist and physicist","George Boole, the Cork mathematician"],"He worked at Maynooth and gave himself many shocks."],
+    ["Which Belfast-born astronomer discovered pulsars?","Jocelyn Bell Burnell",["Agnes Clerke, the astronomy historian","Annie Maunder, the solar astronomer","Kathleen Lonsdale, the crystallographer"],"She spotted them as a student in 1967."],
+    ["Which Irish engineer invented the steam turbine?","Charles Parsons",["Harry Ferguson, the tractor pioneer","John Philip Holland, the submarine designer","Aeneas Coffey, the still designer"],"His little ship Turbinia stunned the navy in 1897."],
+    ["Which Irishman invented the aircraft ejection seat?","James Martin",["Louis Brennan, the torpedo inventor","Charles Parsons, the turbine engineer","John Philip Holland, the submarine builder"],"His seats have saved thousands of pilots' lives."],
+    ["Which Irish mathematician carved a formula on a bridge?","William Rowan Hamilton",["George Boole, the professor at Cork","Robert Mallet, the Dublin engineer","John Joly, the Trinity scientist"],"He scratched the quaternion rule on Broom Bridge in Dublin."],
+    ["Which Irish scientist first used the word seismology?","Robert Mallet",["John Tyndall, the physicist","John Joly, the geologist","Francis Beaufort, the admiral"],"He set off gunpowder on Killiney beach to time earth tremors."],
+    ["Which Irish inventor designed the column still for whiskey?","Aeneas Coffey",["Harry Ferguson, the engineer","James Martin, the aircraft designer","Charles Parsons, the turbine builder"],"His still let distillers work continuously instead of in batches."],
+    ["Which Irish scientist studied the shapes of crystals?","Kathleen Lonsdale",["Jocelyn Bell Burnell, the astronomer","Annie Maunder, the sun watcher","Agnes Clerke, the science writer"],"She proved that the benzene ring is flat."],
+    ["Where was Robert Boyle born?","Lismore, County Waterford",["Cork city, in the south of Ireland","Dublin city, on the east coast","Belfast, in the north of Ireland"],"He was the fourteenth child of the Earl of Cork."],
+    ["Which Irish scientist helped work out the age of the Earth?","John Joly",["Ernest Walton, the atom splitter","George Boole, the mathematician","Nicholas Callan, the priest inventor"],"He used radioactivity in rocks to make his estimate."],
+    ["Which Irish astronomer studied sunspots with her husband?","Annie Maunder",["Kathleen Lonsdale, the chemist","Agnes Clerke, the writer","Jocelyn Bell Burnell, the radio astronomer"],"The Maunder Minimum, a quiet spell for the Sun, is named for them."],
+    ["Which giant telescope was built in County Offaly?","The Leviathan of Parsonstown",["The Great Refractor at Armagh","The Dunsink Observatory telescope","The Markree Castle telescope"],"For seventy years it was the largest telescope in the world."],
+    ["Which Irish scientist wrote a famous book asking What Is Life?","Erwin Schrödinger",["Ernest Walton, the physicist","John Joly, the geologist","George Boole, the mathematician"],"He wrote it in Dublin, and it inspired the discovery of DNA's structure."]
+  ],
+  eco: [
+    ["What is money mainly used for?","Buying and selling things",["Decorating the walls of a house","Measuring how tall a person is","Keeping food cold in a fridge"],"Before money, people had to swap goods directly."],
+    ["What is the currency used in Ireland?","The euro",["The pound, used across Britain","The dollar, used in America","The krona, used in Sweden"],"Ireland swapped the punt for the euro in 2002."],
+    ["What does it mean to save money?","Keeping some instead of spending it",["Spending all of it as quickly as you possibly can","Lending it out to somebody else for a while","Giving it away to a charity that needs it"],"Saving a little each week adds up surprisingly fast."],
+    ["What is a budget?","A plan for how to spend money",["A shop that sells very cheap things","A coin used in another country","A machine that prints banknotes"],"Grown-ups make budgets so the money lasts all month."],
+    ["What does a bank do with the money you save?","Keeps it safe and lends some out",["Burns it to keep the building warm","Buries it in a field for safety","Posts it back to you every week"],"That is why banks pay you a little interest."],
+    ["What is interest on savings?","Extra money the bank pays you",["A fee you pay to open an account","A tax the government takes away","A fine for spending too much"],"Interest on a loan works the other way round."],
+    ["What is profit?","Money left after costs are paid",["The total amount a shop takes in","The wages paid to the workers","The rent paid on the building"],"If costs are bigger than sales, that is a loss."],
+    ["What is a wage?","Money paid for doing a job",["Money paid to buy a house","Money paid to the government","Money borrowed from a friend"],"Wages are often paid weekly or monthly."],
+    ["What are taxes used for?","Paying for schools, roads and hospitals",["Paying the wages of workers in private shops","Buying goods on behalf of private companies","Printing the banknotes used by the central bank"],"Everyone chips in so everyone can use them."],
+    ["What does it mean if prices go up over time?","Inflation",["Deflation, when prices are falling","Taxation, when money is collected","Donation, when money is given away"],"A euro buys less than it did twenty years ago."],
+    ["What is a loan?","Money borrowed that must be paid back",["Money given to you as a birthday present","Money you happen to find lying on the ground","Money you have earned by doing a job of work"],"Almost every house in Ireland is bought with one."],
+    ["What is a discount?","Money taken off the usual price",["Money added on to the price","A tax paid when you buy something","The cost of delivering an item"],"Half price means a fifty per cent discount."],
+    ["What does exporting mean?","Selling goods to another country",["Buying goods from another country","Making goods inside your own country","Storing goods in a big warehouse"],"Ireland exports a lot of dairy and medicine."],
+    ["What does importing mean?","Buying goods from another country",["Selling goods on to another country abroad","Growing your own food on your own farmland","Recycling goods once they are worn out"],"Ireland imports most of its fuel."],
+    ["What is a business?","An organisation that sells goods or services",["A place where people go in order to sleep","A group of friends who meet up regularly","A building where the laws of a country are made"],"A lemonade stand is a business too."],
+    ["What is the price of something?","How much money it costs to buy",["How heavy the item is for you to carry","How long the item will last before wearing out","How far the item has travelled to reach the shop"],"Prices usually rise when things are scarce."],
+    ["What is a customer?","Somebody who buys something",["Somebody who makes the goods","Somebody who owns the factory","Somebody who delivers the post"],"Shops compete to attract customers."],
+    ["What is an ATM?","A machine that gives out cash",["A machine that counts your steps","A machine that prints new money","A machine that stores food safely"],"The letters stand for automated teller machine."],
+    ["What does it mean to earn money?","To get paid for work you do",["To find money in an old coat","To borrow money from a bank","To win money in a competition"],"Pocket money for chores is earning too."],
+    ["Why do people put money in a bank?","To keep it safe and available",["To make it disappear completely","To turn it into a different colour","To stop anyone else earning it"],"Deposits in Irish banks are guaranteed up to €100,000."]
   ]
 },
 2: {
@@ -3054,6 +3127,72 @@ const DATA = {
     ["Is Fortnite usually played in first or third person?","Third person",["First person only","Top-down","Sideways"],"You can see your character from behind!"],
     ["Fortnite has hosted live in-game events featuring what?","Real music stars",["Real football matches","Cooking shows","The news"],"Millions log in to watch together!"],
     ["What closing danger must players avoid to survive?","The storm",["The sun","The rain","The fog"],"Stay inside the safe circle!"]
+  ],
+  igeo: [
+    ["Which province has the most counties?","Ulster",["Leinster, in the east of Ireland","Munster, in the south of Ireland","Connacht, in the west of Ireland"],"Ulster has nine counties, three of them in the Republic."],
+    ["Which is the largest county in Ireland by area?","Cork",["Galway, on the western coast","Mayo, in the north west","Donegal, in the far north"],"It is often nicknamed the Rebel County."],
+    ["Which is the smallest county in Ireland?","Louth",["Carlow, in the south east","Longford, in the midlands","Monaghan, along the border"],"It is known as the Wee County."],
+    ["Which mountain range contains Carrauntoohil?","The MacGillycuddy's Reeks",["The Wicklow Mountains range","The Mourne Mountains range","The Twelve Bens range"],"The Reeks hold Ireland's three highest peaks."],
+    ["What is the largest lake in the Republic of Ireland?","Lough Corrib",["Lough Derg, on the Shannon","Lough Ree, on the Shannon","Lough Conn, in County Mayo"],"It is said to have an island for every day of the year."],
+    ["Which county contains the Burren?","Clare",["Galway, just across the bay","Limerick, further inland","Kerry, to the south west"],"Its bare limestone pavement hides rare Arctic and Mediterranean flowers."],
+    ["Where are the Slieve League sea cliffs?","Donegal",["Mayo, further to the south","Sligo, along the coast","Antrim, in the north east"],"They are among the highest sea cliffs in Europe."],
+    ["Which peninsula lies west of Tralee?","The Dingle Peninsula",["The Beara Peninsula further south","The Iveragh Peninsula to the south","The Inishowen Peninsula up north"],"Its Irish-speaking area is called Corca Dhuibhne."],
+    ["What is Ireland's most northerly point?","Malin Head",["Fair Head, in County Antrim","Bloody Foreland, in Donegal","Downpatrick Head, in Mayo"],"It sits on the Inishowen Peninsula in Donegal."],
+    ["What is Ireland's most southerly mainland point?","Mizen Head",["Brow Head, nearby in Cork","Old Head of Kinsale in Cork","Carnsore Point, in Wexford"],"Brow Head is actually a few metres further south."],
+    ["Which river gave its name to a famous 1690 battle?","The Boyne",["The Shannon, Ireland's longest","The Barrow, in the south east","The Blackwater, in County Cork"],"The Battle of the Boyne was fought near Drogheda."],
+    ["Which lake is the source of Dublin's famous stout water supply story?","Lough Vartry",["Lough Dan, in County Wicklow","Lough Bray, in the mountains","Lough Tay, the Guinness Lake"],"Lough Tay is nicknamed the Guinness Lake for its dark water and pale sand."],
+    ["Which county is known as the Garden of Ireland?","Wicklow",["Kilkenny, the Marble County","Meath, the Royal County","Carlow, the Dolmen County"],"Its gardens at Powerscourt are world famous."],
+    ["Where is the Curragh, home of Irish flat racing?","Kildare",["Meath, near the Boyne valley","Tipperary, at Coolmore","Galway, at Ballybrit"],"The word curragh comes from the Irish for a marsh or racecourse."],
+    ["Which is the highest mountain in Northern Ireland?","Slieve Donard",["Slieve Binnian, also in the Mournes","Slieve Gullion, in County Armagh","Cuilcagh, on the Fermanagh border"],"It rises 850 metres straight out of the Irish Sea at Newcastle."],
+    ["Which large bay lies between Louth and Down?","Carlingford Lough",["Strangford Lough, further north","Dundalk Bay, just to the south","Belfast Lough, further north again"],"The border runs right down the middle of it."],
+    ["Which county is nicknamed the Kingdom?","Kerry",["Cork, the Rebel County","Galway, the Tribesmen","Mayo, the Yew County"],"Its Gaelic footballers have won more All-Irelands than any other county."],
+    ["Which island off Kerry once had a transatlantic cable station?","Valentia Island",["Bere Island, in County Cork","Clare Island, off Mayo","Tory Island, off Donegal"],"The first lasting cable to America was landed there in 1866."],
+    ["Which mountains lie between Newry and Newcastle?","The Mourne Mountains",["The Sperrin Mountains further west","The Antrim Plateau to the north","The Cooley Mountains to the south"],"C. S. Lewis said they inspired the landscape of Narnia."],
+    ["Which lough is famous for its pilgrimage island in Donegal?","Lough Derg",["Lough Swilly, near Letterkenny","Lough Eske, near Donegal town","Lough Finn, in the hills"],"Confusingly, there is another Lough Derg on the Shannon."]
+  ],
+  isci: [
+    ["What does Boyle's Law describe?","Pressure rises as gas volume falls",["Volume rises as the gas gets hotter","Pressure rises as the gas gets hotter","Gases always expand to fill a container"],"He worked it out with an air pump in the 1660s."],
+    ["What did Walton and Cockcroft do in 1932?","Split the atomic nucleus with a machine",["Discovered the neutron inside the atom","Built the first working nuclear reactor","Measured the exact charge of an electron"],"They turned lithium into helium and shared the 1951 Nobel Prize."],
+    ["What are quaternions used for today?","Rotating objects in computer graphics",["Encrypting messages sent over the internet","Predicting the weather several days ahead","Measuring distances between distant stars"],"Games and spacecraft both use Hamilton's idea."],
+    ["What is the Tyndall effect?","Light scattering off tiny suspended particles",["Light bending as it passes into a denser piece of glass","Light splitting into a full rainbow of separate colours","Light being absorbed by a strongly coloured chemical dye"],"It is why a beam is visible in a dusty room."],
+    ["Which observatory did William Rowan Hamilton direct?","Dunsink Observatory",["Armagh Observatory in the north","Birr Castle Observatory in Offaly","Markree Observatory in County Sligo"],"He became Astronomer Royal of Ireland at just twenty-two."],
+    ["What did Kathleen Lonsdale prove about benzene?","Its ring of carbon atoms is flat",["It contains a chain rather than a ring","It has seven carbon atoms in a ring","Its atoms are arranged in a cube"],"She used X-ray crystallography to show it."],
+    ["What was unusual about Jocelyn Bell Burnell's Nobel Prize?","She did not receive one for her discovery",["She was the youngest person ever to win the physics prize","She won two separate prizes in two different subjects","She had to share the prize with three other researchers"],"The 1974 prize went to her supervisor instead."],
+    ["Which Irish physicist has a Cork research institute named after him?","John Tyndall",["Robert Boyle, the chemist","Ernest Walton, the physicist","George Boole, the mathematician"],"The Tyndall National Institute works on microchips and photonics."],
+    ["What did William Thomson, born in Belfast, give his name to?","The kelvin temperature scale",["The tesla unit of magnetic field","The joule unit of energy","The newton unit of force"],"He is better known as Lord Kelvin."],
+    ["What did Charles Parsons' turbine transform?","Ships and electricity generation",["Farming and the harvesting of grain","Printing and the making of books","Mining and the cutting of coal"],"Most of the world's power is still made by steam turbines."],
+    ["What did Robert Mallet build to study earthquakes?","The first seismic map of the world",["The first machine to predict tremors","The first shockproof building design","The first underground listening station"],"He also coined the words seismology and epicentre."],
+    ["Which Irish woman wrote a celebrated history of astronomy?","Agnes Clerke",["Annie Maunder, the solar observer","Kathleen Lonsdale, the crystallographer","Mary Ward, the microscopist"],"A crater on the Moon is named after her."],
+    ["What is Mary Ward sadly remembered for?","Being the first person killed by a car",["Being the first woman elected to the Royal Society","Being the first person to see a live cell","Being the first Irish woman to fly a plane"],"She was also a gifted microscopist and illustrator."],
+    ["What did John Joly pioneer in medicine?","Using radium to treat cancer",["Using X-rays to set broken bones","Using anaesthetic gas in surgery","Using antiseptics in the operating theatre"],"The Dublin Method of radiotherapy came from his work."],
+    ["Which Irish physicist gave his name to a photochemical law?","John Tyndall",["Robert Boyle, the natural philosopher","George Gabriel Stokes, the mathematician","Nicholas Callan, the priest and inventor"],"He also showed that carbon dioxide traps heat in the air."],
+    ["What did George Gabriel Stokes study?","How fluids flow and how light fluoresces",["How atoms combine together to form larger molecules","How the planets move on their orbits around the Sun","How electricity travels along a long copper wire"],"Born in Sligo, he gave his name to Stokes' Law."],
+    ["What did the Leviathan of Parsonstown reveal?","The spiral shape of distant galaxies",["The rings around the planet Saturn","The mountains on the surface of the Moon","The moons orbiting around Jupiter"],"Lord Rosse first sketched the Whirlpool Galaxy in 1845."],
+    ["Where did Erwin Schrödinger work during the 1940s?","The Dublin Institute for Advanced Studies",["Trinity College Dublin's physics department","University College Cork's science faculty","Queen's University Belfast's laboratory"],"Éamon de Valera personally invited him to Ireland."],
+    ["What did Robert Boyle insist a good experiment must be?","Repeatable and openly reported",["Performed in secret and kept from rivals","Explained by the four classical elements","Carried out only by trained gentlemen"],"He published his failures as well as his successes, which was unusual."],
+    ["Which Irish surgeon has a bone disease named after him?","Robert Adams",["Abraham Colles, of wrist fracture fame","William Stokes, the Dublin physician","Dominic Corrigan, the heart specialist"],"Dublin doctors of that era named a remarkable number of conditions."]
+  ],
+  eco: [
+    ["What is inflation?","A general rise in prices over time",["A general fall in prices right across the economy","A rise in the number of jobs available to workers","A fall in the amount of tax that people must pay"],"Central banks usually aim for around two per cent a year."],
+    ["What is deflation?","A general fall in prices over time",["A general rise in prices right across the economy","A drop in the value of a currency against others","A rise in the amount a government has to borrow"],"It sounds good, but it can make people stop spending."],
+    ["What does GDP measure?","The total value of what a country produces",["The total amount of money held in a country's banks","The number of people who live in a country today","The amount a government chooses to spend each year"],"It stands for gross domestic product."],
+    ["What is a recession?","A period when the economy shrinks",["A period when prices are rising unusually quickly","A period when the government increases its taxes","A period when a country's exports grow very fast"],"A common rule of thumb is two quarters of falling output."],
+    ["What happens to demand when a price falls?","Demand usually rises",["Demand usually falls as well","Demand always stays the same","Demand becomes impossible to measure"],"This is the law of demand."],
+    ["What is scarcity?","Limited resources against unlimited wants",["Having far too much of absolutely everything","A shortage brought about only by bad weather","A tax that is placed on unusually rare goods"],"Economists say scarcity is the reason economics exists."],
+    ["What is barter?","Swapping goods without using money",["Paying for goods using a credit card","Borrowing money at a low rate","Selling goods to another country"],"It needs both sides to want what the other has."],
+    ["What is a share in a company?","A small piece of ownership",["A loan given to the company","A tax paid by the company","A discount for regular customers"],"Shareholders may receive part of the profits as a dividend."],
+    ["What is a stock exchange?","A market where shares are bought and sold",["A shop that sells its goods at fixed prices","A bank that lends only to established businesses","A government office responsible for collecting taxes"],"Dublin's exchange dates back to 1793."],
+    ["What is an entrepreneur?","Someone who starts and runs a business",["Somebody who works for a very large company","Somebody who lends money to growing businesses","Somebody whose job is inspecting business accounts"],"The word comes from French, meaning one who undertakes."],
+    ["What is unemployment?","People who want work but have none",["People who have chosen to retire early","People working fewer hours than before","People who are studying at college"],"Economists measure it as a share of the labour force."],
+    ["What is a minimum wage?","The lowest legal hourly pay",["The average pay across the country","The most an employer may pay","The pay of a starting apprentice"],"Ireland introduced one in the year 2000."],
+    ["What is VAT?","A tax added to the price of goods",["A tax taken from your weekly wages","A tax paid when you buy a house","A tax on the profits of a company"],"It stands for value added tax."],
+    ["What is income tax?","A tax on the money people earn",["A tax added to the price of goods","A tax on the land that you own","A tax charged on imported goods"],"Higher earners pay a higher rate on part of their income."],
+    ["What is a budget deficit?","Spending more than is collected in taxes",["Collecting rather more in taxes than is actually spent","Spending exactly what has been collected in taxation","Refusing to collect any taxes from anybody at all"],"A surplus is the opposite situation."],
+    ["What is national debt?","Money a government has borrowed",["Money the country holds in reserves","Money owed by households to banks","Money spent on schools each year"],"Governments borrow by selling bonds."],
+    ["What is an exchange rate?","The price of one currency in another",["The fee a bank charges for a transfer","The rate at which prices rise each year","The interest paid on a savings account"],"It changes constantly during trading hours."],
+    ["What is interest on a loan?","The cost of borrowing the money",["A tax the government adds to loans","The amount originally borrowed","A refund given for repaying early"],"The original sum borrowed is called the principal."],
+    ["What is a monopoly?","A market with only one seller",["A market with many small sellers","A market with only one buyer","A market with no regulation at all"],"Monopolies can charge more because buyers have no choice."],
+    ["What is supply?","How much sellers are willing to offer",["How much buyers are willing to purchase","How much a good costs to produce","How many shops exist in a town"],"Supply usually rises as the price rises."]
   ]
 },
 3: {
@@ -6458,6 +6597,72 @@ const DATA = {
     ["What kind of game is Fortnite's main mode?","A battle royale",["A racing game","A puzzle game","A cooking game"],"Everyone against everyone!"],
     ["What do players buy to unlock rewards each season?","The Battle Pass",["A season ticket","A golden ticket","A VIP card"],"Play to unlock skins and emotes!"],
     ["What do we call the regular map and item changes in Fortnite?","A new season",["A holiday","A weekend","A break"],"Each season brings a fresh theme!"]
+  ],
+  igeo: [
+    ["How high is Carrauntoohil?","About 1,038 metres",["About 850 metres above sea level","About 1,300 metres above sea level","About 700 metres above sea level"],"That is a little over 3,400 feet."],
+    ["Where does the River Shannon rise?","The Shannon Pot in Cavan",["Lough Allen in County Leitrim","The Cuilcagh plateau in Fermanagh","Lough Ree in County Roscommon"],"The pot is a small dark pool on the slopes of Cuilcagh."],
+    ["Which three counties of Ulster are in the Republic?","Donegal, Cavan and Monaghan",["Donegal, Cavan and Leitrim","Donegal, Monaghan and Louth","Cavan, Monaghan and Fermanagh"],"The other six make up Northern Ireland."],
+    ["What is Ireland's only true fjord?","Killary Harbour",["Carlingford Lough in the north east","Bantry Bay in west Cork","Lough Swilly in Donegal"],"It is a deep glacial inlet on the Mayo and Galway border."],
+    ["Where are Ireland's highest sea cliffs?","Croaghaun on Achill Island",["The Cliffs of Moher in Clare","Slieve League in Donegal","The Cliffs of Kilkee in Clare"],"They plunge almost 700 metres into the Atlantic."],
+    ["Which peak is the highest in Leinster?","Lugnaquilla",["Mount Leinster on the Carlow border","Djouce in the Wicklow Mountains","Slieve Bloom in County Laois"],"It stands 925 metres up in the Wicklow Mountains."],
+    ["Which mountain is the highest in Connacht?","Mweelrea",["Ben Bulben above Sligo town","Croagh Patrick beside Clew Bay","Errigal in County Donegal"],"It rises 814 metres above Killary Harbour."],
+    ["What are the Three Sisters rivers?","The Barrow, Nore and Suir",["The Barrow, Slaney and Suir","The Nore, Suir and Blackwater","The Barrow, Nore and Liffey"],"They meet near Waterford Harbour before reaching the sea."],
+    ["Which is Ireland's second longest river?","The Barrow",["The Blackwater in County Cork","The Suir in County Tipperary","The Bann in County Antrim"],"It runs about 190 km from the Slieve Bloom mountains."],
+    ["Which mountain range are the Twelve Bens?","A quartzite range in Connemara",["A limestone range in County Clare","A basalt range in County Antrim","A granite range in County Wicklow"],"Benbaun is the highest of the twelve at 729 metres."],
+    ["What landform gives Cavan and Monaghan their hummocky look?","Drumlins",["Eskers left by meltwater streams","Corries carved by mountain ice","Karst formed by dissolving limestone"],"Drumlins are small egg-shaped hills dropped by moving ice."],
+    ["What are the long winding gravel ridges of the midlands called?","Eskers",["Drumlins formed beneath ice sheets","Moraines pushed up at a glacier snout","Erratics carried far from their source"],"The Esker Riada carried an ancient road across the bogs."],
+    ["Which national park is the oldest in Ireland?","Killarney National Park",["Connemara National Park in Galway","Glenveagh National Park in Donegal","The Burren National Park in Clare"],"It began with the gift of the Muckross estate in 1932."],
+    ["Which county contains the Céide Fields?","Mayo",["Sligo, along the same coast","Donegal, further to the north","Galway, to the south of Mayo"],"Stone walls there were farmed almost 6,000 years ago."],
+    ["Which bay is enclosed by the Beara and Sheep's Head peninsulas?","Bantry Bay",["Dunmanus Bay, just to the south","Kenmare Bay, to the north","Roaringwater Bay, further east"],"The French fleet failed to land there in 1796."],
+    ["What rock type forms the Burren's pavement?","Carboniferous limestone",["Ancient granite from a deep intrusion","Basalt from ancient lava flows","Quartzite formed under great pressure"],"Rainwater slowly dissolves it into deep grooves called grykes."],
+    ["What is the Fastnet Rock?","A lighthouse rock off west Cork",["A sea stack off the Antrim coast","A small island off County Mayo","A reef at the mouth of the Shannon"],"Emigrants called it Ireland's Teardrop, the last land they saw."],
+    ["Which lough on the Shannon lies above Killaloe?","Lough Derg",["Lough Ree, further upstream","Lough Allen, near the source","Lough Corrib, in County Galway"],"It is the largest of the three great Shannon lakes."],
+    ["Which upland gives its name to Ireland's midland range?","The Slieve Bloom Mountains",["The Comeragh Mountains in Waterford","The Galtee Mountains in Tipperary","The Knockmealdown Mountains"],"They straddle the Laois and Offaly border."],
+    ["Which county has the longest coastline in Ireland?","Cork",["Donegal, with its many inlets","Mayo, with its islands and bays","Kerry, with its long peninsulas"],"Estimates vary with the method, but Cork usually comes out ahead."]
+  ],
+  isci: [
+    ["What did Boyle's 1661 book The Sceptical Chymist argue?","That matter is made of tiny particles",["That all matter is made of four elements","That metals can be changed into gold","That air has no weight of its own"],"It helped turn alchemy into modern chemistry."],
+    ["What machine did Walton and Cockcroft use?","A linear particle accelerator",["A cyclotron with a circular magnetic field","A nuclear reactor with a graphite core","A cloud chamber for tracking particles"],"Their voltage multiplier reached about 700,000 volts."],
+    ["What is unusual about quaternion multiplication?","It is not commutative",["It is not associative in any case","It cannot produce a negative result","It only works with whole numbers"],"Hamilton realised that i times j does not equal j times i."],
+    ["What did John Tyndall demonstrate about gases in 1859?","That water vapour and carbon dioxide absorb heat",["That oxygen is by far the main greenhouse gas present","That nitrogen traps most of the heat leaving the Earth","That gases cannot absorb any radiant heat whatsoever"],"It is the foundation of climate science."],
+    ["Which Irish physicist proposed the electron before it was found?","George Johnstone Stoney",["George Gabriel Stokes of Sligo","John Tyndall of County Carlow","Nicholas Callan of County Louth"],"He coined the name electron in 1891."],
+    ["What is the FitzGerald contraction?","Objects shortening as they approach light speed",["Metals shrinking noticeably as they are cooled right down","Gases compressing sharply under very high applied pressure","Light bending as it passes close by a very heavy star"],"George FitzGerald's idea fed directly into relativity."],
+    ["What did Kathleen Lonsdale become in 1945?","One of the first women in the Royal Society",["The first woman to win a Nobel in chemistry","The first female professor at Cambridge","The first woman to lead a British university"],"She and Marjory Stephenson were elected together."],
+    ["What are pulsars?","Rapidly spinning neutron stars",["Enormous clouds of glowing hydrogen gas","Black holes swallowing nearby matter","Young stars still forming inside dust"],"Bell Burnell's team nicknamed the first one LGM-1 for Little Green Men."],
+    ["What was John Joly's pleochroic haloes work about?","Estimating the age of the Earth from rocks",["Measuring the distance to the nearest neighbouring stars","Tracing the slow movement of the continents over time","Dating fossils by counting the surrounding rock layers"],"Tiny discoloured rings around radioactive grains acted as clocks."],
+    ["What did Lord Kelvin get badly wrong?","The age of the Earth",["The direction of heat flow","The existence of absolute zero","The behaviour of electric cables"],"He was far too low because he did not know about radioactivity."],
+    ["What did Parsons' Turbinia do at the 1897 naval review?","Raced through the fleet at record speed",["Sank in the harbour after its main boiler exploded","Towed a full battleship right across the harbour","Broke down completely before the review even began"],"The stunt won him navy contracts almost immediately."],
+    ["What is the Maunder Minimum?","A long period with very few sunspots",["A gap in the orbit of an asteroid belt","The faintest point in a star's brightness","A cold spell in the Earth's early history"],"It ran roughly from 1645 to 1715, during a chilly stretch in Europe."],
+    ["Who wrote the bestselling Irish book The Story of the Heavens?","Robert Ball",["Lord Rosse, who built the great telescope","Agnes Clerke, the historian of astronomy","John Joly, the Trinity College geologist"],"Ball was Astronomer Royal of Ireland and a hugely popular lecturer."],
+    ["What did Nicholas Callan's induction coil later enable?","The spark coil used in engines and radio",["The very first electric motor ever to be built","The first practical and long-lasting electric light bulb","The first working telephone receiver to be demonstrated"],"His largest coil threw sparks about 40 centimetres long."],
+    ["What did Aeneas Coffey's still improve on?","The single batch pot still",["The wooden fermentation vessel","The copper condensing worm tub","The charcoal filtering column"],"Irish distillers rejected it, so the Scots adopted it instead."],
+    ["What did John Desmond Bernal pioneer?","X-ray study of biological molecules",["The theory explaining the drift of the continents","The first synthetic antibiotic drug to reach patients","The detailed structure of the atomic nucleus itself"],"The Tipperary-born scientist mentored several Nobel winners."],
+    ["Which Irish physician described a collapsing pulse?","Dominic Corrigan",["Abraham Colles, the surgeon","William Stokes, the physician","Robert Graves, the physician"],"Corrigan's pulse is a sign of a leaking aortic valve."],
+    ["Which Dublin physician has a thyroid disease named after him?","Robert Graves",["William Stokes, his close colleague","Dominic Corrigan, the heart doctor","Abraham Colles, the surgeon"],"Graves also introduced timing the pulse with a watch."],
+    ["What did Ernest Walton do after winning the Nobel Prize?","Returned to teach physics in Dublin",["Moved permanently to work in America","Left science to work in government","Founded a private research company"],"He taught at Trinity College until 1974."],
+    ["What is the Boyle Medal awarded for?","Outstanding contributions to Irish science",["The best science teacher anywhere in the country","A notable discovery made by a secondary student","Excellence in the teaching of chemistry at university"],"The Royal Dublin Society and The Irish Times award it."]
+  ],
+  eco: [
+    ["What is opportunity cost?","The value of the next best alternative",["The money actually spent on a purchase","The total cost of running a business","The extra cost of producing one more unit"],"Choosing one thing always means giving up another."],
+    ["What does price elasticity of demand measure?","How much demand responds to a price change",["How quickly a price returns to normal","How long a product lasts before wearing out","How many sellers there are in a market"],"Petrol is inelastic; luxury holidays are elastic."],
+    ["What is a market with a few large sellers called?","An oligopoly",["A monopoly with a single seller","A monopsony with a single buyer","Perfect competition with many sellers"],"Supermarkets and airlines often look like oligopolies."],
+    ["What characterises perfect competition?","Many sellers offering an identical product",["A single seller controlling the whole market","A few firms agreeing prices between them","One buyer facing many competing sellers"],"It is a theoretical benchmark rather than a real market."],
+    ["What is fiscal policy?","Government decisions on tax and spending",["Central bank decisions about the level of interest rates","Rules setting out how much capital banks must hold","Agreements about trade struck between two countries"],"Monetary policy is the interest rate side."],
+    ["Who sets interest rates for the euro area?","The European Central Bank",["The Central Bank of Ireland alone","The European Commission in Brussels","The International Monetary Fund"],"Its main job is keeping inflation near two per cent."],
+    ["What is quantitative easing?","A central bank buying assets to add money",["A government cutting taxes to boost demand","A bank lowering the deposits it must hold","A country devaluing its own currency"],"It was used heavily after the 2008 crisis."],
+    ["What does the consumer price index track?","The cost of a typical basket of goods",["The total output of the whole economy","The number of people employed each month","The average wage paid across the country"],"It is the standard way of measuring inflation."],
+    ["What is the difference between nominal and real values?","Real values are adjusted for inflation",["Nominal values are adjusted for inflation","Real values only count physical goods","Nominal values exclude government spending"],"A pay rise below inflation is a real pay cut."],
+    ["Why is Irish GDP an unusual measure?","Multinational accounting inflates the figure",["Ireland does not include any farming output in it","The figure leaves out all of the service industries","Ireland only reports the figure every second year"],"Ireland uses modified gross national income instead."],
+    ["What did Adam Smith mean by the invisible hand?","Self-interest can produce a public benefit",["That governments ought to control all of the prices","That trade between nations always ends in failure","That markets need no rules or regulation of any kind"],"He also wrote at length about the limits of markets."],
+    ["What did John Maynard Keynes argue in a slump?","Governments should spend to boost demand",["Governments should cut spending sharply","Central banks should raise interest rates","Wages should be allowed to fall freely"],"His ideas shaped policy after the Second World War."],
+    ["What is comparative advantage?","Specialising in what you give up least to make",["Producing everything more cheaply than anybody else does","Having by far the largest workforce in a whole region","Owning more natural resources than neighbouring states"],"David Ricardo showed trade helps both sides even so."],
+    ["What is a tariff?","A tax on imported goods",["A limit on the quantity that may be imported","A subsidy paid to domestic producers","A ban on trading with a particular country"],"A quota is the quantity limit."],
+    ["What is a subsidy?","A government payment supporting producers",["A tax that is charged on the profits of producers","A limit on how much a producer is allowed to make","A loan that a producer is obliged to repay in full"],"Farm supports are the classic example."],
+    ["What does the Gini coefficient measure?","Inequality of income within a country",["The total wealth held by a country","The rate of inflation over a year","The share of workers who are unemployed"],"Zero means perfect equality and one perfect inequality."],
+    ["What is a progressive tax?","One taking a larger share from higher incomes",["One taking exactly the same share from everybody","One taking a larger share from the lowest incomes","One charged only on the goods and services people buy"],"Ireland's income tax is strongly progressive."],
+    ["What is the difference between GDP and GNP?","GNP counts income earned abroad by residents",["GNP leaves out all of the manufacturing output","GDP counts only what the government itself spends","GDP is always measured before inflation is counted"],"The gap is unusually large in Ireland."],
+    ["What is a central bank's lender of last resort role?","Lending to solvent banks in a crisis",["Lending directly to households in trouble","Buying shares in failing companies","Guaranteeing all business loans"],"Walter Bagehot set out the classic rule in 1873."],
+    ["What is stagflation?","High inflation alongside weak growth",["Rapid growth alongside falling prices","Falling prices alongside high employment","Steady growth alongside stable prices"],"The oil shocks of the 1970s produced it."]
   ]
 },
 4: {
@@ -8697,22 +8902,92 @@ const DATA = {
     ["What kind of game is Fortnite's main mode?","A battle royale",["A racing game","A puzzle game","A cooking game"],"Everyone against everyone!"],
     ["What do players buy to unlock rewards each season?","The Battle Pass",["A season ticket","A golden ticket","A VIP card"],"Play to unlock skins and emotes!"],
     ["What do we call the regular map and item changes in Fortnite?","A new season",["A holiday","A weekend","A break"],"Each season brings a fresh theme!"]
+  ],
+  igeo: [
+    ["How high is Croaghaun on Achill Island?","About 688 metres",["About 1,038 metres above the sea","About 214 metres above the sea","About 950 metres above the sea"],"Its seaward face is one of the highest cliffs in Europe."],
+    ["What is the approximate area of Lough Neagh?","About 390 square kilometres",["About 150 square kilometres in area","About 700 square kilometres in area","About 60 square kilometres in area"],"That makes it the biggest lake in the British Isles."],
+    ["Which mountain is Ireland's highest inland peak?","Galtymore",["Lugnaquilla in County Wicklow","Slieve Donard in County Down","Mweelrea in County Mayo"],"It reaches 917 metres on the Tipperary and Limerick border."],
+    ["What is the Esker Riada?","A gravel ridge carrying an ancient route",["A system of raised bogs stretching across the midlands","A chain of glacial lakes running through Roscommon","A long limestone escarpment in the county of Sligo"],"It let travellers cross the boggy centre of the island."],
+    ["Which are Ireland's oldest rocks?","Gneiss on Inishtrahull off Donegal",["Granite exposed in the Wicklow Mountains south of Dublin","Limestone spread right across the great central plain","Basalt lava flows forming the plateau of County Antrim"],"They are around 1.7 billion years old."],
+    ["What formed the Antrim Plateau?","Flood basalt from ancient eruptions",["Deposits laid down by a warm shallow sea","Sand dunes cemented into solid rock","Ash falling from a distant volcano"],"The same lava flows produced the Giant's Causeway."],
+    ["Roughly how many columns make up the Giant's Causeway?","About forty thousand",["About four hundred columns","About four thousand columns","About four hundred thousand columns"],"Most of them are neat hexagons."],
+    ["Which corrie lake sits beneath a great cliff in the Comeraghs?","Coumshingaun",["Lough Ouler in County Wicklow","Lough Bray in the Dublin hills","Lough Nafooey in County Galway"],"It is one of the finest glacial corries in Europe."],
+    ["What is a turlough?","A lake that drains away underground",["A raised bog with a domed surface","A sea inlet flooded by rising seas","A hill shaped by a passing ice sheet"],"They fill and empty with the water table in limestone country."],
+    ["Which range separates Fermanagh from Cavan?","The Cuilcagh Mountains",["The Sperrin Mountains further north","The Bluestack Mountains in Donegal","The Ox Mountains in County Sligo"],"The Marble Arch Caves run beneath them."],
+    ["What is the Shannon Callows?","Seasonally flooded riverside grassland",["A range of low rounded hills lying beside the river","A chain of small shallow lakes just north of Athlone","A long stretch of raised bog in the county of Offaly"],"They are a stronghold for the corncrake."],
+    ["What kind of bog covers much of the Irish midlands?","Raised bog",["Blanket bog draped over the hills","Fen dominated by reeds and sedge","Salt marsh flooded by the tide"],"Blanket bog is more typical of the wetter western uplands."],
+    ["Which sea area separates Ireland from Wales at its narrowest?","The North Channel and Irish Sea",["The Celtic Sea to the far south","The Bristol Channel further east","The Malin Sea north of Donegal"],"From Torr Head you can see Scotland on a clear day."],
+    ["What is Rockall?","A tiny disputed rock in the Atlantic",["A group of inhabited islands lying west of Donegal","A submerged reef off the coast of County Clare","A shifting sandbank in the middle of the Irish Sea"],"Ireland, Britain, Denmark and Iceland have all made claims nearby."],
+    ["Which glacial feature is Ben Bulben in Sligo?","A limestone plateau cut by ice",["A volcanic plug left by erosion","A granite dome pushed up from below","A sandstone ridge folded by pressure"],"Yeats asked to be buried in its shadow at Drumcliff."],
+    ["What is the Golden Vale?","Rich farmland across Tipperary and Limerick",["A deep wooded valley in the county of Wicklow","A sheltered coastal glen in the county of Antrim","A broad fertile plain in the county of Meath"],"Its limestone soils make it Ireland's best dairy country."],
+    ["Which two counties share Lough Derg on the Shannon?","Clare, Tipperary and Galway",["Only Clare and Tipperary border the lake","Only Galway and Roscommon border the lake","Only Offaly and Westmeath border the lake"],"Three counties actually border it, which catches many people out."],
+    ["What is the highest point of the Sperrin Mountains?","Sawel Mountain",["Slieve Gallion at the eastern end","Mullaghcarn near Gortin","Dart Mountain in the range"],"It stands 678 metres on the Tyrone and Derry border."],
+    ["What is the Céide Fields significant for?","The oldest known field system in the world",["The largest hill fort ever discovered in Ireland","The earliest known hoard of Irish worked gold","The oldest surviving stone circle in the country"],"Bog growth preserved the walls for almost 6,000 years."],
+    ["Which Irish river has the largest catchment area?","The Shannon",["The Bann in the north east","The Barrow in the south east","The Corrib in County Galway"],"It drains about a fifth of the whole island."]
+  ],
+  isci: [
+    ["What was the Cockcroft-Walton reaction?","Lithium plus a proton making two helium nuclei",["Uranium splitting apart after absorbing a stray neutron","Hydrogen fusing together into helium under huge pressure","Carbon slowly decaying into nitrogen over many years"],"It was the first artificial disintegration of a nucleus."],
+    ["What is the algebraic property of the quaternion units?","Their squares all equal minus one",["Their squares all equal positive one","They commute freely with each other","They form a field rather than a ring"],"Hamilton wrote i²=j²=k²=ijk=−1 on Broom Bridge."],
+    ["What did Stoney calculate before naming the electron?","An estimate of the fundamental unit of charge",["The exact mass of a single atom of hydrogen","The speed of light travelling through empty space","The number of atoms found in a gram of any gas"],"He worked from Faraday's laws of electrolysis."],
+    ["What does Stokes' Law describe?","The drag on a small sphere in a fluid",["The pressure at depth in a still liquid","The lift generated by a curved wing","The flow of heat through a solid bar"],"It explains why fine particles settle so slowly."],
+    ["What is the Lorentz-FitzGerald contraction hypothesis?","Length shortens along the direction of motion",["Time running slowly for a very fast-moving clock","Mass increasing steadily as an object speeds up","Light always travelling at exactly the same speed"],"It was proposed to explain the Michelson-Morley result."],
+    ["What did Bernal's 1930s work establish?","That proteins could be studied by X-rays",["That DNA rather than protein carries the genetic code","That enzymes are built mainly out of carbohydrate","That viruses can never be crystallised for study"],"He and Dorothy Hodgkin took the first protein diffraction pattern."],
+    ["What did Schrödinger's What Is Life? predict?","An aperiodic crystal carrying hereditary information",["That genes are made from simple repeating protein chains","That mutations arise only from exposure to radiation","That living things require an entirely new kind of physics"],"Both Watson and Crick said it set them on their path."],
+    ["What is the Schrödinger equation used for?","Describing how a quantum system evolves",["Calculating the orbit of a planet around its star","Measuring the total entropy of an enclosed gas","Predicting when a given nucleus will decay"],"He shared the 1933 Nobel Prize with Paul Dirac."],
+    ["What is the significance of Joly's radium work in Dublin?","Delivering radiotherapy through hollow needles",["The first machine capable of producing diagnostic X-ray images","The discovery of an entirely new radioactive chemical element","A method of measuring absorbed radiation deep inside the body"],"The Dublin Method spread to hospitals worldwide."],
+    ["Which Irish-born scientist worked on the structure of DNA's neighbours?","Kathleen Lonsdale",["Jocelyn Bell Burnell, the astronomer","Agnes Clerke, the astronomy historian","Annie Maunder, the solar astronomer"],"Her crystallography methods underpinned much of that era's biology."],
+    ["What was Lord Rosse's Leviathan's aperture?","About 1.8 metres, or seventy-two inches",["About 0.9 metres across, or thirty-six inches","About 2.5 metres across, or one hundred inches","About 0.6 metres across, or twenty-four inches"],"It held the record from 1845 until 1917."],
+    ["Why was the Leviathan's usefulness limited?","The wet Irish climate and a fixed mounting",["The main mirror was made from ordinary window glass","There was no way at all to record what was seen","The tube was far too short for its enormous width"],"It could only swing a little either side of the meridian."],
+    ["What did Beaufort's scale originally describe?","The sail a ship could safely carry",["The measured speed of the wind in knots","The height of the waves at sea","The pressure recorded on a barometer"],"Wind speeds were attached to it much later."],
+    ["What is the Callan-Symanzik equation named partly for?","A twentieth-century American physicist",["The Maynooth priest and inventor Nicholas Callan","An Irish mathematician working in Cork city","A Dublin astronomer working in the 1800s"],"Curtis Callan is no relation to the Irish inventor."],
+    ["What did Walton and Cockcroft's result confirm?","Einstein's mass-energy equivalence",["The existence of the neutron inside the nucleus","The wave-like nature of the moving electron","The uncertainty principle of quantum theory"],"The energy released matched the missing mass exactly."],
+    ["What did John Tyndall's experiments on spontaneous generation show?","That sterilised air produced no new life",["That life could arise from a sterile broth alone","That bacteria need sunlight in order to grow","That heat cannot destroy every kind of microbe"],"He backed Pasteur's germ theory against its critics."],
+    ["Which Irish institute did de Valera model on Princeton?","The Dublin Institute for Advanced Studies",["The Royal Irish Academy based in central Dublin","The Tyndall National Institute based in Cork","The Armagh Observatory in the north of Ireland"],"He was a mathematics teacher before he entered politics."],
+    ["What is the Corrigan-Stokes-Graves connection?","They were all physicians of the Dublin School",["They all worked together in hospitals in Cork city","They were all leading surgeons practising in Belfast","They all trained alongside each other in Edinburgh"],"Nineteenth-century Dublin medicine had a global reputation."],
+    ["What did William Rowan Hamilton contribute to mechanics?","A reformulation now central to quantum theory",["A proof that energy is always perfectly conserved","A brand new law describing the motion of planets","A general method for solving cubic equations"],"The Hamiltonian appears in almost every physics course."],
+    ["What was Ireland's first Nobel Prize in the sciences?","Walton's shared physics prize in 1951",["Schrödinger's prize for physics awarded in 1933","Bell Burnell's prize for her work on pulsars","Boyle's prize for chemistry in the 1660s"],"The Nobel Prizes only began in 1901."]
+  ],
+  eco: [
+    ["What is the law of diminishing marginal utility?","Each extra unit gives less added satisfaction",["Each extra unit produced costs more than the last one","Total satisfaction falls as soon as you consume more","Prices tend to fall as more units are purchased"],"The second slice of cake is never quite like the first."],
+    ["What is a Giffen good?","One where demand rises as its price rises",["One where demand falls away as people's incomes rise","One that has no close substitutes available at all","One that is sold in only a single country worldwide"],"Very few convincing real examples have ever been found."],
+    ["What is a Veblen good?","One desired more because it is expensive",["One that is bought only when household incomes fall","One with perfectly elastic demand at every price","One that is produced by a single large monopolist"],"Luxury watches and designer bags are usually cited."],
+    ["What is moral hazard?","Taking more risk because someone else bears it",["Hiding important information before a deal is struck","Refusing on principle to trade with a rival firm","Setting a price deliberately below the cost of production"],"Bank bailouts are the classic worry."],
+    ["What is adverse selection?","Hidden information distorting who takes part",["Risky behaviour beginning after a contract is signed","Sellers quietly agreeing to fix the market price","Consumers all choosing exactly the same brand"],"Akerlof's market for lemons is the famous example."],
+    ["What is an externality?","A cost or benefit falling on a third party",["A cost that is paid directly by the producer","A benefit shared out equally among all the buyers","A tax that is charged on goods brought in from abroad"],"Pollution is the standard negative example."],
+    ["What defines a public good?","It is non-rival and non-excludable",["It is provided only by the government of the day","It is sold at a price that is below its true cost","It is consumed by absolutely everybody equally"],"Street lighting and national defence both qualify."],
+    ["What is the tragedy of the commons?","Shared resources being overused by individuals",["Governments failing to collect enough tax revenue","Prices collapsing whenever supply becomes too high","Firms merging together until only one of them remains"],"Elinor Ostrom won a Nobel for showing communities can solve it."],
+    ["What is a Nash equilibrium?","No player gains by changing strategy alone",["The outcome that turns out best for absolutely everyone","The single strategy that guarantees a win every time","The point at which all of the prices become equal"],"John Nash shared the 1994 economics Nobel for it."],
+    ["What is the prisoner's dilemma?","Both do worse by each acting in self-interest",["Both do rather better by refusing to cooperate at all","One player always wins no matter what else happens","Neither of the players has any real choice to make"],"It explains why cartels and arms races are unstable."],
+    ["What is Pareto efficiency?","No one can gain without another losing",["Everybody ends up with exactly the same income","Total output reaches its highest possible level","All of the markets clear at the very same moment"],"It says nothing at all about fairness."],
+    ["What is the Keynesian multiplier?","Extra spending raising income by more than itself",["Interest rates falling whenever the money supply rises","Prices rising in direct proportion to the money supply","Output doubling as soon as the workforce has doubled"],"Its size depends on how much of each euro is spent again."],
+    ["What is the Phillips curve?","A trade-off between inflation and unemployment",["A link between the level of saving and of investment","A relationship between tax rates and total revenue","A curve showing income inequality within a country"],"The 1970s badly damaged confidence in the simple version."],
+    ["What does the Laffer curve suggest?","Very high tax rates can reduce total revenue",["Higher tax rates will always raise more total revenue","Tax revenue is entirely unrelated to the tax rate","Lower tax rates will always raise more total revenue"],"Where the peak actually lies is fiercely disputed."],
+    ["What is a liquidity trap?","Rate cuts stop stimulating the economy",["Banks running short of the physical cash they need","Investors finding they are unable to sell their assets","Households borrowing far more than they can repay"],"Japan is the most studied example."],
+    ["What is Gresham's law?","Bad money drives out good money",["Good money drives out bad money","Prices always return to their average","Debt grows faster than income does"],"People hoard the valuable coins and spend the debased ones."],
+    ["What did Schumpeter mean by creative destruction?","New innovation destroying older industries",["Governments deliberately closing weak firms","Recessions wiping out household savings","Companies merging to reduce competition"],"He saw it as the essential engine of capitalism."],
+    ["What does the Coase theorem say?","Clear property rights can settle externalities",["Governments must always tax pollution in every case","Externalities can never be resolved by private bargaining","Free markets will always produce entirely fair outcomes"],"It assumes bargaining costs are negligible, which is rare."],
+    ["What is behavioural economics concerned with?","How real people depart from perfect rationality",["How governments go about setting their annual budgets","How firms decide what level of output to produce","How currencies move against one another over time"],"Kahneman and Tversky's prospect theory launched the field."],
+    ["What is loss aversion?","Losses feel worse than equal gains feel good",["People generally prefer certain gains to risky ones","People tend to overvalue things they already own","People ignore very small probabilities altogether"],"Roughly, a loss hurts about twice as much."]
   ]
 }
 };
 
 const LEVELS = { 1:{name:"Explorer",emoji:"🐣",sub:"Ages 5–7"}, 2:{name:"Adventurer",emoji:"🚀",sub:"Ages 8–10"}, 3:{name:"Expert",emoji:"🧠",sub:"Ages 11+"}, 4:{name:"Mastermind",emoji:"🎓",sub:"Adults"} };
-const CATS = { cap:{name:"Capitals",emoji:"🏛️"}, flag:{name:"Flags",emoji:"🚩"}, pop:{name:"People",emoji:"👨‍👩‍👧‍👦"}, mtn:{name:"Mountains",emoji:"⛰️"}, riv:{name:"Rivers",emoji:"🌊"}, oce:{name:"Oceans & Seas",emoji:"🐳"}, con:{name:"Continents",emoji:"🗺️"}, lmk:{name:"Landmarks",emoji:"🗽"}, eur:{name:"Europe",emoji:"🏰"}, irl:{name:"Ireland",emoji:"☘️"}, sli:{name:"Sligo",emoji:"🌄"}, soc:{name:"Soccer",emoji:"⚽"}, rug:{name:"Rugby",emoji:"🏉"}, gaa:{name:"Gaelic Football",emoji:"🥅"}, srf:{name:"Surfing",emoji:"🏄"}, glf:{name:"Golf",emoji:"⛳"}, his:{name:"Irish History",emoji:"📜"}, art:{name:"Art",emoji:"🎨"}, ehi:{name:"European History",emoji:"⚔️"}, dis:{name:"Disgusting History",emoji:"🤢"}, sci:{name:"Science",emoji:"🔬"}, sph:{name:"Street Smarts",emoji:"💪"}, lif:{name:"Life Science",emoji:"🌱"}, ear:{name:"Earth Science",emoji:"🌋"}, spc:{name:"Space Science",emoji:"🚀"}, ani:{name:"Animals",emoji:"🦁"}, din:{name:"Dinosaurs",emoji:"🦕"}, mus:{name:"Music",emoji:"🎵"}, sw:{name:"Star Wars",emoji:"🌌"}, hp:{name:"Harry Potter",emoji:"🪄"}, lotr:{name:"Lord of the Rings",emoji:"💍"}, mvl:{name:"Marvel",emoji:"🦸"}, col:{name:"Collectibles",emoji:"🃏"}, shp:{name:"Country Shapes",emoji:"🧩"}, pkm:{name:"Pokémon",emoji:"⚡"}, myt:{name:"Myths & Legends",emoji:"🐉"}, mov:{name:"Movies & TV",emoji:"🎬"}, gam:{name:"Gaming",emoji:"🎮"}, frt:{name:"Fortnite",emoji:"🪂"}, tec:{name:"Tech, AI & Online",emoji:"🤖"}, gal:{name:"Galway",emoji:"🎻"}, kik:{name:"Kilkenny",emoji:"🐈"}, eng:{name:"Engineering",emoji:"🏗️"}, cod:{name:"Coding",emoji:"💻"}, jun:{name:"Jungle Animals",emoji:"🐒"}, sea:{name:"Sea Creatures",emoji:"🐙"}, fst:{name:"First Aid",emoji:"🚑"}, mny:{name:"Money Skills",emoji:"💰"}, hlt:{name:"Healthy Living",emoji:"🥗"}, mth:{name:"Maths",emoji:"🔢"}, wrd:{name:"Weird Facts",emoji:"🤯"}, rec:{name:"World Records",emoji:"🏆"}, srv:{name:"Survival",emoji:"🏕️"}, mcr:{name:"Minecraft",emoji:"⛏️"}, anm:{name:"Anime & Ghibli",emoji:"🍥"}, phy:{name:"Physics",emoji:"⚛️"}, dahl:{name:"Roald Dahl",emoji:"🍫"}, mix:{name:"Mix It Up!",emoji:"🎲"} };
+const CATS = { cap:{name:"Capitals",emoji:"🏛️"}, flag:{name:"Flags",emoji:"🚩"}, pop:{name:"People",emoji:"👨‍👩‍👧‍👦"}, mtn:{name:"Mountains",emoji:"⛰️"}, riv:{name:"Rivers",emoji:"🌊"}, oce:{name:"Oceans & Seas",emoji:"🐳"}, con:{name:"Continents",emoji:"🗺️"}, lmk:{name:"Landmarks",emoji:"🗽"}, eur:{name:"Europe",emoji:"🏰"}, irl:{name:"Ireland",emoji:"☘️"}, sli:{name:"Sligo",emoji:"🌄"}, soc:{name:"Soccer",emoji:"⚽"}, rug:{name:"Rugby",emoji:"🏉"}, gaa:{name:"Gaelic Football",emoji:"🥅"}, srf:{name:"Surfing",emoji:"🏄"}, glf:{name:"Golf",emoji:"⛳"}, his:{name:"Irish History",emoji:"📜"}, art:{name:"Art",emoji:"🎨"}, ehi:{name:"European History",emoji:"⚔️"}, dis:{name:"Disgusting History",emoji:"🤢"}, sci:{name:"Science",emoji:"🔬"}, sph:{name:"Street Smarts",emoji:"💪"}, lif:{name:"Life Science",emoji:"🌱"}, ear:{name:"Earth Science",emoji:"🌋"}, spc:{name:"Space Science",emoji:"🚀"}, ani:{name:"Animals",emoji:"🦁"}, din:{name:"Dinosaurs",emoji:"🦕"}, mus:{name:"Music",emoji:"🎵"}, sw:{name:"Star Wars",emoji:"🌌"}, hp:{name:"Harry Potter",emoji:"🪄"}, lotr:{name:"Lord of the Rings",emoji:"💍"}, mvl:{name:"Marvel",emoji:"🦸"}, col:{name:"Collectibles",emoji:"🃏"}, shp:{name:"Country Shapes",emoji:"🧩"}, pkm:{name:"Pokémon",emoji:"⚡"}, myt:{name:"Myths & Legends",emoji:"🐉"}, mov:{name:"Movies & TV",emoji:"🎬"}, gam:{name:"Gaming",emoji:"🎮"}, frt:{name:"Fortnite",emoji:"🪂"}, tec:{name:"Tech, AI & Online",emoji:"🤖"}, gal:{name:"Galway",emoji:"🎻"}, kik:{name:"Kilkenny",emoji:"🐈"}, eng:{name:"Engineering",emoji:"🏗️"}, cod:{name:"Coding",emoji:"💻"}, jun:{name:"Jungle Animals",emoji:"🐒"}, sea:{name:"Sea Creatures",emoji:"🐙"}, fst:{name:"First Aid",emoji:"🚑"}, mny:{name:"Money Skills",emoji:"💰"}, hlt:{name:"Healthy Living",emoji:"🥗"}, mth:{name:"Maths",emoji:"🔢"}, wrd:{name:"Weird Facts",emoji:"🤯"}, rec:{name:"World Records",emoji:"🏆"}, srv:{name:"Survival",emoji:"🏕️"}, mcr:{name:"Minecraft",emoji:"⛏️"}, anm:{name:"Anime & Ghibli",emoji:"🍥"}, phy:{name:"Physics",emoji:"⚛️"}, dahl:{name:"Roald Dahl",emoji:"🍫"}, igeo:{name:"Irish Geography",emoji:"🗾"}, isci:{name:"Irish Scientists",emoji:"🧪"}, eco:{name:"Economics",emoji:"📈"}, allgeo:{name:"All Geography",emoji:"🌍"}, allsci:{name:"All Science",emoji:"🔭"}, mix:{name:"Mix It Up!",emoji:"🎲"} };
+const COMBO = {
+  allgeo:["cap","flag","pop","mtn","riv","oce","con","lmk","shp","eur","irl","igeo","sli","gal","kik"],
+  allsci:["sci","phy","eng","lif","ear","spc","ani","jun","sea","din","cod","tec","isci"]
+};
 const GROUPS = [
-  {name:"🌍 Geography", cats:["cap","flag","pop","mtn","riv","oce","con","lmk","shp","eur"]},
+  {name:"🌍 Geography", cats:["allgeo","cap","flag","pop","mtn","riv","oce","con","lmk","shp","eur","igeo"]},
   {name:"🔢 Maths", cats:["mth"]},
-  {name:"🔬 Science", cats:["sci","phy","eng","lif","ear","spc","ani","jun","sea","din"]},
-  {name:"☘️ Ireland", cats:["irl","his","sli","gal","kik"]},
+  {name:"🔬 Science", cats:["allsci","sci","phy","eng","lif","ear","spc","ani","jun","sea","din","isci"]},
+  {name:"☘️ Ireland", cats:["irl","igeo","isci","his","sli","gal","kik"]},
   {name:"⚽ Sport", cats:["soc","rug","gaa","srf","glf"]},
   {name:"🎬 Movies, Gaming & Tech", cats:["dahl","mov","anm","gam","frt","cod","mcr","pkm","sw","hp","lotr","mvl","col","tec"]},
   {name:"🤯 Weird & Wonderful", cats:["wrd","rec"]},
   {name:"📜 History, Myths & Arts", cats:["ehi","dis","myt","art","mus"]},
-  {name:"💪 Life Skills", cats:["sph","fst","srv","mny","hlt"]}
+  {name:"💪 Life Skills", cats:["sph","fst","srv","mny","eco","hlt"]}
 ];
 const AVATARS = ["🦁","🐼","🦊","🐧","🦄","🐯","🐨","🐙"];
 const BADGES = [
@@ -8957,7 +9232,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v50 · Quizzical Puffin · 7,978 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v51 · Quizzical Puffin · 8,218 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -9062,7 +9337,9 @@ function startRound(cat){
        save("gq_stats",st); }catch(e){}
   const bank = cat==="mix"
     ? shuffle([].concat(...Object.values(DATA[sel.level])))
-    : shuffle(DATA[sel.level][cat]);
+    : (COMBO[cat]
+        ? shuffle([].concat(...COMBO[cat].map(k=>DATA[sel.level][k]||[])))
+        : shuffle(DATA[sel.level][cat]));
   round = { qs: bank.slice(0,ROUND_LEN), i:0, correct:0, streak:0, gained:0, newBadges:[] };
   showQuestion();
 }
@@ -9081,7 +9358,8 @@ function showQuestion(){
     <div class="question">${esc(q[0])}</div>
     <div id="opts">${opts.map(o=>`<button class="btn center" style="${flagOpts?'font-size:2.6rem;padding:10px':''}" data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div>
     <div id="after"></div>
-  </div>`;
+  </div>
+  <div class="quitbar"><button onclick="quitRound()">🏠 Back to Menu</button></div>`;
   $("#opts").addEventListener("click", e=>{
     const b=e.target.closest("button"); if(!b||round.answered) return;
     answer(b, b.dataset.o===q[1], q);
@@ -9120,6 +9398,20 @@ function answer(btn, right, q){
   $("#after").innerHTML = `<div class="fact">${msg}<br><br>💡 <b>Fun fact:</b> ${esc(q[3])}</div>
     <button class="btn primary center" onclick="next()">${round.i+1<ROUND_LEN?"Next Question ➡️":"See My Score 🏁"}</button>`;
 }
+function quitRound(){
+  const gained = round ? round.gained : 0;
+  const msg = gained>0
+    ? `Finish here and go back to the menu?\n\nYou'll keep the ${gained} points you've earned so far.`
+    : `Go back to the menu?`;
+  if(!confirm(msg)) return;
+  if(gained>0){
+    const p=profiles[curP];
+    p.points += gained;
+    save("gq_profiles",profiles);
+  }
+  round=null;
+  screenHome();
+}
 function next(){
   round.answered=false; round.i++;
   if(round.i<ROUND_LEN) showQuestion(); else finishRound();
@@ -9131,7 +9423,7 @@ function grantIf(id, cond){
 function finishRound(){
   const p=profiles[curP];
   p.points += round.gained;
-  if(!p.cats.includes(sel.cat) && sel.cat!=="mix") p.cats.push(sel.cat);
+  if(!p.cats.includes(sel.cat) && sel.cat!=="mix" && !COMBO[sel.cat]) p.cats.push(sel.cat);
   grantIf("perfect", round.correct===ROUND_LEN);
   grantIf("expertperfect", round.correct===ROUND_LEN && sel.level>=3);
   grantIf("pts100", p.points>=100);

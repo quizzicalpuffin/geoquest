@@ -88,6 +88,13 @@
   .profile-list .pts { margin-left:auto; font-size:.85rem; opacity:.7; font-weight:600; }
   .footerlink { text-align:center; opacity:.75; font-size:.85rem; margin-top:auto; padding:12px 0; }
   .grouphdr { font-weight:800; font-size:1.05rem; margin:16px 0 8px; padding-bottom:5px; border-bottom:2px solid rgba(255,255,255,.3); opacity:.95; }
+  .quitbar { margin-top:18px; padding-bottom:6px; text-align:center; }
+  .quitbar button {
+    font-family:inherit; font-weight:800; font-size:1rem; cursor:pointer;
+    background:rgba(255,255,255,.08); color:#dfe6ff; border:1px solid rgba(255,255,255,.28);
+    border-radius:999px; padding:11px 22px; letter-spacing:.02em;
+  }
+  .quitbar button:active { transform:scale(.96); }
 
   /* ---- puffin theme ---- */
   .puffbg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
@@ -1511,7 +1518,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New user</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v7 · Puffin Medical · 1,023 questions · Add to Home Screen in Safari to run it as an app</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v8 · Puffin Medical · 1,023 questions · Add to Home Screen in Safari to run it as an app</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -1632,7 +1639,8 @@ function showQuestion(){
     <div class="question">${esc(q[0])}</div>
     <div id="opts">${opts.map(o=>`<button class="btn center" style="${flagOpts?'font-size:2.6rem;padding:10px':''}" data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div>
     <div id="after"></div>
-  </div>`;
+  </div>
+  <div class="quitbar"><button onclick="quitRound()">◄ Back to Menu</button></div>`;
   $("#opts").addEventListener("click", e=>{
     const b=e.target.closest("button"); if(!b||round.answered) return;
     answer(b, b.dataset.o===q[1], q);
@@ -1670,6 +1678,20 @@ function answer(btn, right, q){
   }
   $("#after").innerHTML = `<div class="fact">${msg}<br><br>💡 <b>Fun fact:</b> ${esc(q[3])}</div>
     <button class="btn primary center" onclick="next()">${round.i+1<ROUND_LEN?"Next Question ➡️":"See My Score 🏁"}</button>`;
+}
+function quitRound(){
+  const gained = round ? round.gained : 0;
+  const msg = gained>0
+    ? `End this set and return to the menu?\n\nThe ${gained} points earned so far will be kept.`
+    : `Return to the menu?`;
+  if(!confirm(msg)) return;
+  if(gained>0){
+    const p=profiles[curP];
+    p.points += gained;
+    save("qpmed_profiles",profiles);
+  }
+  round=null;
+  screenHome();
 }
 function next(){
   round.answered=false; round.i++;
