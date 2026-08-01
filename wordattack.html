@@ -32,6 +32,19 @@ body{
 body.theme-blue{--bg:#E9F1F7;--panel:#FBFDFF;--line:#CBDCE8}
 body.theme-mint{--bg:#E8F3EC;--panel:#FAFFFB;--line:#C9E1D2}
 body.theme-grey{--bg:#EDEDEA;--panel:#FAFAF8;--line:#D8D8D3}
+/* Dark. Off-white text on charcoal rather than white on black — pure white
+   on pure black smears for a lot of readers. */
+body.theme-dark{--bg:#161A1D;--panel:#1E252A;--ink:#E9E6E0;--ink-soft:#9FACB4;
+  --line:#333D45;--pitch:#3C9463;--pitch-dk:#2E7350;--good:#5FBF87;--miss:#E2924C}
+body.theme-dark .feedback.ok,body.theme-dark .opt.right,body.theme-dark .lettbtn.right,
+body.theme-dark .gridwords span.s2{background:#1B3325;border-color:var(--good)}
+body.theme-dark .feedback.no,body.theme-dark .opt.wrongpick,body.theme-dark .lettbtn.wrongpick,
+body.theme-dark .gridwords span.s0{background:#39281A;border-color:var(--miss)}
+body.theme-dark .opt.picked,body.theme-dark .gridwords span.s1{background:#3A3323;border-color:var(--gold)}
+body.theme-dark .sentence mark{background:#5A4818;color:#FFE9A8}
+body.theme-dark .board{background:#0E1316;border-color:#070A0C}
+body.theme-dark .powertrack{background:linear-gradient(90deg,
+  #2C3339 0 42.3%, #24422F 42.3% 76.9%, #2C3339 76.9% 88.5%, #493322 88.5% 100%)}
 .wrap{max-width:720px;margin:0 auto;padding:14px 16px 40px}
 .screen{display:none}
 .screen.on{display:block;animation:fade .18s ease-out}
@@ -144,6 +157,12 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
 .gridwords span.s2{background:#E4F1E8;border-color:var(--good)}
 .gridwords span.s1{background:#FFF6DF;border-color:var(--gold)}
 .gridwords span.s0{background:#FBEADB;border-color:var(--miss)}
+.pill.lg-good{background:#E4F1E8;border-color:var(--good)}
+.pill.lg-mid{background:#FFF6DF;border-color:var(--gold)}
+.pill.lg-weak{background:#FBEADB;border-color:var(--miss)}
+body.theme-dark .pill.lg-good{background:#1B3325}
+body.theme-dark .pill.lg-mid{background:#3A3323}
+body.theme-dark .pill.lg-weak{background:#39281A}
 .clockbox{font-weight:800;font-variant-numeric:tabular-nums}
 .goalflash{position:fixed;inset:0;background:rgba(46,125,79,.94);color:#fff;display:grid;place-items:center;z-index:99;font-size:2.6em;font-weight:800;letter-spacing:.06em;text-align:center;padding:20px}
 
@@ -342,9 +361,9 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
       <h1>Squad list</h1>
       <p class="muted small">All 96 words from your report. Tap any word to hear it and see its synonyms.</p>
       <div class="small" style="margin-bottom:10px">
-        <span class="pill" style="background:#E4F1E8;border-color:var(--good)">Strong</span>
-        <span class="pill" style="background:#FFF6DF;border-color:var(--gold)">Getting there</span>
-        <span class="pill" style="background:#FBEADB;border-color:var(--miss)">Needs work</span>
+        <span class="pill lg-good">Strong</span>
+        <span class="pill lg-mid">Getting there</span>
+        <span class="pill lg-weak">Needs work</span>
       </div>
       <div class="gridwords" id="squadGrid"></div>
     </div>
@@ -416,6 +435,7 @@ input[type=range]{width:150px;accent-color:var(--pitch)}
           <button data-theme="theme-blue" style="background:#E9F1F7" aria-pressed="false" title="Blue"></button>
           <button data-theme="theme-mint" style="background:#E8F3EC" aria-pressed="false" title="Mint"></button>
           <button data-theme="theme-grey" style="background:#EDEDEA" aria-pressed="false" title="Grey"></button>
+          <button data-theme="theme-dark" style="background:#1E252A" aria-pressed="false" title="Dark"></button>
         </div>
       </div>
     </div>
