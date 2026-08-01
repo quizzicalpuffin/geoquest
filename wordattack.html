@@ -2081,14 +2081,15 @@ function runDrawStander(c,x,y){
 
 /* Sliding defender — low along the ground, hurdle him. */
 function runDrawSlider(c,x,y){
-  c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+5,42,7,0,0,6.3); c.fill();
+  // kept inside his own channel so it is never unclear which one he is in
+  c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+5,34,7,0,0,6.3); c.fill();
   c.fillStyle=RUN_KIT;
-  c.fillRect(x-34,y-19,54,19);                    // body along the turf
-  c.fillStyle="rgba(255,255,255,.16)"; c.fillRect(x-34,y-19,54,5);
-  c.fillStyle="#14151A"; c.fillRect(x+18,y-19,16,10);   // trailing leg
-  c.fillRect(x+30,y-22,14,7);                          // boot
-  runHead(c,x-40,y-10,9);
-  c.fillStyle=RUN_KIT; c.fillRect(x-30,y-27,26,9);      // trailing arm
+  c.fillRect(x-24,y-19,46,19);                    // body along the turf
+  c.fillStyle="rgba(255,255,255,.16)"; c.fillRect(x-24,y-19,46,5);
+  c.fillStyle="#14151A"; c.fillRect(x+14,y-19,14,10);   // trailing leg
+  c.fillRect(x+24,y-22,12,7);                          // boot
+  runHead(c,x-30,y-10,8);
+  c.fillStyle=RUN_KIT; c.fillRect(x-20,y-26,20,8);      // trailing arm
   runArrow(c,x,y-44,"up");
 }
 function runArrow(c,x,y,dir){
@@ -2141,18 +2142,23 @@ function runDrawPlayer(c){
 /* The finish: he strikes it from the spot and it flies into the top corner. */
 function runDrawShot(c, spotY, goalY){
   var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs);
-  var x=RUN_W/2, planted=RUN_GROUND;
-  // the striker, having followed through
-  runShadow(c,x-16,planted+4,22,.20);
-  c.fillStyle="#14151A"; c.fillRect(x-30,planted-16,14,16);
-  c.fillStyle="#FFFFFF"; c.fillRect(x-30,planted-16,14,6);
-  c.fillStyle="#14151A"; c.fillRect(x-6,planted-22,22,8); c.fillRect(x+14,planted-26,14,6);
-  c.fillStyle="#FFFFFF"; c.fillRect(x-31,planted-48,34,34);
-  c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(x-31,planted-48,34,7);
-  c.fillStyle="#FFFFFF"; c.fillRect(x-45,planted-44,15,10); c.fillRect(x+2,planted-52,15,10);
-  runHead(c,x-14,planted-58,10);
+  var x=RUN_W/2, g=RUN_GROUND;
+  runShadow(c,x-10,g+4,22,.20);
+  c.fillStyle="#14151A"; c.fillRect(x-23,g-18,13,18);              // planted leg
+  c.fillStyle="#FFFFFF"; c.fillRect(x-23,g-18,13,6);
+  c.fillStyle="#14151A"; c.fillRect(x-26,g-3,17,5);                // planted boot
+  c.save();                                                        // kicking leg, followed through
+  c.translate(x-4,g-21); c.rotate(-0.55);
+  c.fillStyle="#14151A"; c.fillRect(0,-6,27,12);
+  c.fillStyle="#FFFFFF"; c.fillRect(0,-6,11,12);
+  c.restore();
+  c.fillStyle="#FFFFFF"; c.fillRect(x-27,g-52,34,34);              // shirt
+  c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(x-27,g-52,34,7);
+  c.fillStyle="#FFFFFF";
+  c.fillRect(x-42,g-46,16,10); c.fillRect(x+7,g-56,16,10);         // arms out for balance
+  runHead(c,x-10,g-62,10);
   // ball from the spot into the top corner, rising then dipping into the net
-  var bx0=x+6, by0=planted-8, bx1=RUN_W-84, by1=goalY-52;
+  var bx0=x+16, by0=g-16, bx1=RUN_W-84, by1=goalY-52;
   var bx=bx0+(bx1-bx0)*t, by=by0+(by1-by0)*t - Math.sin(Math.PI*t)*26;
   runBall(c,bx,by,9-t*1.5);
   if(t>0.82){                                     // net takes the pace out of it
