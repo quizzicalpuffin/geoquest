@@ -901,37 +901,36 @@ const CLASSES = [
 {t:1,r:"are all fish",g:["salmon","trout","mackerel","herring"]},
 {t:1,r:"are all fruit",g:["apple","banana","pear","plum"]},
 {t:1,r:"are all vegetables",g:["carrot","turnip","cabbage","parsnip"]},
-{t:1,r:"are all trees",g:["oak","ash","willow","birch"]},
+{t:1,k:["wood"],r:"are all trees",g:["oak","ash","willow","birch"]},
 {t:1,r:"are all kinds of weather",g:["hail","drizzle","thunder","frost"]},
 {t:2,r:"are all musical instruments",g:["piano","violin","trumpet","banjo"]},
 {t:2,r:"are all metals",g:["iron","copper","silver","lead"]},
-{t:2,r:"are all pieces of furniture",g:["wardrobe","dresser","bookcase","sideboard"]},
-{t:1,r:"are all clothes",g:["jumper","trousers","scarf","jacket"]},
+{t:2,k:["home"],r:"are all pieces of furniture",g:["wardrobe","dresser","bookcase","sideboard"]},
+{t:1,k:["wear"],r:"are all clothes",g:["jumper","trousers","scarf","jacket"]},
 {t:1,r:"are all vehicles",g:["lorry","van","bus","jeep"]},
-{t:2,r:"are all tools",g:["hammer","spanner","chisel","screwdriver"]},
+{t:2,k:["tool"],r:"are all tools",g:["hammer","spanner","chisel","screwdriver"]},
 {t:2,r:"are all insects",g:["beetle","wasp","moth","earwig"]},
 {t:3,r:"are all shapes",g:["hexagon","cylinder","pyramid","cube"]},
 {t:1,r:"are all things you write with",g:["pencil","biro","chalk","crayon"]},
-{t:2,r:"are all things you cut with",g:["scissors","saw","shears","blade"]},
-{t:2,r:"are all things that measure something",g:["ruler","scales","clock","thermometer"]},
+{t:2,k:["tool"],r:"are all things you cut with",g:["scissors","saw","shears","blade"]},
+{t:2,k:["gauge"],r:"are all things that measure something",g:["ruler","scales","clock","thermometer"]},
 {t:1,r:"are all things that give light",g:["torch","lamp","candle","lantern"]},
-{t:2,r:"are all things you carry things in",g:["rucksack","basket","bucket","suitcase"]},
-{t:1,r:"are all things you sit on",g:["stool","bench","couch","saddle"]},
-{t:2,r:"are all things that keep you dry",g:["umbrella","raincoat","tent","canopy"]},
+{t:2,k:["hold"],r:"are all things you carry things in",g:["rucksack","basket","bucket","suitcase"]},
+{t:1,k:["home"],r:"are all things you sit on",g:["stool","bench","couch","saddle"]},
+{t:2,k:["wear"],r:"are all things that keep you dry",g:["umbrella","raincoat","tent","canopy"]},
 {t:3,r:"are all things that make a sound louder",g:["microphone","speaker","megaphone","amplifier"]},
-{t:1,r:"are all found in a kitchen",g:["kettle","oven","fridge","sink"]},
+{t:1,k:["gauge","hold"],r:"are all found in a kitchen",g:["kettle","oven","fridge","sink"]},
 {t:1,r:"are all found on a beach",g:["dune","shell","seaweed","pebble"]},
-{t:2,r:"are all found in a hospital",g:["ward","stretcher","bandage","surgeon"]},
-{t:2,r:"are all found on a farm",g:["barn","silage","byre","haystack"]},
-{t:2,r:"are all found in a forest",g:["bark","moss","fern","trunk"]},
+{t:2,k:["gauge"],r:"are all found in a hospital",g:["ward","stretcher","bandage","surgeon"]},
+{t:2,k:["hold"],r:"are all found on a farm",g:["barn","silage","byre","haystack"]},
+{t:2,k:["wood"],r:"are all found in a forest",g:["bark","moss","fern","trunk"]},
 {t:1,r:"are all parts of a football pitch",g:["touchline","goalpost","penalty spot","dugout"]},
 {t:3,r:"are all found in a library",g:["catalogue","librarian","index","bookmark"]},
 {t:1,r:"are all times of day",g:["dawn","noon","dusk","midnight"]},
 {t:1,r:"are all seasons",g:["spring","autumn","winter","summer"]},
 {t:2,r:"are all months",g:["January","March","October","August"]},
 {t:2,r:"are all lengths of time",g:["minute","hour","decade","century"]},
-{t:3,r:"all mean very soon",g:["shortly","presently","imminently","directly"]},
-{t:3,r:"are all things that happen once a year",g:["birthday","Christmas","harvest","anniversary"]}
+{t:3,r:"all mean very soon",g:["shortly","presently","imminently","directly"]}
 ];
 
 /* ---- COMMENTARY: spoken passages, nothing to decode.
@@ -1128,15 +1127,25 @@ var MODES = {
   }
 };
 
-/* A word must never appear in two groups, or a distractor could quietly be a
-   correct answer. Built once at load and checked by the outsider picker. */
+/* Two safeguards so a distractor is never secretly a right answer.
+   1. No word may appear in two groups.
+   2. Groups that overlap in meaning share a tag and are never used against
+      each other — a couch really is furniture, a saw really is a tool, an
+      oak really is found in a forest, so those pairings are barred. */
 var CLASS_OWNER = {};
 CLASSES.forEach(function(e,i){ e.g.forEach(function(w){ CLASS_OWNER[norm(w)]=i; }); });
+function classesClash(a,b){
+  var ka=CLASSES[a].k, kb=CLASSES[b].k;
+  if(!ka || !kb) return false;
+  for(var i=0;i<ka.length;i++) if(kb.indexOf(ka[i])>=0) return true;
+  return false;
+}
 function outsiders(idx, count){
   var out=[], guard=0, used={};
   while(out.length<count && guard++<400){
     var j=(Math.random()*CLASSES.length)|0;
     if(j===idx) continue;
+    if(classesClash(idx,j)) continue;             // overlapping meaning
     var w=pick(CLASSES[j].g);
     if(CLASS_OWNER[norm(w)]===idx) continue;      // belongs to the target group
     if(used[norm(w)]) continue;
@@ -1283,6 +1292,9 @@ function englishVoices(){
 }
 /* The flat, robotic default is usually a "compact" voice. Prefer Irish, then
    UK, and strongly prefer enhanced/premium/neural ones where installed. */
+function isRichVoice(v){
+  return !!v && /premium|enhanced|neural|siri/i.test(v.name+" "+(v.voiceURI||""));
+}
 function voiceScore(v){
   var n=(v.name+" "+(v.voiceURI||"")).toLowerCase(), s=0;
   if(/en[-_]ie/i.test(v.lang)) s+=40;
@@ -1327,6 +1339,33 @@ function say(text, onend){
     }
     speechSynthesis.speak(u);
   }catch(e){ if(onend) onend(); }
+}
+
+/* Long text one sentence at a time. Engines give a whole paragraph a flat,
+   run-on delivery; fed a sentence at a time they put the stress and the
+   falling tone in the right places, which is most of what "robotic" is. */
+function sayPassage(text, onend){
+  if(!S.opts.voice || !("speechSynthesis" in window)){ if(onend) onend(); return; }
+  var parts=(text.match(/[^.!?]+[.!?]*/g)||[text])
+              .map(function(s){ return s.trim(); }).filter(Boolean);
+  var i=0;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  var next=function(){
+    if(i>=parts.length){ if(onend) onend(); return; }
+    var line=parts[i++], moved=false;
+    var go=function(){ if(moved) return; moved=true; setTimeout(next,180); };
+    try{
+      var u=new SpeechSynthesisUtterance(line);
+      if(VOICE) u.voice=VOICE;
+      u.lang = VOICE ? VOICE.lang : "en-GB";
+      u.rate=0.95; u.pitch=1;
+      var guard=setTimeout(go, Math.max(3000, line.length*100));
+      u.onend=function(){ clearTimeout(guard); go(); };
+      u.onerror=function(){ clearTimeout(guard); go(); };
+      speechSynthesis.speak(u);
+    }catch(e){ go(); }
+  };
+  next();
 }
 
 /* =======================================================================
@@ -1467,7 +1506,7 @@ function renderQuestion(){
       $("listenStatus").textContent="Playing…";
       $("btnPlayPassage").disabled=true;
       var t0=Date.now();
-      say(q.passage, function(){
+      sayPassage(q.passage, function(){
         if($("btnPlayPassage")) $("btnPlayPassage").disabled=false;
         reveal();
         // If it "finished" almost instantly the audio never really played
@@ -2440,10 +2479,16 @@ function fillVoiceList(){
     return;
   }
   sel.innerHTML=v.map(function(x){
-    return '<option value="'+x.voiceURI.replace(/"/g,"&quot;")+'">'+x.name+' ('+x.lang+')</option>';
+    return '<option value="'+x.voiceURI.replace(/"/g,"&quot;")+'">'+
+           x.name+' ('+x.lang+')'+(isRichVoice(x)?' ★ clearer':'')+'</option>';
   }).join("");
   sel.value = (VOICE && VOICE.voiceURI) || v[0].voiceURI;
-  $("voiceHint").textContent = v.length+" voices installed. On iPhone, add better ones in Settings → Accessibility → Spoken Content → Voices.";
+  var anyRich = v.some(isRichVoice);
+  $("voiceHint").innerHTML = anyRich
+    ? 'The ones marked ★ sound the most natural. Tap "Hear this voice" to compare.'
+    : 'All '+v.length+' voices here are the basic ones, which sound flat. On iPhone: '+
+      '<b>Settings → Accessibility → Spoken Content → Voices → English</b>, then download '+
+      'an <b>Enhanced</b> or <b>Premium</b> voice. It will be picked up automatically.';
 }
 $("setVoicePick").addEventListener("change", function(){
   S.opts.voiceURI=this.value; save(); pickVoice();
