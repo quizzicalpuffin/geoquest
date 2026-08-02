@@ -90,6 +90,13 @@
   .grouphdr { font-weight:800; font-size:1.05rem; margin:16px 0 8px; padding-bottom:5px; border-bottom:2px solid rgba(255,255,255,.3); opacity:.95; }
   .wmwrap { width:100%; margin:0 auto 12px; border-radius:12px; overflow:hidden; border:2px solid rgba(0,0,0,.35); }
   .wmwrap svg { display:block; width:100%; height:auto; cursor:crosshair; }
+  .wmwrap { position:relative; touch-action:none; }
+  .wmwrap svg { touch-action:none; }
+  .wmctl { position:absolute; right:7px; bottom:7px; display:flex; flex-direction:column; gap:5px; }
+  .wmctl button { width:34px; height:34px; border-radius:9px; border:1px solid rgba(255,255,255,.3);
+    background:rgba(6,24,38,.78); color:#fff; font-size:.95rem; cursor:pointer; line-height:1; padding:0; }
+  .wmctl button:disabled { opacity:.35; cursor:default; }
+  .wmctl button:active { transform:scale(.94); }
   .wmask { text-align:center; font-size:.9rem; opacity:.85; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
   .wmname { text-align:center; font-size:1.4rem; font-weight:800; margin:2px 0 12px; line-height:1.25; }
   .chboard { display:grid; grid-template-columns:repeat(8,1fr); width:100%; max-width:340px; margin:0 auto 14px; border-radius:10px; overflow:hidden; border:3px solid rgba(0,0,0,.4); }
@@ -1626,7 +1633,27 @@ const DATA = {
     ["Can pigs look up at the sky easily?","No, their neck limits it",["Yes, easily and for hours","Only when jumping","Only at night"],"Their spine makes it awkward!"],
     ["What is the only continent with no reptiles or snakes?","Antarctica",["Western Australia","Europe","Africa"],"Far too cold for them!"],
     ["What happens if you shout for 8 years?","You'd produce enough energy to heat one cup of tea",["You'd produce enough energy to power a whole small city","Nothing at all","You'd melt ice"],"Sound carries surprisingly little energy!"],
-    ["Which body part never stops growing?","Your nose and ears",["Your feet and hands","Your eyes","Your teeth"],"Your eyes stay almost the same size from birth!"]
+    ["Which body part never stops growing?","Your nose and ears",["Your feet and hands","Your eyes","Your teeth"],"Your eyes stay almost the same size from birth!"],
+    ["How many legs does a caterpillar really have?","Six true legs, plus stubby prolegs",["Exactly one hundred legs, hence the name","No legs at all — it simply wriggles along","Twelve legs in total, six at either end"],"The fat little prolegs fall off when it becomes a butterfly."],
+    ["What colour is a zebra's skin under its stripes?","Black",["White, like the pale stripes","Pink, like a pig's skin","Grey, like an elephant"],"The white stripes are patches where the fur has no colour."],
+    ["Can a kangaroo hop backwards?","No, it cannot",["Yes, but only very slowly","Yes, faster than it goes forwards","Only when it is frightened"],"Its huge tail and back feet get in the way."],
+    ["What happens to a starfish if it loses an arm?","It can grow a new one",["It cannot survive without it","It swaps to swimming instead","It shrinks to half its size"],"Some can even regrow a whole body from one arm."],
+    ["How long is a sloth's meal inside it?","Up to a month",["About one hour in total","About a single day","About five minutes"],"They digest so slowly they only come down to poo once a week."],
+    ["What is the only mammal that can truly fly?","The bat",["The flying squirrel, which glides","The sugar glider, which glides","The flying fish, which leaps"],"Squirrels and gliders only glide, they do not flap."],
+    ["How many teeth does a snail have?","Thousands, on a ribbon-like tongue",["None whatsoever, it swallows its food whole","Just four very sharp teeth at the front","Exactly thirty-two, the same as a person"],"The ribbon is called a radula and works like a file."],
+    ["What colour is a hippo's sweat?","Reddish pink",["Clear, like a person's sweat","Bright green like grass","Deep blue like the water"],"It works as sunscreen and stops infections."],
+    ["Can a goldfish really only remember for three seconds?","No, they remember for months",["Yes, exactly three seconds and no more","Yes, roughly ten seconds at the very most","No, they remember nothing at all ever"],"Goldfish can be trained to push levers for food."],
+    ["What is a baby puffin called?","A puffling",["A pufflet, like a piglet","A chicklet, like a chicken","A puffkin, like a pumpkin"],"Young pufflings leave the burrow at night to avoid gulls."],
+    ["How many bones are in your body when you are born?","About three hundred",["About two hundred and six","About one hundred exactly","About five hundred bones"],"Many fuse together as you grow into the 206 an adult has."],
+    ["Which is the only bone in your body not joined to another?","The hyoid, in your throat",["The kneecap, in your leg","The smallest bone in your ear","The very tip of your spine"],"It floats in the neck and helps you speak and swallow."],
+    ["What are your fingernails made of?","Keratin, like your hair",["Solid calcium, like bone","Hardened skin cells only","A thin layer of enamel"],"Rhino horn is made of much the same stuff."],
+    ["Do you really swallow spiders in your sleep?","No, that is a myth",["Yes, about eight every year","Yes, about one every month","Yes, but only in summer"],"Spiders avoid vibrations, and a sleeping person hums with them."],
+    ["Why do onions make you cry?","They release a gas that stings your eyes",["They are naturally extremely spicy inside","They give off a very strong sweet perfume","They contain tiny sharp crystals of acid"],"Chilling the onion first slows the reaction down."],
+    ["How fast does a sneeze travel?","Around 160 kilometres an hour",["About 5 kilometres an hour, a gentle puff","About 500 kilometres an hour, like a jet","Roughly the speed of sound through the air"],"Which is why covering your mouth really matters."],
+    ["Which sea creature has three hearts and blue blood?","The octopus",["The jellyfish, which drifts","The starfish, on the seabed","The sea turtle, which swims"],"Copper in the blood makes it blue instead of red."],
+    ["What is the tallest animal in the world?","The giraffe",["The elephant, which is heaviest","The ostrich, the tallest bird","The polar bear, when standing"],"Its neck alone can be over two metres long."],
+    ["How many eyes does a bee have?","Five",["Two, like most animals","Eight, like a spider","One, in the middle"],"Two big compound eyes and three small simple ones."],
+    ["What happens to a jellyfish that has no brain?","It gets by with a nerve net",["It cannot move about the ocean at all","It borrows one from a passing fish","It slowly grows one as it gets older"],"They have no heart or bones either."]
   ],
   rec: [
     ["What is the tallest building in the world?","The Burj Khalifa",["The Empire State Building","The Shard","Big Ben"],"It's 828 m tall, in Dubai!"],
@@ -1648,7 +1675,24 @@ const DATA = {
     ["Which is the largest bird?","The ostrich",["The emperor penguin","The eagle","The swan"],"Too heavy to fly!"],
     ["What is the deepest part of the ocean?","The Mariana Trench",["The Puerto Rico Trench","The Irish Sea","The Baltic"],"Nearly 11 km deep!"],
     ["What is the largest land animal?","The African elephant",["The white rhinoceros bull","The hippo","The giraffe"],"Weighing up to 6 tonnes!"],
-    ["What is the largest rainforest?","The Amazon",["The Congo Basin","Borneo","Daintree"],"Mostly in Brazil!"]
+    ["What is the largest rainforest?","The Amazon",["The Congo Basin","Borneo","Daintree"],"Mostly in Brazil!"],
+    ["What is the largest animal that has ever lived?","The blue whale",["The African elephant, on land","The largest dinosaur ever found","The giant squid, in the deep"],"Its heart alone can weigh as much as a small car."],
+    ["Which is the longest river in the world?","The Nile or the Amazon, depending who you ask",["The Shannon, the longest river in all of Ireland","The Thames, which flows right through London","The Danube, which crosses much of central Europe"],"Experts still argue about where the Amazon truly begins."],
+    ["What is the highest mountain in the world?","Mount Everest",["K2, the second highest peak","Kilimanjaro, in Africa","Mont Blanc, in the Alps"],"It stands 8,849 metres above sea level."],
+    ["Which is the largest ocean?","The Pacific",["The Atlantic, between the Americas and Europe","The Indian Ocean, south of Asia","The Arctic Ocean, at the North Pole"],"It covers more area than all the land on Earth."],
+    ["Which is the biggest country by area?","Russia",["Canada, the second largest","China, in eastern Asia","The United States of America"],"It is nearly twice the size of Canada."],
+    ["Which is the smallest country in the world?","Vatican City",["Monaco, on the French coast","San Marino, inside Italy","Malta, in the Mediterranean"],"You could walk across it in about twenty minutes."],
+    ["What is the deepest place in the ocean?","The Mariana Trench",["The Puerto Rico Trench","The Java Trench, near Indonesia","The Tonga Trench, in the Pacific"],"It is deeper than Everest is tall."],
+    ["Which bird has the largest wingspan?","The wandering albatross",["The golden eagle, in the mountains","The condor, in South America","The pelican, by the sea"],"Its wings can stretch over three metres."],
+    ["What is the largest desert in the world?","Antarctica",["The Sahara, in Africa","The Gobi, in Asia","The Arabian Desert"],"A desert is defined by how little rain falls, not by heat."],
+    ["Which is the fastest bird when diving?","The peregrine falcon",["The eagle, when hunting","The swift, in level flight","The hummingbird, when hovering"],"It can exceed 380 km an hour in a stoop."],
+    ["Which animal has the longest life?","The Greenland shark",["The elephant, on land","The parrot, in captivity","The tortoise, on the islands"],"Some are thought to be over 400 years old."],
+    ["What is the coldest place ever recorded?","Antarctica",["Siberia, in northern Russia","Greenland, in the far north","Northern Canada in winter"],"Vostok Station recorded -89.2°C in 1983."],
+    ["Which is the largest island in the world?","Greenland",["Australia, which counts as a continent","Madagascar, off Africa","Borneo, in southeast Asia"],"Australia is bigger, but it counts as a continent."],
+    ["What is the biggest flower in the world?","The rafflesia",["The sunflower, at full height","The giant water lily","The tallest rose bush"],"It smells strongly of rotting meat to attract flies."],
+    ["What is the tallest tree in the world?","A coast redwood in California",["An ancient oak tree standing in southern England","A towering eucalyptus in the Australian forests","A giant sequoia growing high in the Nevada hills"],"The tallest known one is over 115 metres."],
+    ["Which is the largest lake in the world?","The Caspian Sea",["Lake Superior in North America","Lake Victoria in Africa","Lake Baikal in Russia"],"It is called a sea, but it is really a lake."],
+    ["Which animal makes the loudest sound?","The sperm whale",["The lion, when it roars","The howler monkey in the trees","The elephant, when trumpeting"],"Its clicks can reach 230 decibels underwater."]
   ],
   srv: [
     ["What is the most important thing to find if lost outdoors?","Stay put and stay warm",["Climb the tallest tree you can find","Run in one direction","Hide silently"],"Staying put makes you easier to find!"],
@@ -3206,7 +3250,24 @@ const DATA = {
     ["What is the tallest grass in the world?","Bamboo",["Sugar cane","Corn","Rye"],"Some species grow a metre a day!"],
     ["Why do onions make you cry?","They release a gas that irritates the eyes",["They contain pepper and are extremely spicy","They are spicy","They are cold"],"Chilling them first helps!"],
     ["What is the world's most stolen food?","Cheese",["Chocolate","Bread","Bananas"],"Around 4% of all cheese made is stolen!"],
-    ["How many times is a piece of paper foldable in half?","Usually about seven",["Usually about a hundred","Twenty","Unlimited"],"Thickness doubles each fold!"]
+    ["How many times is a piece of paper foldable in half?","Usually about seven",["Usually about a hundred","Twenty","Unlimited"],"Thickness doubles each fold!"],
+    ["Why can't you hum while holding your nose?","Humming needs air out through the nose",["Your throat closes up entirely by itself","Your tongue blocks the sound completely","The sound simply cannot leave your mouth"],"Try it — it stops almost at once."],
+    ["Why do your fingers wrinkle in the bath?","Your nervous system does it on purpose",["The skin soaks up far too much water","The skin dries out badly and then shrinks","Blood drains right out of your fingertips"],"It seems to help you grip wet things."],
+    ["What is the loudest sound ever recorded?","The eruption of Krakatoa in 1883",["A rocket launch from Cape Canaveral","A blue whale calling underwater","A jet engine at close range"],"It was heard almost 5,000 km away."],
+    ["Why is the sea salty?","Rivers carry minerals off the land",["Sea creatures make salt themselves","Salt falls from the sky as rain","Ships spill salt as they travel"],"The salt stays behind when water evaporates."],
+    ["What happens to your body in space without exercise?","Muscles and bones waste away",["You grow permanently taller","Your blood turns a darker colour","Your hair stops growing"],"Astronauts train about two hours every day."],
+    ["How much taller are astronauts in space?","About five centimetres",["About half a metre taller","About one millimetre taller","They are not taller at all"],"Their spine stretches without gravity squashing it."],
+    ["Why do we yawn?","Nobody is completely sure",["To cool the brain down, definitely","Because the body needs oxygen","To stretch the jaw muscles"],"Cooling the brain is the leading idea, but it is not settled."],
+    ["Which fruit floats and which sinks?","Apples float, most stone fruits sink",["Every kind of fruit floats in fresh water","Every kind of fruit sinks in fresh water","Only citrus fruit floats, the rest sink"],"Apples are about a quarter air."],
+    ["Why does asparagus change the smell of your wee?","A sulphur compound breaks down in the body",["It contains a very unusual artificial dye","It stops the kidneys from working properly","The strange smell comes from the water itself"],"Only some people can smell it, which is its own oddity."],
+    ["What is the hardest substance made by the human body?","Tooth enamel",["The bone in your thigh","The nail on your thumb","The cartilage in your ear"],"It is harder than steel, but it cannot repair itself."],
+    ["Why do cats purr?","To comfort themselves as well as others",["Only ever when they are perfectly happy","To warn other cats to stay well away","To help them digest their food properly"],"Injured cats purr too, and the vibration may aid healing."],
+    ["What was the first food eaten in space?","Pureed food from a tube",["A full roast dinner with all the trimmings","A bar of chocolate saved for the occasion","A fresh apple brought up from the ground"],"John Glenn proved in 1962 that swallowing works fine in orbit."],
+    ["Which animal has fingerprints almost identical to ours?","The koala",["The chimpanzee, our close relative","The gorilla, the largest ape","The orangutan, in the trees"],"They have confused forensic experts before."],
+    ["How long can a cockroach live without its head?","About a week",["Only a few minutes","About a whole year","It dies immediately"],"It breathes through its body and eventually dies of thirst."],
+    ["What is the only food a mouse cannot resist, despite the cartoons?","Not cheese — they prefer sweet things",["Cheese, exactly as shown in the cartoons","Raw carrots, above every other food","Uncooked rice grains straight from the bag"],"Peanut butter works far better in a trap."],
+    ["Why do we get goosebumps?","Tiny muscles try to fluff up hair we no longer have",["Blood rushes suddenly to the surface of the skin to warm you","The skin is quietly repairing itself","The nerves are simply misfiring at random"],"It is a leftover from furrier ancestors."],
+    ["What colour was the first Coca-Cola?","Green",["Brown, as it is today","Clear, like water","Bright red like the label"],"The caramel colouring came later."]
   ],
   rec: [
     ["Who is the fastest human ever recorded over 100 m?","Usain Bolt",["Carl Lewis","Michael Johnson","Justin Gatlin"],"9.58 seconds in 2009!"],
@@ -3228,7 +3289,26 @@ const DATA = {
     ["Which animal has the longest migration?","The Arctic tern",["The humpback whale","The swallow","The wildebeest"],"Pole to pole every year!"],
     ["What is the biggest volcano in the solar system?","Olympus Mons on Mars",["Mauna Loa on Hawaii island","Mount Etna","Krakatoa"],"Nearly three times the height of Everest!"],
     ["What is the strongest bite force of any living animal?","The saltwater crocodile",["The great white shark itself","The lion","The hyena"],"Enough to crush bone easily!"],
-    ["How long was the longest recorded flight by a paper aeroplane indoors?","Over 29 seconds",["Over ten whole minutes","3 seconds","2 minutes"],"A carefully engineered throw!"]
+    ["How long was the longest recorded flight by a paper aeroplane indoors?","Over 29 seconds",["Over ten whole minutes","3 seconds","2 minutes"],"A carefully engineered throw!"],
+    ["What is the longest anyone has held their breath underwater?","Over twenty-four minutes",["About four minutes at most","About ten minutes at most","Just under an hour"],"Divers breathe pure oxygen beforehand to manage it."],
+    ["What is the fastest a human has ever run?","Just over 44 kilometres an hour",["About 25 kilometres an hour at the very fastest","About 60 kilometres an hour over a short sprint","About 80 kilometres an hour, downhill with a wind"],"Usain Bolt hit that speed mid-race in 2009."],
+    ["Which country has won the most World Cups?","Brazil",["Germany, with four titles","Italy, with four titles","Argentina, with three titles"],"Brazil have won it five times."],
+    ["What is the longest wall in the world?","The Great Wall of China",["Hadrian's Wall in England","The walls of Constantinople","The Berlin Wall, before 1989"],"All its branches together run over 21,000 km."],
+    ["What is the busiest airport in the world?","Atlanta in the United States",["Heathrow, on the western edge of London","Dubai, the great hub of the Persian Gulf","Tokyo Haneda, serving the Japanese capital"],"It handles over a hundred million passengers a year."],
+    ["What is the longest-running television programme?","A news or sports show, running for decades",["A soap opera first broadcast in the early 1990s","A cartoon series first made back in the 1980s","A quiz show that began in the early 2000s"],"Several have run continuously since the 1940s."],
+    ["Which is the most spoken language in the world?","English, if you count second-language speakers",["French, which is spoken widely across Africa","Spanish, spoken throughout most of the Americas","Arabic, spoken across the whole Middle East"],"Mandarin has the most native speakers."],
+    ["What is the longest bone in the human body?","The femur, in your thigh",["The tibia, in your shin","The humerus, in your arm","The spine, down your back"],"It is about a quarter of your height."],
+    ["What is the smallest bone in the human body?","The stapes, in your ear",["The bone in your little toe","The tip of your tailbone","The smallest finger bone"],"It is about three millimetres long."],
+    ["Which is the driest place on Earth?","The Atacama Desert in Chile",["The Sahara, in north Africa","Death Valley in California","The Gobi, in central Asia"],"Some weather stations there have never recorded rain."],
+    ["What is the deepest lake in the world?","Lake Baikal in Russia",["Lake Tanganyika in Africa","The Caspian Sea in Asia","Lake Superior in America"],"It holds about a fifth of the world's fresh surface water."],
+    ["What is the tallest waterfall in the world?","Angel Falls in Venezuela",["Niagara Falls in Canada","Victoria Falls in Zambia","Iguazu Falls in Brazil"],"The water falls 979 metres, much of it turning to mist."],
+    ["What is the largest volcanic eruption in recorded history?","Tambora in 1815",["Krakatoa in 1883","Vesuvius in AD 79","Mount St Helens in 1980"],"It caused a year without a summer across the world."],
+    ["What is the strongest earthquake ever recorded?","Valdivia in Chile, 1960",["San Francisco in 1906","Tohoku in Japan, 2011","Lisbon in Portugal, 1755"],"It measured 9.5 on the moment magnitude scale."],
+    ["What is the longest a person has lived?","One hundred and twenty-two years",["One hundred years exactly, and not a day more","One hundred and ten years, verified by records","One hundred and forty years, in a remote village"],"Jeanne Calment of France died in 1997."],
+    ["What is the most expensive painting ever sold?","Salvator Mundi, attributed to Leonardo",["The Mona Lisa, which hangs in the Louvre in Paris","The Starry Night, painted by Vincent van Gogh","The Scream, painted by the Norwegian Edvard Munch"],"It fetched about 450 million dollars in 2017."],
+    ["What is the longest word in most English dictionaries?","Pneumonoultramicroscopicsilicovolcanoconiosis",["Antidisestablishmentarianism, a political term","Floccinaucinihilipilification, meaning worthlessness","Supercalifragilisticexpialidocious, from the film"],"It is a lung disease caused by breathing fine ash."],
+    ["What is the largest animal migration on Earth?","Tiny sea creatures rising each night",["Wildebeest crossing the Serengeti","Monarch butterflies flying to Mexico","Arctic terns flying pole to pole"],"Zooplankton rise and sink daily in vast numbers."],
+    ["What is the heaviest land animal?","The African bush elephant",["The white rhinoceros","The hippopotamus in rivers","The giraffe, the tallest"],"A big bull can weigh over six tonnes."]
   ],
   srv: [
     ["What is the survival 'rule of threes' for water?","About three days without water",["About three months without water","Three hours","Three weeks"],"Three minutes without air, three hours without shelter in bad weather!"],
@@ -6725,7 +6805,24 @@ const DATA = {
     ["What is the only number spelled with letters in alphabetical order in English?","Forty",["Fifty","Thirty","Sixty"],"F-O-R-T-Y!"],
     ["Why does time feel faster as you get older?","Each year is a smaller fraction of your life and holds fewer novel events",["Clocks genuinely speed up, and the Earth spins a little bit faster every year","Memory improves","The Earth spins faster"],"Novelty stretches perceived time!"],
     ["What is the fastest muscle in the human body?","The eye muscles",["The tongue muscle","The heart","The calf"],"They perform tiny rapid movements called saccades!"],
-    ["Why do we have fingerprints?","Likely to improve grip and touch sensitivity",["To identify us and to reduce sweating on the hands","To hold water","To reduce sweating"],"Their identification use is a happy accident!"]
+    ["Why do we have fingerprints?","Likely to improve grip and touch sensitivity",["To identify us and to reduce sweating on the hands","To hold water","To reduce sweating"],"Their identification use is a happy accident!"],
+    ["Why does helium make your voice squeaky?","Sound travels faster through it",["It shrinks your vocal cords","It makes your throat vibrate faster","It reduces the air in your lungs"],"The pitch is the same; the resonance changes."],
+    ["Why can't you tickle yourself?","Your brain predicts the sensation",["Your fingers are the wrong shape","You are not ticklish on your own skin","You cannot reach the right spots"],"The cerebellum cancels out expected touch."],
+    ["Why is the sky blue but sunsets red?","Blue light scatters more in the atmosphere",["The Sun itself changes colour in the evening","The atmosphere thins away as night falls","Dust hanging in the air turns the light red"],"At sunset light travels further, so blue scatters away entirely."],
+    ["What is the uncanny valley?","Almost-human faces feeling disturbing",["A valley where sounds echo very strangely","The gap between two great mountain ranges","A place where compasses stop working"],"It matters enormously in animation and robotics."],
+    ["Why do we forget dreams so quickly?","The memory-forming part of the brain is quiet in sleep",["Dreams are never stored as memories at all","The eyes are closed so nothing is recorded","The brain deliberately deletes every dream each morning"],"Writing them down immediately is the only reliable trick."],
+    ["What is synaesthesia?","Senses blending, like seeing colours in sounds",["Losing one of the senses altogether","Having a very unusual sense of smell","Hearing sounds that are not really there at all"],"Some people taste words or see numbers in colour."],
+    ["Why does time seem to pass faster as you get older?","Each year is a smaller share of your life",["The brain physically slows down with age","The days themselves genuinely get shorter","Memory simply works faster as you age"],"Novel experiences slow it down again."],
+    ["What is the sound barrier?","The point where an object outruns its own sound waves",["A solid wall that blocks all sound waves","The quietest sound that a person is able to hear at all","The limit of what a microphone can record"],"The pressure wave reaches the ground as a sonic boom."],
+    ["Why do mirrors seem to flip left and right but not up and down?","They actually flip front to back",["They only reverse horizontal light","Our eyes are side by side","The glass is curved very slightly"],"You do the left-right swap yourself when you imagine turning around."],
+    ["What is a phantom limb?","Feeling a limb that is no longer there",["A limb that has completely stopped working","An extra limb that appears only in a dream","A shadow cast by a limb in bright light"],"The brain's map of the body outlives the body part."],
+    ["Why does cutting an onion under water help?","The stinging gas dissolves before reaching you",["The water cools the whole onion right down","Water simply washes the stinging juice away","It stops the sharp knife from slipping on the wet board"],"Wearing goggles works even better."],
+    ["What is the McGurk effect?","Seeing lips change the sound you hear",["Hearing a sound long after it has stopped","Seeing a colour that is not really there","Feeling a touch merely from seeing it happen"],"Watching a mouth say 'ga' while hearing 'ba' makes you hear 'da'."],
+    ["Why do stars twinkle but planets do not?","Stars are point sources, planets are small discs",["Planets are very much closer to the Earth","Stars are very much hotter than any of the planets are","Planets shine only by reflected sunlight"],"Turbulent air bends the pinpoint light of a star."],
+    ["What is Occam's razor?","The simplest explanation is usually the best",["Every effect must have two separate causes","Nothing at all can ever be proved absolutely","Complex problems need equally complex answers"],"It is a rule of thumb, not a law of nature."],
+    ["What is the Streisand effect?","Trying to hide something makes it far better known",["A singer's voice shattering a pane of glass","A rumour that eventually turns out to be entirely true","News spreading faster than it can be written"],"It is named after an attempt to suppress a photo of a house."],
+    ["Why does chopping wood warm you twice?","Once cutting it and once burning it",["The axe heats up as you swing","Wood releases heat when it splits","The exercise makes the fire burn hotter"],"An old saying usually credited to Henry Ford."],
+    ["What is the observer effect in science?","Measuring something can change it",["Watchers always disagree on results","Only trained observers see the truth","Results change depending on who looks"],"Putting a thermometer in water changes the water's temperature slightly."]
   ],
   rec: [
     ["What is the highest score ever in a professional football match?","149-0",["36-0 in 1885","10-0","20-1"],"AS Adema beat SO l'Emyrne in Madagascar in 2002 — all own goals in protest!"],
@@ -6747,7 +6844,27 @@ const DATA = {
     ["What is the fastest speed achieved by a human-made vehicle?","The Parker Solar Probe",["A Japanese bullet train","Concorde","An F1 car"],"Over 690,000 km/h near the Sun!"],
     ["What is the largest living organism by area?","A honey fungus in Oregon",["A giant redwood in California","A blue whale","A coral"],"Covering nearly 10 square kilometres!"],
     ["What is the longest bridge in the world?","The Danyang-Kunshan Grand Bridge",["The Golden Gate Bridge in America","The Øresund","Tower Bridge"],"Over 160 km long, in China!"],
-    ["What is the highest recorded wave surfed?","About 26 metres",["About 50 metres high","5 metres","10 metres"],"Ridden at Nazaré in Portugal!"]
+    ["What is the highest recorded wave surfed?","About 26 metres",["About 50 metres high","5 metres","10 metres"],"Ridden at Nazaré in Portugal!"],
+    ["What is the longest possible total solar eclipse?","About seven and a half minutes",["About thirty seconds at the very most","About one full hour from start to finish","About twenty minutes of complete darkness"],"The Moon's shadow races across the ground at over 1,500 km an hour."],
+    ["What is the largest structure in the known universe?","A supercluster or great wall of galaxies",["The Milky Way galaxy that we ourselves live in","The largest black hole ever found by astronomers","The Andromeda galaxy, our nearest large neighbour"],"Some span billions of light years."],
+    ["What is the fastest spinning object known in space?","A millisecond pulsar",["A comet near the Sun","A large spinning asteroid","The planet Jupiter itself"],"Some spin over 700 times every second."],
+    ["What is the coldest temperature possible?","Absolute zero, about minus 273 degrees Celsius",["Minus one thousand degrees on the Celsius scale","Minus one hundred degrees on the Celsius scale","There is no lower limit to temperature at all"],"At absolute zero, particles have the least possible energy."],
+    ["What is the most abundant element in the universe?","Hydrogen",["Oxygen, which we breathe","Carbon, the basis of life","Iron, in the Earth's core"],"It makes up about three quarters of all normal matter."],
+    ["What is the highest recorded human-made temperature?","Trillions of degrees in a particle collider",["About ten thousand degrees, as in a lightning bolt","About one million degrees, as in a fusion reactor","About one billion degrees, briefly in a laboratory"],"Colliding lead ions briefly recreates conditions after the Big Bang."],
+    ["What is the deepest hole ever drilled?","The Kola Superdeep Borehole in Russia",["A diamond mine sunk deep in South Africa","An oil well drilled far out in the North Sea","A road tunnel bored beneath the Swiss Alps"],"It reached over twelve kilometres and got stuck."],
+    ["What is the longest suspension bridge span?","The Canakkale Bridge in Turkey",["The Golden Gate Bridge in San Francisco Bay","The Akashi Kaikyo Bridge in southern Japan","The Humber Bridge in the north of England"],"Its main span is over two kilometres."],
+    ["What is the longest railway line in the world?","The Trans-Siberian Railway",["The Orient Express route","The Canadian Pacific line","The Indian Pacific in Australia"],"It runs over 9,000 km from Moscow to Vladivostok."],
+    ["What is the largest empire in history by land area?","The Mongol Empire, in one continuous stretch",["The Roman Empire at the very height of its power","The Ottoman Empire during the sixteen hundreds","The Spanish Empire across the whole of the Americas"],"The British Empire was larger overall, but scattered."],
+    ["What is the oldest known living tree?","A bristlecone pine in California",["An ancient oak standing in the New Forest","A yew growing in an old Irish churchyard","A baobab on the dry plains of Madagascar"],"One is thought to be over 4,800 years old."],
+    ["What is the largest single organism on Earth?","A honey fungus in Oregon",["A blue whale in the Pacific","A giant sequoia in California","The Great Barrier Reef"],"It covers about nine square kilometres underground."],
+    ["What is the most venomous creature in the sea?","The box jellyfish",["The great white shark","The blue-ringed octopus","The stonefish on the reef"],"Its sting can kill a person in minutes."],
+    ["What is the greatest depth a person has reached in the ocean?","Almost eleven kilometres, in the Mariana Trench",["About one kilometre down, in a small submarine","About three kilometres down, in a research vessel","About six kilometres down, in a steel bathyscaphe"],"The pressure there is over a thousand times that at the surface."],
+    ["What is the fastest crewed vehicle ever?","The Apollo 10 capsule returning to Earth",["A supersonic passenger jet crossing the Atlantic","A rocket-powered car on a dry lake bed","A record-breaking speedboat on open water"],"It reached almost 40,000 km an hour."],
+    ["What is the largest object a person has ever moved?","An entire building shifted on rails",["An enormous boulder hauled out of a quarry","A fully loaded ship floated into a dry dock","A great stone statue moved inside a museum"],"Whole churches and lighthouses have been relocated intact."],
+    ["What is the highest anyone has parachuted from?","The edge of space, around 41 kilometres up",["From the very summit of Mount Everest itself","From a passenger jet at its cruising height","From a helicopter three kilometres above ground"],"Alan Eustace broke Felix Baumgartner's record in 2014."],
+    ["What is the longest continuously inhabited city?","Damascus or Jericho, depending on the definition",["Rome, which was founded in the year 753 before Christ","Athens, the great city of ancient Greece","Cairo, standing beside the river Nile"],"Both have claims going back many thousands of years."],
+    ["What is the longest word in a Shakespeare play?","Honorificabilitudinitatibus",["Antidisestablishmentarianism","Incomprehensibilities entirely","Supercalifragilisticexpialidocious"],"It appears in Love's Labour's Lost."],
+    ["What is the highest a bird has ever been recorded flying?","A Rüppell's vulture at 11 kilometres",["A swan flying at two kilometres above the ground","An eagle soaring four kilometres above the mountains","A goose crossing the Himalayas at seven kilometres"],"It unfortunately met an aeroplane."]
   ],
   srv: [
     ["What is the physiological cause of most drowning deaths in cold water?","Cold water shock causing gasping and rapid breathing",["Muscle cramp alone, leading to sudden total exhaustion","Exhaustion alone","Sharks"],"The first minute matters most — float to live!"],
@@ -9137,7 +9254,22 @@ const DATA = {
     ["What is Zipf's law?","Word frequency is inversely proportional to its rank",["All words are equally common, and language is entirely random","Long words are rarer","Language is random"],"'The' dominates English texts!"],
     ["What is the Overview effect?","A cognitive shift reported by astronauts seeing Earth from space",["A telescope aberration that causes a very serious navigation error","A type of map","A navigation error"],"Many describe a profound sense of unity!"],
     ["What is Moravec's paradox?","Hard reasoning is easy for computers, while basic perception is hard",["Computers cannot calculate at all, although robots do move perfectly well","Robots move perfectly","Chess is unsolvable"],"Why we have superhuman chess but clumsy robots!"],
-    ["What is the Flynn effect?","A long-term rise in average IQ test scores",["A long-term decline in literacy and numeracy","A sleep pattern","A memory trick"],"It has recently plateaued or reversed in some countries!"]
+    ["What is the Flynn effect?","A long-term rise in average IQ test scores",["A long-term decline in literacy and numeracy","A sleep pattern","A memory trick"],"It has recently plateaued or reversed in some countries!"],
+    ["What is Zeno's arrow paradox?","At each instant the arrow is still, yet it moves",["An arrow can never actually leave the bow","Two arrows can never be fired at the very same moment","An arrow speeds up steadily as it falls"],"Calculus eventually dissolved the puzzle."],
+    ["What is the Monty Hall problem?","Switching doors doubles your chance of winning",["All three of the doors are equally good","Switching doors will halve your chance of winning","The host always opens the door with the prize"],"It baffled professional mathematicians when it was popularised."],
+    ["What is Boltzmann's brain?","The absurd idea of a mind popping out of chaos",["A model of how memory is stored inside the human brain","The smallest possible machine that can think","A human brain grown in a laboratory dish"],"It is used to show a cosmological theory has gone wrong."],
+    ["What is the Great Filter?","Some barrier that stops life becoming a galactic civilisation",["A thick layer of cosmic dust that blocks the light of distant stars","The outer edge of the observable universe","A screen used in radio astronomy dishes"],"Whether it lies behind us or ahead is the unsettling part."],
+    ["What is Roko's basilisk?","A thought experiment about a future AI punishing inaction",["A snake said to kill you with a single look","A very early and destructive computer virus","A puzzle about the problem of infinite regress in formal logic"],"It caused genuine distress online, which is itself revealing."],
+    ["What is the Mandela effect?","Large numbers of people sharing a false memory",["Forgetting exactly where you left something","Remembering only the last thing that was said","Recalling your own childhood unusually clearly"],"Many people vividly remember him dying in prison in the 1980s."],
+    ["What is the Simpson's paradox?","A trend in groups that reverses when they are combined",["Data that repeats itself over and over again quite exactly","Two averages that cannot properly be compared","A sample far too small to be of any use"],"It has decided real arguments about hospital survival rates."],
+    ["What is survivorship bias?","Only studying the things that made it through",["Trusting the oldest available evidence most","Believing a survivor's account of events fully","Assuming that the strongest will always win"],"The classic example is armouring the wrong parts of returning bombers."],
+    ["What is the halting problem?","No program can decide whether every program will stop",["Computers are quite unable to divide any number by zero","A loop in a program will always run forever","Programs cannot check their own running speed"],"Alan Turing proved it in 1936."],
+    ["What is Gödel's incompleteness theorem about?","Any rich system has truths it cannot prove",["Every equation has at least one solution","All of mathematics can eventually be automated","Numbers eventually begin to repeat themselves"],"It shook the foundations of mathematics in 1931."],
+    ["What is the Ouroboros in chemistry famous for?","Kekulé dreamt of it and solved benzene's ring",["It describes a molecule that copies itself","It is the standard symbol for carbon dating","It names a circular and self-sustaining chemical reaction"],"A snake eating its own tail gave him the shape."],
+    ["What is Maxwell's demon?","An imaginary sorter that seems to break thermodynamics",["A particle that appears to travel backwards through time","A force that holds all the atoms together","A creature that can see radio waves directly"],"The paradox dissolves once you count the cost of the demon's memory."],
+    ["What is the Voynich manuscript?","A book nobody has ever managed to read",["The oldest surviving printed Bible","A map of a continent that never existed","A code used during the Second World War"],"Carbon dating puts it in the early 1400s."],
+    ["What is the Wow! signal?","A strong unexplained radio burst detected in 1977",["The very first sound ever to be recorded on the Moon","A pulse from a newly discovered pulsar","The loudest thunderclap ever measured"],"It lasted 72 seconds and has never been heard again."],
+    ["What is the Antikythera mechanism?","An ancient Greek machine for predicting the heavens",["A siege weapon used during the great siege of Syracuse in Sicily","An early water clock built in Alexandria","A device for measuring the speed of a ship"],"It is over 2,000 years old and stunningly sophisticated."]
   ],
   rec: [
     ["What is the current official record for the men's 100 m?","9.58 seconds",["10.01 seconds","9.79","9.20"],"Set by Usain Bolt in Berlin, 2009!"],
@@ -9159,7 +9291,27 @@ const DATA = {
     ["What is the longest recorded coastline of any country?","Canada's",["Russia's","Australia's","Indonesia's"],"Over 200,000 km!"],
     ["What is the oldest continuously operating company in the world?","A Japanese construction or hospitality firm",["An English merchant bank founded in the 1600s","A French winery","A German brewery"],"Some date back over 1,300 years!"],
     ["What is the most decorated Olympic nation in a single Games?","The USA or Soviet Union in various Games",["Ireland at the Los Angeles Games back in 1984","Fiji","Jamaica"],"Depending on the year and medal count!"],
-    ["What is the highest number of goals scored in a single football career?","Over 1,000, claimed by Pelé and others",["Exactly 500, as claimed by Maradona alone","100","10,000"],"Record-keeping from that era is disputed!"]
+    ["What is the highest number of goals scored in a single football career?","Over 1,000, claimed by Pelé and others",["Exactly 500, as claimed by Maradona alone","100","10,000"],"Record-keeping from that era is disputed!"],
+    ["What is the largest prime number currently known?","One with over forty million digits",["A number with about one thousand digits","A number with about one million digits","There is no largest known prime"],"They are found by distributed computing projects."],
+    ["What is the most precise measurement ever made?","The detection of gravitational waves",["The mass of a single proton in an atomic nucleus","The distance to the nearest star beyond the Sun","The speed of light travelling through a vacuum"],"LIGO measures shifts smaller than a proton's width."],
+    ["What is the largest known star by volume?","A red hypergiant such as UY Scuti or Stephenson 2-18",["The Sun, which sits at the centre of our own system","Sirius, by far the brightest star in our night sky","Betelgeuse, the red giant in the Orion constellation"],"If placed in our solar system it would swallow Jupiter's orbit."],
+    ["What is the most massive object ever weighed?","A supermassive black hole of tens of billions of suns",["The largest known cluster of galaxies anywhere in the sky","The whole of the Milky Way galaxy added together","The very largest single star ever discovered"],"TON 618 is among the heaviest known."],
+    ["What is the highest energy particle ever detected?","The Oh-My-God particle in 1991",["A photon from a distant quasar","A neutrino from a supernova","A proton from the solar wind"],"It carried the energy of a fast-bowled cricket ball in one particle."],
+    ["What is the longest-running scientific experiment?","The pitch drop experiment in Australia",["A long-term study of tree rings in North America","A continuous record of sunspot observations","A tide gauge measuring the level of the North Sea"],"It began in 1927 and has produced nine drops."],
+    ["What is the closest a spacecraft has come to the Sun?","Within about six million kilometres",["About one hundred million kilometres","About fifty million kilometres","It has touched the surface"],"The Parker Solar Probe flew through the corona."],
+    ["What is the furthest human-made object from Earth?","Voyager 1",["The Hubble Space Telescope","The New Horizons probe","The Pioneer 10 spacecraft"],"It crossed into interstellar space in 2012."],
+    ["What is the largest number with a common name?","A googolplex",["A googol, ten to the hundred","A trillion, a million millions","A quadrillion, larger still"],"It cannot be written out; there is not enough room in the universe."],
+    ["What is the smallest thing ever directly imaged?","A single atom",["A single living cell","A strand of human DNA","A single wavelength of light"],"Electron microscopes can now resolve individual atoms."],
+    ["What is the fastest chess checkmate possible?","Two moves, known as Fool's Mate",["One single move by White","Three moves, in the Scholar's Mate","Four moves, in the Scholar's Mate"],"It needs Black to help by playing very badly."],
+    ["What is the largest number of people at a single gathering?","Tens of millions at a religious festival",["About one million people at an outdoor concert","About five million people watching a street parade","About one hundred thousand at a stadium final"],"The Kumbh Mela in India draws the largest crowds on Earth."],
+    ["What is the most languages any person has spoken?","Several dozen, though claims are hard to verify",["About eight languages, every one of them spoken fluently","About eight languages, all spoken fluently","Over one thousand languages, mostly written"],"Cardinal Mezzofanti reputedly used around thirty-eight."],
+    ["What is the oldest known musical instrument?","A bone flute around forty thousand years old",["A stone drum found in a tomb in ancient Egypt","A bronze horn recovered from an Iron Age bog","A wooden harp discovered in a bog in Ireland"],"It was carved from a bird bone and found in Germany."],
+    ["What is the oldest known written story?","The Epic of Gilgamesh",["Homer's Iliad from ancient Greece","The Book of the Dead from Egypt","Beowulf, written in Old English"],"It was written on clay tablets over 4,000 years ago."],
+    ["What is the largest thing ever built by hand without machines?","The Great Pyramid of Giza",["The Colosseum in ancient Rome","Stonehenge on Salisbury Plain","The Great Wall of China"],"It was the tallest structure on Earth for nearly 4,000 years."],
+    ["What is the highest voltage ever generated?","Tens of millions of volts in a lightning laboratory",["About one thousand volts, handled quite safely","About one hundred thousand volts on a power line","About one million volts, inside a research laboratory"],"Natural lightning can exceed a hundred million volts."],
+    ["What is the strongest magnetic field ever measured?","Around a magnetar, a type of neutron star",["Inside a hospital magnetic resonance scanner","At the very centre of the Earth's molten core","Inside the magnets of a particle accelerator"],"It is powerful enough to disrupt atoms from a great distance."],
+    ["What is the loudest sound possible in air?","About 194 decibels",["About 300 decibels in theory","About 1,000 decibels in theory","There is no upper limit at all"],"Beyond that the sound wave becomes a shock wave instead."],
+    ["What is the longest anything has taken to fall in a laboratory?","A single drop of pitch, over a decade",["A feather falling inside a sealed vacuum chamber","A grain of sand sinking through very thick oil","A droplet of mercury cooled almost to freezing"],"Pitch looks solid but flows about a hundred billion times slower than water."]
   ],
   srv: [
     ["What is the physiological sequence of cold water immersion deaths?","Cold shock, swim failure, hypothermia, then circum-rescue collapse",["Immediate hypothermia, then cramp, and finally drowning in deep water","Immediate hypothermia","Cramp then drowning"],"Most deaths occur in the first minutes, not from hypothermia!"],
@@ -9675,7 +9827,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v56 · Quizzical Puffin · 8,534 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v57 · Quizzical Puffin · 8,679 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -10103,23 +10255,125 @@ function screenMap(){
   </div>
   <button class="btn ghost center" onclick="screenHome()">← Back to the quiz</button>`;
 }
-function wmStart(tier,kind){
-  let pool=TARGETS.filter(t=>(tier?t.t<=tier:true) && (kind==="all"?true:t.k===kind));
-  if(tier) pool=pool.filter(t=>t.t===tier || tier===1);
-  if(pool.length<WM_ROUND) pool=TARGETS.filter(t=>kind==="all"||t.k===kind);
-  wmSt={q:shuffle(pool.slice()).slice(0,WM_ROUND),i:0,score:0,tier,kind,guess:null,res:null};
-  wmRender();
+function wmClampView(v){
+  v.w=Math.max(34,Math.min(WM_W,v.w));
+  v.h=v.w*WM_H/WM_W;
+  v.x=Math.max(0,Math.min(WM_W-v.w,v.x));
+  v.y=Math.max(0,Math.min(WM_H-v.h,v.y));
+  return v;
 }
-function wmTap(ev){
-  if(!wmSt||wmSt.res) return;
+function wmApplyView(){
   const svg=document.getElementById("wmsvg");
-  const r=svg.getBoundingClientRect();
-  const p=ev.touches&&ev.touches[0]?ev.touches[0]:ev;
-  const x=(p.clientX-r.left)/r.width*WM_W, y=(p.clientY-r.top)/r.height*WM_H;
-  if(x<0||x>WM_W||y<0||y>WM_H) return;
-  const lon=wmLon(x), lat=wmLat(y);
-  const t=wmSt.q[wmSt.i];
-  wmSt.guess=[lon,lat];
+  if(!svg) return;
+  const v=wmSt.view;
+  svg.setAttribute("viewBox",`${v.x.toFixed(2)} ${v.y.toFixed(2)} ${v.w.toFixed(2)} ${v.h.toFixed(2)}`);
+  const k=(v.w/WM_W);
+  svg.style.setProperty("--k",k);
+  const zo=document.getElementById("wmzoomout"), zi=document.getElementById("wmzoomin");
+  if(zo) zo.disabled = v.w>=WM_W-0.5;
+  if(zi) zi.disabled = v.w<=34.5;
+  wmDrawPins();
+}
+function wmZoomAt(factor,mx,my){
+  const v=wmSt.view;
+  const nw=Math.max(34,Math.min(WM_W,v.w/factor));
+  const nh=nw*WM_H/WM_W;
+  if(mx===undefined){ mx=v.x+v.w/2; my=v.y+v.h/2; }
+  const rx=(mx-v.x)/v.w, ry=(my-v.y)/v.h;
+  wmSt.view=wmClampView({x:mx-rx*nw, y:my-ry*nh, w:nw, h:nh});
+  wmApplyView();
+}
+function wmZoom(f){ wmZoomAt(f); }
+function wmResetView(){ wmSt.view={x:0,y:0,w:WM_W,h:WM_H}; wmApplyView(); }
+function wmFit(pts,pad){
+  const xs=pts.map(p=>wmX(p[0])), ys=pts.map(p=>wmY(p[1]));
+  let x0=Math.min(...xs)-pad, x1=Math.max(...xs)+pad, y0=Math.min(...ys)-pad, y1=Math.max(...ys)+pad;
+  let w=Math.max(x1-x0,(y1-y0)*WM_W/WM_H);
+  w=Math.max(60,Math.min(WM_W,w));
+  const cx=(x0+x1)/2, cy=(y0+y1)/2;
+  wmSt.view=wmClampView({x:cx-w/2,y:cy-w*WM_H/WM_W/2,w,h:w*WM_H/WM_W});
+}
+function wmPt(ev){
+  const svg=document.getElementById("wmsvg");
+  const r=svg.getBoundingClientRect(), v=wmSt.view;
+  const p=(ev.touches&&ev.touches[0])||(ev.changedTouches&&ev.changedTouches[0])||ev;
+  return [v.x+(p.clientX-r.left)/r.width*v.w, v.y+(p.clientY-r.top)/r.height*v.h];
+}
+function wmDrawPins(){
+  const g=document.getElementById("wmmark");
+  if(!g) return;
+  const s=wmSt, k=Math.sqrt(s.view.w/WM_W);
+  let out="";
+  if(s.res){
+    const t=s.q[s.i];
+    const gx=wmX(s.guess[0]), gy=wmY(s.guess[1]), ax=wmX(t.lon), ay=wmY(t.lat);
+    out+=`<line x1="${gx}" y1="${gy}" x2="${ax}" y2="${ay}" stroke="#fff" stroke-width="${2*k}" stroke-dasharray="${5*k} ${4*k}" opacity=".85"/>`;
+    out+=`<circle cx="${gx}" cy="${gy}" r="${7*k}" fill="none" stroke="#e8604c" stroke-width="${3.5*k}"/>`;
+    out+=`<circle cx="${ax}" cy="${ay}" r="${6.5*k}" fill="#FFD93D" stroke="#fff" stroke-width="${2.5*k}"/>`;
+  } else if(s.guess){
+    const gx=wmX(s.guess[0]), gy=wmY(s.guess[1]);
+    out+=`<circle cx="${gx}" cy="${gy}" r="${7*k}" fill="none" stroke="#e8604c" stroke-width="${3.5*k}"/>`;
+    out+=`<circle cx="${gx}" cy="${gy}" r="${1.6*k}" fill="#e8604c"/>`;
+  }
+  g.innerHTML=out;
+}
+function wmBind(){
+  const svg=document.getElementById("wmsvg");
+  if(!svg||svg._wmBound) return;
+  svg._wmBound=true;
+  let pts=new Map(), moved=false, start=null, pinchStart=null;
+  const dist=()=>{ const a=[...pts.values()]; return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y); };
+  const mid=()=>{ const a=[...pts.values()]; return {clientX:(a[0].x+a[1].x)/2, clientY:(a[0].y+a[1].y)/2}; };
+  svg.addEventListener("pointerdown",e=>{
+    svg.setPointerCapture(e.pointerId);
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===1){ moved=false; start={x:e.clientX,y:e.clientY,view:{...wmSt.view}}; }
+    if(pts.size===2){ moved=true; pinchStart={d:dist(),view:{...wmSt.view},m:wmPt(mid())}; }
+  });
+  svg.addEventListener("pointermove",e=>{
+    if(!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size>=2&&pinchStart){
+      const f=dist()/pinchStart.d;
+      wmSt.view={...pinchStart.view};
+      wmZoomAt(f,pinchStart.m[0],pinchStart.m[1]);
+      e.preventDefault(); return;
+    }
+    if(!start) return;
+    const dx=e.clientX-start.x, dy=e.clientY-start.y;
+    if(!moved && Math.hypot(dx,dy)<7) return;
+    moved=true;
+    const r=svg.getBoundingClientRect();
+    wmSt.view=wmClampView({x:start.view.x-dx/r.width*start.view.w, y:start.view.y-dy/r.height*start.view.h,
+                           w:start.view.w, h:start.view.h});
+    wmApplyView();
+    e.preventDefault();
+  });
+  const up=e=>{
+    pts.delete(e.pointerId);
+    if(pts.size<2) pinchStart=null;
+    if(pts.size===0){
+      if(!moved && !wmSt.res){
+        const p=wmPt(e);
+        wmSt.guess=[wmLon(p[0]),wmLat(p[1])];
+        wmDrawPins();
+        const b=document.getElementById("wmplace");
+        if(b){ b.disabled=false; b.classList.add("primary"); }
+        const h=document.getElementById("wmhelp");
+        if(h) h.textContent="Zoom in to fine-tune, then tap Place it here.";
+      }
+      start=null; moved=false;
+    }
+  };
+  svg.addEventListener("pointerup",up);
+  svg.addEventListener("pointercancel",up);
+  svg.addEventListener("dblclick",e=>{ const p=wmPt(e); wmZoomAt(2,p[0],p[1]); e.preventDefault(); });
+  svg.addEventListener("wheel",e=>{ const p=wmPt(e); wmZoomAt(e.deltaY<0?1.25:1/1.25,p[0],p[1]); e.preventDefault(); },{passive:false});
+}
+function wmPlace(){
+  const s=wmSt;
+  if(!s.guess||s.res) return;
+  const t=s.q[s.i], [lon,lat]=s.guess;
   const km=wmKm(lon,lat,t.lon,t.lat);
   let pts=0, verdict="";
   if(t.k==="c"){
@@ -10134,15 +10388,13 @@ function wmTap(ev){
     else if(km<3000){ pts=15; verdict="Not far off."; }
     else verdict="Quite a way out.";
   }
-  wmSt.score+=pts;
-  wmSt.res={km,pts,verdict};
+  s.score+=pts;
+  s.res={km,pts,verdict};
   try{ pts>=70?sndRight():sndWrong(); if(pts===100) confetti(); }catch(e){}
+  wmFit([[lon,lat],[t.lon,t.lat]],28);
   wmRender();
 }
-function wmNext(){
-  wmSt.i++; wmSt.guess=null; wmSt.res=null;
-  if(wmSt.i>=wmSt.q.length) wmFinish(); else wmRender();
-}
+
 function wmFinish(){
   const s=wmSt.score, max=wmSt.q.length*100;
   const p=profiles[curP];
@@ -10165,21 +10417,21 @@ function wmFinish(){
     <button class="btn ghost center" onclick="screenMap()">Choose another set</button>
   </div>`;
 }
+function wmStart(tier,kind){
+  let pool=TARGETS.filter(t=>(tier?t.t<=tier:true) && (kind==="all"?true:t.k===kind));
+  if(tier) pool=pool.filter(t=>t.t===tier || tier===1);
+  if(pool.length<WM_ROUND) pool=TARGETS.filter(t=>kind==="all"||t.k===kind);
+  wmSt={q:shuffle(pool.slice()).slice(0,WM_ROUND),i:0,score:0,tier,kind,guess:null,res:null,
+        view:{x:0,y:0,w:WM_W,h:WM_H}};
+  wmRender();
+}
+function wmNext(){
+  wmSt.i++; wmSt.guess=null; wmSt.res=null;
+  wmSt.view={x:0,y:0,w:WM_W,h:WM_H};
+  if(wmSt.i>=wmSt.q.length) wmFinish(); else wmRender();
+}
 function wmRender(){
   const s=wmSt, t=s.q[s.i], res=s.res;
-  let marks="";
-  if(res){
-    const gx=wmX(s.guess[0]), gy=wmY(s.guess[1]), ax=wmX(t.lon), ay=wmY(t.lat);
-    if(t.k==="c"){
-      const d=(WORLD[t.c]||[]).map(r=>"M"+r.map(p=>wmX(p[0]).toFixed(1)+" "+wmY(p[1]).toFixed(1)).join("L")+"Z").join("");
-      marks+=`<path d="${d}" fill="#FFD93D" stroke="#fff" stroke-width="1"/>`;
-    }
-    marks+=`<line x1="${gx.toFixed(1)}" y1="${gy.toFixed(1)}" x2="${ax.toFixed(1)}" y2="${ay.toFixed(1)}" stroke="#fff" stroke-width="2" stroke-dasharray="5 4" opacity=".85"/>`;
-    marks+=`<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="7" fill="none" stroke="#e8604c" stroke-width="3.5"/>`;
-    marks+=`<circle cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="6.5" fill="#FFD93D" stroke="#fff" stroke-width="2.5"/>`;
-  } else if(s.guess){
-    marks+=`<circle cx="${wmX(s.guess[0]).toFixed(1)}" cy="${wmY(s.guess[1]).toFixed(1)}" r="7" fill="none" stroke="#e8604c" stroke-width="3.5"/>`;
-  }
   app.innerHTML=`
   <div class="topbar"><span class="pill">🗺️ ${s.i+1} of ${s.q.length}</span><span class="pill">⭐ ${s.score}</span></div>
   <div class="progress"><div style="width:${(s.i/s.q.length)*100}%"></div></div>
@@ -10187,17 +10439,25 @@ function wmRender(){
     <div class="wmask">Find the ${WM_KIND[t.k]}</div>
     <div class="wmname">${esc(t.n)}</div>
     <div class="wmwrap">
-      <svg id="wmsvg" viewBox="0 0 ${WM_W} ${WM_H}" xmlns="http://www.w3.org/2000/svg" onclick="wmTap(event)">
-        <rect width="${WM_W}" height="${WM_H}" fill="#14364f"/>
-        <path d="${wmMapPath()}" fill="#4d7f93" stroke="#0e2739" stroke-width="0.6"/>
-        ${marks}
+      <svg id="wmsvg" viewBox="0 0 ${WM_W} ${WM_H}" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="${WM_W}" height="${WM_H}" fill="#14364f"/>
+        <path d="${wmMapPath()}" fill="#4d7f93" stroke="#0e2739" stroke-width="0.6" vector-effect="non-scaling-stroke"/>
+        ${res&&t.k==="c"?`<path d="${(WORLD[t.c]||[]).map(r=>"M"+r.map(p=>wmX(p[0]).toFixed(1)+" "+wmY(p[1]).toFixed(1)).join("L")+"Z").join("")}" fill="#FFD93D" stroke="#fff" stroke-width="1" vector-effect="non-scaling-stroke"/>`:""}
+        <g id="wmmark"></g>
       </svg>
+      <div class="wmctl">
+        <button id="wmzoomin" onclick="wmZoom(1.8)" title="Zoom in">➕</button>
+        <button id="wmzoomout" onclick="wmZoom(1/1.8)" title="Zoom out">➖</button>
+        <button onclick="wmResetView()" title="Whole world">🌍</button>
+      </div>
     </div>
     ${res?`<div class="fact"><b>${res.verdict}</b> You were ${res.km.toLocaleString()} km away — <b>+${res.pts} points</b><br><br>💡 ${esc(t.f)}</div>
           <button class="btn primary center" onclick="wmNext()">${s.i+1<s.q.length?"Next place ➡️":"See my score 🏁"}</button>`
-         :`<div class="chmsg">Tap the map where you think it is.</div>`}
+         :`<div class="chmsg" id="wmhelp">Tap the map where you think it is. Pinch or use ➕ to zoom in.</div>
+           <button class="btn center" id="wmplace" onclick="wmPlace()" disabled>Place it here ✓</button>`}
   </div>
   <div class="quitbar"><button onclick="screenMap()">🏠 Back to the menu</button></div>`;
+  wmBind(); wmApplyView();
 }
 
 /* ================= CHESS OPENING TRAINER ================= */
