@@ -140,6 +140,16 @@ h3{font-size:1.05em}
 .listenbox{margin:.2em 0 .1em}
 .passage{margin-top:10px;padding:12px 14px;border-radius:12px;background:var(--bg);
   border:2px solid var(--line);font-size:1.05em}
+.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.avcard{border:2px solid var(--line);border-radius:14px;background:var(--bg);padding:8px 6px 10px;
+  cursor:pointer;text-align:center;font:inherit;color:inherit;transition:border-color .12s,transform .08s}
+.avcard:active{transform:scale(.97)}
+.avcard.on{border-color:var(--pitch);border-width:3px;background:var(--panel)}
+.avcard canvas{display:block;width:100%;height:auto}
+.avcard b{display:block;font-size:.78em;margin-top:4px}
+.daystreak{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--line);
+  border-radius:999px;padding:3px 12px;font-size:.82em;font-weight:700}
+.daystreak .fl{color:#E8712A;font-size:1.05em}
 .voicelist{max-height:230px;overflow:auto;border:2px solid var(--line);border-radius:12px;padding:8px}
 .voicebtn{margin-bottom:6px;padding:11px 12px}
 .voicebtn.on{border-color:var(--pitch);background:var(--bg);font-weight:700}
@@ -342,9 +352,20 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <div id="seasonBody"></div>
     </div>
     <div class="row">
+      <button class="btn ghost" id="btnAvatar">Your player</button>
       <button class="btn ghost" id="btnSquad">Squad list</button>
       <button class="btn ghost" id="btnParent">Parent zone</button>
     </div>
+  </section>
+
+  <!-- ================= AVATAR ================= -->
+  <section class="screen" id="scAvatar">
+    <div class="card">
+      <h1>Pick your player</h1>
+      <p class="muted">This is who runs at the defence and takes the penalties.</p>
+      <div class="avgrid" id="avGrid"></div>
+    </div>
+    <button class="btn ghost" id="btnHomeAvatar">Done</button>
   </section>
 
   <!-- ================= LEVEL ================= -->
@@ -1179,6 +1200,7 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
+  avatar:0, days:{last:"",streak:0,best:0},
   opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false} };
 var S = load();
 function load(){
@@ -1187,7 +1209,8 @@ function load(){
       opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
       runs:Object.assign({taken:0,scored:0},o.runs||{}),
-      xp: o.xp||0, fifties: o.fifties||0
+      xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0,
+      days: Object.assign({last:"",streak:0,best:0}, o.days||{})
     }); } }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
@@ -2123,7 +2146,30 @@ function penDismiss(){
    ======================================================================= */
 var RUN = { live:false, done:null, raf:null, timer:null, result:false, resolvedAt:0 };
 var RUN_W=360, RUN_H=520, RUN_GROUND=402, RUN_LANES=[86,180,274];
-var RUN_KIT = "#C8102E";          // every defender in the same kit
+/* =======================================================================
+   AVATARS — pick your player. Kits, skin tones and hair are varied on
+   purpose so he can find one that looks like him.
+   ======================================================================= */
+var AVATARS = [
+ {n:"Sligo White",  no:9,  kit:"#FFFFFF", trim:"#1B4E8C", shorts:"#14151A", socks:"#FFFFFF", skin:"#E9C39C", hair:"#2B2118", style:"plain"},
+ {n:"Anfield Red",  no:7,  kit:"#C8102E", trim:"#F2C300", shorts:"#C8102E", socks:"#C8102E", skin:"#F1D2B0", hair:"#8A4B1E", style:"plain"},
+ {n:"Sky Blue",     no:10, kit:"#4EA3E0", trim:"#0B3D66", shorts:"#FFFFFF", socks:"#4EA3E0", skin:"#8D5524", hair:"#1B1310", style:"plain"},
+ {n:"Amber",        no:11, kit:"#F2C300", trim:"#23262B", shorts:"#23262B", socks:"#F2C300", skin:"#C68642", hair:"#241A12", style:"plain"},
+ {n:"Green Hoops",  no:4,  kit:"#2E7D4F", trim:"#FFFFFF", shorts:"#FFFFFF", socks:"#2E7D4F", skin:"#5C3317", hair:"#120C08", style:"hoops"},
+ {n:"Purple",       no:8,  kit:"#6B3FA0", trim:"#F2C300", shorts:"#FFFFFF", socks:"#6B3FA0", skin:"#F1D2B0", hair:"#D9B26A", style:"plain"},
+ {n:"Stripes",      no:5,  kit:"#23262B", trim:"#FFFFFF", shorts:"#23262B", socks:"#23262B", skin:"#E9C39C", hair:"#4A3722", style:"stripes"},
+ {n:"Orange",       no:6,  kit:"#E8712A", trim:"#14151A", shorts:"#14151A", socks:"#E8712A", skin:"#C68642", hair:"#B5651D", style:"plain"}
+];
+function myAvatar(){ return AVATARS[Math.min(S.avatar||0, AVATARS.length-1)]; }
+
+/* Defenders wear whichever colour contrasts with the chosen kit, so the
+   player is never the same colour as the people tackling him. */
+var RUN_KIT = "#C8102E";
+function defenderKit(){
+  var k=myAvatar().kit.toUpperCase();
+  var r=parseInt(k.substr(1,2),16), g=parseInt(k.substr(3,2),16), b=parseInt(k.substr(5,2),16);
+  return (r>140 && r>b+40) ? "#1F5FA8" : "#C8102E";   // reddish kit -> blue defenders
+}
 var RUN_CFG = {
   rows:8, gap:250, gapVar:70, lead:430, runIn:260, goalAhead:200,
   speed:250, speedEnd:300,
@@ -2380,11 +2426,12 @@ function runDraw(){
     runDrawPickup(c, RUN_LANES[p.lane], sy);
   });
   // defenders
+  var kit=defenderKit();
   RUN.course.rows.forEach(function(r){
     var sy = RUN_GROUND - (r.z-d);
     if(sy < -70 || sy > RUN_H+50) return;
-    runDrawSlider(c, RUN_LANES[r.slide], sy);
-    runDrawStander(c, RUN_LANES[r.block], sy);
+    runDrawSlider(c, RUN_LANES[r.slide], sy, kit);
+    runDrawStander(c, RUN_LANES[r.block], sy, kit);
   });
 
   if(RUN.phase==="aim" || RUN.phase==="shoot"){
@@ -2458,29 +2505,29 @@ function runHead(c,x,y,r){
 }
 
 /* Standing defender — arms out, blocking the channel. */
-function runDrawStander(c,x,y){
+function runDrawStander(c,x,y,kit){
   runShadow(c,x,y+4,24,.20);
-  c.fillStyle=RUN_KIT;
+  c.fillStyle=kit||RUN_KIT;
   c.fillRect(x-32,y-42,64,10);                    // outstretched arms
   c.fillRect(x-18,y-48,36,34);                    // shirt
   c.fillStyle="rgba(0,0,0,.14)"; c.fillRect(x-18,y-48,36,7);
   c.fillStyle="#14151A"; c.fillRect(x-16,y-16,13,14); c.fillRect(x+3,y-16,13,14);
-  c.fillStyle=RUN_KIT; c.fillRect(x-16,y-6,13,6); c.fillRect(x+3,y-6,13,6);
+  c.fillStyle=kit||RUN_KIT; c.fillRect(x-16,y-6,13,6); c.fillRect(x+3,y-6,13,6);
   c.fillStyle="#14151A"; c.fillRect(x-19,y-2,16,5); c.fillRect(x+3,y-2,16,5);
   runHead(c,x,y-58,10);
 }
 
 /* Sliding defender — low along the ground, hurdle him. */
-function runDrawSlider(c,x,y){
+function runDrawSlider(c,x,y,kit){
   // kept inside his own channel so it is never unclear which one he is in
   c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+5,34,7,0,0,6.3); c.fill();
-  c.fillStyle=RUN_KIT;
+  c.fillStyle=kit||RUN_KIT;
   c.fillRect(x-24,y-19,46,19);                    // body along the turf
   c.fillStyle="rgba(255,255,255,.16)"; c.fillRect(x-24,y-19,46,5);
   c.fillStyle="#14151A"; c.fillRect(x+14,y-19,14,10);   // trailing leg
   c.fillRect(x+24,y-22,12,7);                          // boot
   runHead(c,x-30,y-10,8);
-  c.fillStyle=RUN_KIT; c.fillRect(x-20,y-26,20,8);      // trailing arm
+  c.fillStyle=kit||RUN_KIT; c.fillRect(x-20,y-26,20,8);      // trailing arm
   runArrow(c,x,y-44,"up");
 }
 function runArrow(c,x,y,dir){
@@ -2500,6 +2547,83 @@ function runBall(c,x,y,r){
   c.closePath(); c.fill();
 }
 
+/* One figure used by the runner, the finishing strike and the avatar picker,
+   so what he picks is exactly what he sees on the pitch.
+   pose: 'run' | 'jump' | 'slide' | 'stand' | 'kick'  */
+function drawFooballer(c, x, y, a, pose, phase, scale){
+  scale=scale||1; phase=phase||0;
+  c.save(); c.translate(x,y); c.scale(scale,scale);
+  var dark="rgba(0,0,0,.16)", light="rgba(255,255,255,.22)";
+
+  function head(hx,hy){
+    c.fillStyle=a.skin; c.beginPath(); c.arc(hx,hy,10,0,6.3); c.fill();
+    c.fillStyle="rgba(0,0,0,.10)"; c.beginPath(); c.arc(hx+3,hy+1,10,-0.5,1.6); c.fill();
+    c.fillStyle=a.hair;                                        // hair over the crown
+    c.beginPath(); c.arc(hx,hy-2.5,10,Math.PI*1.02,Math.PI*1.98); c.fill();
+    c.fillRect(hx-10,hy-4,3.5,4); c.fillRect(hx+6.5,hy-4,3.5,4); // sideburns
+  }
+  function shirt(sx,sy,w,h){
+    c.fillStyle=a.kit; c.beginPath();
+    (c.roundRect? c.roundRect(sx,sy,w,h,5) : c.rect(sx,sy,w,h)); c.fill();
+    if(a.style==="stripes"){
+      c.fillStyle=a.trim;
+      for(var i=1;i<w-4;i+=11) c.fillRect(sx+i,sy+1,5,h-2);
+    } else if(a.style==="hoops"){
+      c.fillStyle=a.trim;
+      for(var j=6;j<h-4;j+=11) c.fillRect(sx+1,sy+j,w-2,5);
+    }
+    c.fillStyle=a.trim; c.fillRect(sx+w/2-7,sy,14,5);            // collar
+    c.fillStyle=light; c.fillRect(sx,sy,w,4);                    // top light
+    c.fillStyle=dark;  c.fillRect(sx,sy+h-4,w,4);                // bottom shade
+  }
+  function sleeve(sx,sy,w,h){
+    c.fillStyle=a.kit; c.beginPath();
+    (c.roundRect? c.roundRect(sx,sy,w,h,4) : c.rect(sx,sy,w,h)); c.fill();
+    c.fillStyle=a.trim; c.fillRect(sx<0?sx:sx+w-4, sy, 4, h);    // cuff
+  }
+  function leg(lx,ly,len){
+    c.fillStyle=a.shorts; c.fillRect(lx,ly,12,Math.max(6,len*0.42));
+    c.fillStyle=a.skin;   c.fillRect(lx+1,ly+len*0.42,10,len*0.3);
+    c.fillStyle=a.socks;  c.fillRect(lx+1,ly+len*0.72,10,len*0.28);
+    c.fillStyle=a.trim;   c.fillRect(lx+1,ly+len*0.72,10,3);
+    c.fillStyle="#14151A"; c.fillRect(lx-2,ly+len,15,5);         // boot
+  }
+
+  if(pose==="slide"){
+    c.fillStyle=a.shorts; c.fillRect(4,-19,20,18);
+    shirt(-22,-21,30,20);
+    sleeve(-26,-18,12,8);
+    c.fillStyle=a.socks; c.fillRect(20,-16,12,10);
+    c.fillStyle="#14151A"; c.fillRect(30,-18,14,6);
+    head(-30,-12);
+  } else if(pose==="kick"){
+    leg(-20,-20,20);
+    c.save(); c.translate(-2,-22); c.rotate(-0.55);
+    c.fillStyle=a.shorts; c.fillRect(0,-6,12,12);
+    c.fillStyle=a.socks;  c.fillRect(12,-6,13,12);
+    c.fillStyle="#14151A"; c.fillRect(25,-5,10,10);
+    c.restore();
+    shirt(-18,-54,34,34);
+    sleeve(-31,-50,14,10); sleeve(15,-58,14,10);
+    head(-1,-64);
+  } else {
+    var air=(pose==="jump");
+    var stride=air?0:Math.sin(phase)*6;
+    leg(-15,-18,air?12:16+stride);
+    leg(3,-18,air?12:16-stride);
+    shirt(-18,-52,36,34);
+    sleeve(-31,-48,14,10); sleeve(17,-48,14,10);
+    head(0,-62);
+  }
+  // squad number on the chest
+  if(pose!=="slide"){
+    c.fillStyle=a.trim; c.font="bold 13px -apple-system,BlinkMacSystemFont,sans-serif";
+    c.textAlign="center"; c.fillText(String(a.no), pose==="kick"?-1:0, pose==="kick"?-30:-28);
+    c.textAlign="start";
+  }
+  c.restore();
+}
+
 function runDrawPlayer(c){
   var x=runLaneX(), y=RUN_GROUND, lift=0, sliding=(RUN.state==="slide");
   if(RUN.state==="jump"){
@@ -2508,25 +2632,7 @@ function runDrawPlayer(c){
   }
   runShadow(c,x,y+4,Math.max(10,22-lift/6),Math.max(0.06,0.20-lift/380));
   var by=y-lift;
-  if(sliding){
-    c.fillStyle="#FFFFFF"; c.fillRect(x-26,by-20,52,20);
-    c.fillStyle="#14151A"; c.fillRect(x+16,by-20,14,10);
-    runHead(c,x-32,by-11,9);
-  } else {
-    // legs pump while running; tuck up in the air
-    var stride=Math.sin(RUN.dist/13)*7, air=lift>4;
-    c.fillStyle="#14151A";
-    c.fillRect(x-15,by-16,13,air?11:14+stride);
-    c.fillRect(x+2,by-16,13,air?11:14-stride);
-    c.fillStyle="#FFFFFF"; c.fillRect(x-15,by-16,13,6); c.fillRect(x+2,by-16,13,6);
-    c.fillStyle="#14151A";
-    c.fillRect(x-18,by-(air?5:2),16,5); c.fillRect(x+2,by-(air?5:2),16,5);
-    c.fillStyle="#FFFFFF"; c.fillRect(x-17,by-48,34,34);            // shirt
-    c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(x-17,by-48,34,7);
-    c.fillStyle="#FFFFFF";
-    c.fillRect(x-31,by-46,15,10); c.fillRect(x+16,by-46,15,10);     // arms
-    runHead(c,x,by-58,10);
-  }
+  drawFooballer(c, x, by, myAvatar(), sliding?"slide":(lift>4?"jump":"run"), RUN.dist/13);
   runBall(c, x+(sliding?28:21), by-(sliding?7:5), 9);
 }
 
@@ -2535,19 +2641,7 @@ function runDrawShot(c, spotY, goalY){
   var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs);
   var x=RUN_W/2, g=RUN_GROUND;
   runShadow(c,x-10,g+4,22,.20);
-  c.fillStyle="#14151A"; c.fillRect(x-23,g-18,13,18);              // planted leg
-  c.fillStyle="#FFFFFF"; c.fillRect(x-23,g-18,13,6);
-  c.fillStyle="#14151A"; c.fillRect(x-26,g-3,17,5);                // planted boot
-  c.save();                                                        // kicking leg, followed through
-  c.translate(x-4,g-21); c.rotate(-0.55);
-  c.fillStyle="#14151A"; c.fillRect(0,-6,27,12);
-  c.fillStyle="#FFFFFF"; c.fillRect(0,-6,11,12);
-  c.restore();
-  c.fillStyle="#FFFFFF"; c.fillRect(x-27,g-52,34,34);              // shirt
-  c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(x-27,g-52,34,7);
-  c.fillStyle="#FFFFFF";
-  c.fillRect(x-42,g-46,16,10); c.fillRect(x+7,g-56,16,10);         // arms out for balance
-  runHead(c,x-10,g-62,10);
+  drawFooballer(c, x-8, g, myAvatar(), "kick");
   // ball from the spot to wherever he aimed, rising then dipping
   var target=runZonePoint(RUN.shotZone);
   var bx0=x+16, by0=g-16, bx1=target.x, by1=target.y;
@@ -2659,8 +2753,21 @@ function reviewLine(mode, idx){
   return {title:t.a, say:t.a, detail:t.s.replace("___", t.a)};
 }
 
+function dayKey(d){ return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+/* A day counts once he finishes a match, not merely for opening the app. */
+function markDayPlayed(){
+  var today=dayKey(new Date());
+  if(S.days.last===today) return;
+  var yesterday=dayKey(new Date(Date.now()-864e5));
+  S.days.streak = (S.days.last===yesterday) ? S.days.streak+1 : 1;
+  S.days.last=today;
+  if(S.days.streak>S.days.best) S.days.best=S.days.streak;
+  save();
+}
+
 function endMatch(){
   if(M.timer) clearInterval(M.timer);
+  markDayPlayed();
   var res = M.us>M.them ? "w" : (M.us===M.them ? "d" : "l");
   S.season.p++; S.season[res]++;
   S.season.gf+=M.us; S.season.ga+=M.them;
@@ -2714,7 +2821,10 @@ $("btnQuit").addEventListener("click", function(){
    ======================================================================= */
 function renderHome(){
   var s=S.season;
-  var xpBit='<p style="margin:.2em 0 .6em"><span class="xppill">'+(S.xp||0)+' XP</span>'+
+  var d=S.days.streak||0;
+  var dayBit = d>0 ? '<span class="daystreak"><span class="fl">&#9679;</span>'+
+      d+' day'+(d===1?'':'s')+' in a row</span> ' : '';
+  var xpBit='<p style="margin:.2em 0 .6em">'+dayBit+'<span class="xppill">'+(S.xp||0)+' XP</span>'+
     ' <span class="small muted">'+(S.xp>=FIFTY_COST
       ? 'enough for a fifty-fifty on a question'
       : (FIFTY_COST-(S.xp||0))+' more earns a fifty-fifty')+'</span></p>';
@@ -2728,6 +2838,31 @@ function renderHome(){
       '</td><td class="num">'+s.gf+':'+s.ga+'</td><td class="num"><b>'+s.pts+'</b></td></tr></table>';
   }
 }
+
+/* =======================================================================
+   Avatar picker — each tile is the real figure, drawn by the same code
+   that draws him on the pitch.
+   ======================================================================= */
+function renderAvatars(){
+  var g=$("avGrid");
+  g.innerHTML=AVATARS.map(function(a,i){
+    return '<button class="avcard'+(i===(S.avatar||0)?" on":"")+'" data-av="'+i+'">'+
+      '<canvas width="150" height="190"></canvas><b>'+a.n+'</b></button>';
+  }).join("");
+  var cards=g.querySelectorAll(".avcard");
+  for(var i=0;i<cards.length;i++){
+    var cv=cards[i].querySelector("canvas"), ctx=cv.getContext&&cv.getContext("2d");
+    if(!ctx) continue;
+    ctx.clearRect(0,0,150,190);
+    ctx.fillStyle="rgba(0,0,0,.10)";
+    ctx.beginPath(); ctx.ellipse(75,172,30,7,0,0,6.3); ctx.fill();
+    drawFooballer(ctx, 75, 168, AVATARS[i], "stand", 0, 1.55);
+  }
+}
+$("avGrid").addEventListener("click", function(ev){
+  var b=ev.target.closest("[data-av]"); if(!b) return;
+  S.avatar=+b.getAttribute("data-av"); save(); renderAvatars();
+});
 
 /* =======================================================================
    Squad screen
@@ -2767,6 +2902,8 @@ function renderParent(){
     '<tr><th>Questions answered</th><td class="num"><b>'+seen+'</b></td></tr>'+
     '<tr><th>Overall accuracy</th><td class="num"><b>'+pc+'%</b></td></tr>'+
     '<tr><th>Matches played</th><td class="num"><b>'+S.season.p+'</b></td></tr>'+
+    '<tr><th>Days in a row</th><td class="num"><b>'+(S.days.streak||0)+'</b>'+
+      (S.days.best>S.days.streak?' (best '+S.days.best+')':'')+'</td></tr>'+
     (S.pens.taken?'<tr><th>Penalties scored</th><td class="num"><b>'+S.pens.scored+' of '+S.pens.taken+
       '</b> ('+Math.round(S.pens.scored/S.pens.taken*100)+'%)</td></tr>':'')+
     (S.runs.taken?'<tr><th>Counter attacks</th><td class="num"><b>'+S.runs.scored+' of '+S.runs.taken+
@@ -2914,6 +3051,8 @@ for(var b=0;b<lvlBtns.length;b++){
 $("btnHomeLevel").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnSettings").addEventListener("click",function(){ show("scSettings"); });
 $("btnHomeSet").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnAvatar").addEventListener("click",function(){ renderAvatars(); show("scAvatar"); });
+$("btnHomeAvatar").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnSquad").addEventListener("click",function(){ renderSquad(); show("scSquad"); });
 $("btnHomeSquad").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnParent").addEventListener("click",function(){ renderParent(); show("scParent"); });
