@@ -116,6 +116,9 @@ h3{font-size:1.05em}
 .listenbox{margin:.2em 0 .1em}
 .passage{margin-top:10px;padding:12px 14px;border-radius:12px;background:var(--bg);
   border:2px solid var(--line);font-size:1.05em}
+.voicelist{max-height:230px;overflow:auto;border:2px solid var(--line);border-radius:12px;padding:8px}
+.voicebtn{margin-bottom:6px;padding:11px 12px}
+.voicebtn.on{border-color:var(--pitch);background:var(--bg);font-weight:700}
 .fiftyrow{margin-top:4px}
 .fiftyrow .btn{margin-bottom:6px}
 .opt.gone{opacity:.32;pointer-events:none;text-decoration:line-through}
@@ -416,10 +419,14 @@ body.theme-dark .pill.lg-weak{background:#39281A}
         <label for="setVoice">Read words aloud<br><span class="small muted">Tap the speaker on any word</span></label>
         <div class="switch"><input type="checkbox" id="setVoice" checked><span></span></div>
       </div>
-      <div class="setting" style="flex-wrap:wrap">
-        <label for="setVoicePick">Which voice<br><span class="small muted" id="voiceHint">Pick the best one on this device</span></label>
-        <select id="setVoicePick" style="max-width:100%;flex:1 1 180px"></select>
-        <button class="btn ghost" id="btnTestVoice" style="margin:8px 0 0;width:100%">Hear this voice</button>
+      <div class="setting" style="display:block">
+        <label style="display:block;margin-bottom:6px">Which voice
+          <br><span class="small muted" id="voiceHint">Tap one to hear it</span></label>
+        <div class="voicelist" id="voiceList"></div>
+      </div>
+      <div class="setting">
+        <label for="setReader">A grown-up reads the passage<br><span class="small muted">Shows the words for you to read aloud, then hides them. No robot voice.</span></label>
+        <div class="switch"><input type="checkbox" id="setReader"><span></span></div>
       </div>
       <div class="setting">
         <label for="setAutoSay">Say the answer after a miss<br><span class="small muted">Hearing it helps it stick</span></label>
@@ -1055,7 +1062,7 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
-  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:""} };
+  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false} };
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1555,11 +1562,14 @@ function renderQuestion(){
       $("passageText").classList.toggle("hidden");
       this.textContent = $("passageText").classList.contains("hidden") ? "Show the words" : "Hide the words";
     });
-    if(!S.opts.voice || !("speechSynthesis" in window)){
-      // No sound: read it, then tap to bring up the question
+    if(S.opts.reader || !S.opts.voice || !("speechSynthesis" in window)){
+      // A grown-up reads it aloud (or there is no voice): show the words,
+      // then hide them so the question is still answered from memory.
       $("passageText").classList.remove("hidden");
-      $("btnPlayPassage").innerHTML="I have read it &rsaquo;";
-      $("listenStatus").textContent="Sound is off, so read it instead. The question comes next.";
+      $("btnPlayPassage").innerHTML="Read it out, then tap here &rsaquo;";
+      $("listenStatus").textContent = S.opts.reader
+        ? "Read this aloud to him once. Tap when you have finished."
+        : "Sound is off, so read it instead. The question comes next.";
       $("btnPlayPassage").addEventListener("click", function(){
         $("passageText").classList.add("hidden");
         $("btnShowWords").textContent="Show the words";
@@ -1567,7 +1577,9 @@ function renderQuestion(){
         $("listenStatus").textContent="You can show the words again if you need to.";
         $("btnPlayPassage").classList.add("hidden");
       });
-      $("qHelp").textContent="Turn sound on in settings for the listening version.";
+      $("qHelp").textContent = S.opts.reader
+        ? "A grown-up reads it aloud, then he answers from memory."
+        : "Turn sound on in settings for the listening version.";
     } else {
       $("btnPlayPassage").addEventListener("click", speakIt);
       setTimeout(speakIt, 250);
@@ -2707,35 +2719,35 @@ function applyOpts(){
   document.body.className = o.theme||"";
   $("setVoice").checked=o.voice; $("setAutoSay").checked=o.autoSay;
   $("setClock").checked=o.clock; $("setSpace").checked=o.space; $("setSize").value=o.size;
+  $("setReader").checked=o.reader;
   $("btnSound").innerHTML = o.voice ? "&#128266;" : "&#128263;";
   var sw=$("swatches").children;
   for(var i=0;i<sw.length;i++) sw[i].setAttribute("aria-pressed", String((sw[i].getAttribute("data-theme")||"")===(o.theme||"")));
 }
 function fillVoiceList(){
-  var sel=$("setVoicePick"); if(!sel) return;
+  var box=$("voiceList"); if(!box) return;
   var v=englishVoices().slice().sort(function(a,b){ return voiceScore(b)-voiceScore(a); });
   if(!v.length){
-    sel.innerHTML='<option>No voices found</option>';
-    $("voiceHint").textContent="This device has no speech voices available.";
+    box.innerHTML='<p class="small muted">This device is not offering the browser any speech voices. '+
+      'Turn on "A grown-up reads the passage" above instead.</p>';
+    $("voiceHint").textContent="No voices available";
     return;
   }
-  sel.innerHTML=v.map(function(x){
-    return '<option value="'+x.voiceURI.replace(/"/g,"&quot;")+'">'+
-           x.name+' ('+x.lang+')'+(isRichVoice(x)?' ★ clearer':'')+'</option>';
+  box.innerHTML=v.map(function(x){
+    var on=(VOICE && VOICE.voiceURI===x.voiceURI);
+    return '<button class="btn voicebtn'+(on?" on":"")+'" data-voice="'+
+      x.voiceURI.replace(/"/g,"&quot;")+'">&#9654;&nbsp; '+x.name+
+      ' <span class="small muted">'+x.lang+(isRichVoice(x)?" · clearer":"")+'</span></button>';
   }).join("");
-  sel.value = (VOICE && VOICE.voiceURI) || v[0].voiceURI;
-  var anyRich = v.some(isRichVoice);
-  $("voiceHint").innerHTML = anyRich
-    ? 'The ones marked ★ sound the most natural. Tap "Hear this voice" to compare.'
-    : 'All '+v.length+' voices here are the basic ones, which sound flat. On iPhone: '+
-      '<b>Settings → Accessibility → Spoken Content → Voices → English</b>, then download '+
-      'an <b>Enhanced</b> or <b>Premium</b> voice. It will be picked up automatically.';
+  $("voiceHint").innerHTML = 'This iPad is offering the browser <b>'+v.length+'</b> voice'+
+    (v.length===1?'':'s')+'. Tap one to hear it. '+
+    (v.some(isRichVoice) ? 'The ones marked "clearer" are the better ones.'
+      : 'Apple does not share its best voices with web pages, so these are the basic set — '+
+        'if none of them sound right, use the grown-up option above.');
 }
-$("setVoicePick").addEventListener("change", function(){
-  S.opts.voiceURI=this.value; save(); pickVoice();
-  say("This is how the commentary will sound.");
-});
-$("btnTestVoice").addEventListener("click", function(){
+$("voiceList").addEventListener("click", function(ev){
+  var b=ev.target.closest("[data-voice]"); if(!b) return;
+  S.opts.voiceURI=b.getAttribute("data-voice"); save(); pickVoice(); fillVoiceList();
   say("Puffins spend most of the year far out at sea.");
 });
 
@@ -2743,7 +2755,7 @@ function bindOpt(id,key){
   $(id).addEventListener("change",function(){ S.opts[key]=$(id).checked; save(); applyOpts(); });
 }
 bindOpt("setVoice","voice"); bindOpt("setAutoSay","autoSay");
-bindOpt("setClock","clock"); bindOpt("setSpace","space");
+bindOpt("setClock","clock"); bindOpt("setSpace","space"); bindOpt("setReader","reader");
 $("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(); applyOpts(); });
 $("swatches").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-theme]"); if(!b) return;
