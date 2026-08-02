@@ -88,6 +88,17 @@
   .profile-list .pts { margin-left:auto; font-size:.85rem; opacity:.7; font-weight:600; }
   .footerlink { text-align:center; opacity:.75; font-size:.85rem; margin-top:auto; padding:12px 0; }
   .grouphdr { font-weight:800; font-size:1.05rem; margin:16px 0 8px; padding-bottom:5px; border-bottom:2px solid rgba(255,255,255,.3); opacity:.95; }
+  .chboard { display:grid; grid-template-columns:repeat(8,1fr); width:100%; max-width:340px; margin:0 auto 14px; border-radius:10px; overflow:hidden; border:3px solid rgba(0,0,0,.4); }
+  .chsq { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:clamp(17px,6.2vw,30px); line-height:1; cursor:pointer; -webkit-user-select:none; user-select:none; }
+  .chsq.lt { background:#e9dcbb; }
+  .chsq.dk { background:#9c7550; }
+  .chsq.last { box-shadow: inset 0 0 0 40px rgba(255,217,61,.28); }
+  .chsq.sel { box-shadow: inset 0 0 0 3px #2f8f4e, inset 0 0 0 40px rgba(47,143,78,.25); }
+  .chsq.hint { box-shadow: inset 0 0 0 3px #FFD93D, inset 0 0 0 40px rgba(255,217,61,.3); }
+  .cw { color:#fff; text-shadow:0 0 1px #000, 0 0 2px #000, 0 1px 2px rgba(0,0,0,.7); }
+  .cb { color:#191919; text-shadow:0 1px 1px rgba(255,255,255,.4); }
+  .chmsg { text-align:center; font-weight:700; padding:8px 6px 12px; line-height:1.4; }
+  .chmsg.bad { color:#ffb3a7; }
   .quitbar { margin-top:18px; padding-bottom:6px; text-align:center; }
   .quitbar button {
     font-family:inherit; font-weight:800; font-size:1rem; cursor:pointer;
@@ -1848,6 +1859,28 @@ const DATA = {
     ["Why is the Arctic becoming more important?","Melting ice is opening new sea routes",["The North Pole is moving southwards","More people are choosing to live there","The Arctic is growing steadily colder"],"Ships can now sometimes sail north of Russia in summer."],
     ["What is a natural resource?","Something useful taken from the earth",["A tool that has been made in a modern factory","A law that has been passed by a government","A road that has been built between two cities"],"Oil, gas, water and metals are all natural resources."],
     ["Which country has the most people?","India",["China, its northern neighbour","The United States of America","Indonesia, in southeast Asia"],"India passed China in about 2023."]
+  ],
+  chs: [
+    ["How many squares are there on a chess board?","Sixty-four",["Thirty-two squares in total","Eighty-one squares in total","One hundred squares in total"],"It is an eight by eight grid."],
+    ["How many pawns does each player start with?","Eight",["Six pawns at the start","Ten pawns at the start","Four pawns at the start"],"They fill the whole second row in front of the other pieces."],
+    ["Which piece moves in an L shape?","The knight",["The bishop, which moves diagonally","The rook, which moves in straight lines","The queen, which moves any way"],"It is the only piece that can jump over others."],
+    ["Which piece can only move diagonally?","The bishop",["The rook, which moves in straight lines","The knight, which jumps in an L","The pawn, which moves forward"],"Each player has one bishop for the light squares and one for the dark."],
+    ["Which piece is the most powerful?","The queen",["The king, the most important one","The rook, worth five points","The knight, which can jump"],"She combines the powers of the rook and the bishop."],
+    ["What is the aim of a game of chess?","To checkmate the other king",["To capture every enemy piece","To reach the far side first","To take the enemy queen"],"The game ends the moment the king cannot escape."],
+    ["What does check mean?","The king is under attack",["The king has been captured","The game has ended in a draw","A pawn has reached the end"],"You must get out of check straight away."],
+    ["How many pieces does each player start with in total?","Sixteen",["Twelve pieces at the start","Twenty pieces at the start","Eight pieces at the start"],"Eight pawns and eight bigger pieces."],
+    ["Which colour always moves first?","White",["Black always moves first","Whoever won the last game","It is decided by a coin toss"],"Moving first is a small but real advantage."],
+    ["How does a rook move?","In straight lines up, down or across",["Diagonally across the squares of the board","In an L shape, just like the knight does","One single square in any direction at all"],"Rooks get stronger as the board empties."],
+    ["How far can a king move in one turn?","One square",["Two squares at a time","Three squares at a time","As far as it likes"],"The only exception is castling."],
+    ["Which piece is usually worth the most points?","The queen, worth nine",["The rook, worth five points","The bishop, worth three points","The knight, worth three points"],"Pawns are worth one point each."],
+    ["What happens when a pawn reaches the far side?","It turns into another piece",["It is taken off the board and lost forever","It goes all the way back to its starting square","It becomes a second king for that player"],"Most players choose a queen."],
+    ["How many squares can a pawn move on its very first turn?","One or two",["Only ever one square","Always exactly two squares","Up to three squares"],"After the first move it can only go one square at a time."],
+    ["How does a pawn capture?","Diagonally forwards",["Straight forwards, as it moves","Sideways to the left or right","Backwards over its shoulder"],"This is why pawns can block each other completely."],
+    ["Where does the white queen start?","On a white square",["On a black square always","Beside the rook in the corner","In front of the king"],"Players remember it as queen on her own colour."],
+    ["What is a draw in chess?","A game that nobody wins",["A win for the player with more pieces","A game that must be replayed","A win for whoever is ahead"],"Half a point each in a tournament."],
+    ["Which piece stands in the corner at the start?","The rook",["The knight, next to the corner","The bishop, third from the corner","The queen, in the middle"],"There is a rook in each of the four corners."],
+    ["Which piece can jump over other pieces?","The knight",["The bishop, moving diagonally","The rook, moving in a line","The queen, moving anywhere"],"That makes knights very useful in crowded positions."],
+    ["How many players are there in a game of chess?","Two",["Three players take turns","Four players in pairs","One player against the board"],"Though four-player variants do exist."]
   ]
 },
 2: {
@@ -3411,6 +3444,28 @@ const DATA = {
     ["Which two countries dispute the region of Kashmir?","India and Pakistan",["China and Mongolia in the north","Iran and Afghanistan to the west","Nepal and Bhutan in the Himalayas"],"China also holds a portion of the wider territory."],
     ["Why do straight-line borders cause problems in Africa?","They ignore where peoples actually live",["They are far too difficult for armies to patrol","They always follow the driest available ground","They cut every single country off from the sea"],"European powers drew many of them in the 1880s."],
     ["What is an exclusive economic zone?","Sea where a country controls the resources",["A port that only one shipping company may use","A stretch of sea where all fishing is forbidden","An area of land set aside purely for industry"],"It normally extends 200 nautical miles from the coast."]
+  ],
+  chs: [
+    ["What is castling?","Moving the king two squares and the rook past it",["Swapping the places of the king and the queen over","Moving the rook right into the middle of the board","Promoting one of your own pawns into a second rook"],"It is the only move where two pieces move at once."],
+    ["When are you not allowed to castle?","When the king is in check",["When the queen has been taken","When the rook has been captured","When you have fewer pieces"],"You also cannot castle through or into check."],
+    ["What is stalemate?","No legal move but not in check",["The king being captured at last","Both players running out of time","Repeating the same move three times"],"It is a draw, and a lifeline for the losing side."],
+    ["What is en passant?","A special pawn capture in passing",["A way of promoting a pawn early","A method of castling on the queenside","A rule about touching a piece"],"It only works immediately after the enemy pawn's two-square jump."],
+    ["What does the notation Nf3 mean?","A knight moves to f3",["A pawn moves to f3","The king moves to f3","A new piece appears on f3"],"N is used for knight because K is taken by the king."],
+    ["What is a fork in chess?","One piece attacking two at once",["Two pieces defending each other","A pawn splitting into two","A draw agreed by both players"],"Knights are famous for forking the king and queen."],
+    ["What is a pin?","A piece cannot move without exposing another",["A piece that has become stuck in the corner","A pawn that is unable to move forward at all","Two enemy pawns blocking one another"],"Pinning against the king is called an absolute pin."],
+    ["Which opening starts 1.e4 e5 2.Nf3 Nc6 3.Bc4?","The Italian Game",["The Ruy Lopez, or Spanish","The Scotch Game with d4","The French Defence with e6"],"The bishop eyes the vulnerable f7 square."],
+    ["What is the opening 1.e4 c5 called?","The Sicilian Defence",["The French Defence","The Caro-Kann Defence","The Scandinavian Defence"],"It is the most popular reply to e4 at every level."],
+    ["Which piece should you usually develop early?","The knights and bishops",["The queen, straight away","The rooks, before anything else","The king, into the centre"],"Bringing the queen out too early loses time."],
+    ["Why is the centre of the board important?","Pieces control more squares from there",["The central squares are worth more points","Pieces are able to move faster in the centre","Only the four centre squares can be won"],"A knight on the rim is dim, as the old saying goes."],
+    ["What does it mean to develop a piece?","To bring it into the game from its starting square",["To promote that piece into a second queen for yourself","To trade that piece off for an enemy piece of equal value","To move that piece back towards safety behind the pawns"],"Good openings develop quickly and castle early."],
+    ["How many points is a knight usually worth?","Three",["One point, like a pawn","Five points, like a rook","Nine points, like a queen"],"Bishops are also worth about three."],
+    ["What is a discovered attack?","Moving one piece to unleash another",["Attacking two enemy pieces at the same time","Finding a checkmate that was hidden from view","Attacking using a pawn nobody had noticed"],"A discovered check can be devastating."],
+    ["Which square does the Scholar's Mate attack?","The f7 square",["The e5 square in the centre","The d4 square in the centre","The h7 square by the king"],"f7 is only defended by the king at the start."],
+    ["What is the touch-move rule?","If you touch a piece you must move it",["You may touch any of your pieces freely","You must announce each move out loud","You are allowed to take one move back"],"Saying 'j'adoube' lets you adjust a piece without moving it."],
+    ["How many knights does each player start with?","Two",["One knight each at the start","Three knights each at the start","Four knights each at the start"],"They begin between the rooks and bishops."],
+    ["What is the opening 1.d4 d5 2.c4 called?","The Queen's Gambit",["The King's Gambit","The London System","The English Opening"],"White offers a pawn to take over the centre."],
+    ["What is a gambit?","Giving up material for an advantage",["Refusing to take a free piece","Repeating a move three times","Trading queens as early as possible"],"Usually the payment buys time or the centre."],
+    ["What does it mean to castle kingside?","The king moves towards the h-file rook",["The king moves towards the a-file rook","The king moves to the centre","The queen swaps with the king"],"It is written O-O in chess notation."]
   ]
 },
 3: {
@@ -6980,6 +7035,28 @@ const DATA = {
     ["Why is the Fergana Valley a source of tension?","Its fertile land is split between three states",["It contains the only oilfield in all of central Asia","It is the sole practical route through the Himalayas","No fresh water whatsoever reaches the valley floor"],"Uzbekistan, Kyrgyzstan and Tajikistan all hold parts of it."],
     ["What geographic problem does Ukraine's terrain create?","Flat open land offers little defence",["Dense forest makes movement impossible","High mountains cut the country in two","Desert covers most of the interior"],"The same plain runs from France to the Urals."],
     ["Why has Afghanistan proved so hard to control?","Mountainous terrain favours local resistance",["It has no usable roads of any kind at all","Its population is concentrated in a single city","It is surrounded entirely by featureless desert"],"The Hindu Kush divides the country into isolated valleys."]
+  ],
+  chs: [
+    ["Which opening is 1.e4 e5 2.Nf3 Nc6 3.Bb5?","The Ruy Lopez",["The Italian Game with Bc4","The Scotch Game with d4","The Vienna Game with Nc3"],"It is also called the Spanish Opening."],
+    ["What is the Fried Liver Attack?","A sharp knight sacrifice on f7",["A queenside pawn storm plan","A trap in the Queen's Gambit","An endgame technique with rooks"],"It arises from the Two Knights Defence after Ng5 and Nxf7."],
+    ["Which defence begins 1.e4 e6?","The French Defence",["The Caro-Kann Defence","The Sicilian Defence","The Pirc Defence"],"Black's light-squared bishop is often the problem piece."],
+    ["Which defence begins 1.e4 c6?","The Caro-Kann Defence",["The French Defence, beginning with e6","The Slav Defence, played against d4","The Alekhine Defence, beginning Nf6"],"It is solid because Black keeps a healthy pawn structure."],
+    ["What is the King's Indian Defence?","Black fianchettoes and attacks later",["Black trades the queens off immediately","White pushes on the kingside straight away","Black plays for an early and quiet draw"],"Black often lets White build a big centre and then strikes at it."],
+    ["What does fianchetto mean?","Developing a bishop on the long diagonal",["Castling on the queenside of the board with the rook","Advancing both of the central pawns two squares at once","Trading one of your bishops for an enemy knight"],"The pawn moves to g3 or b3 and the bishop follows."],
+    ["What is zugzwang?","Being forced to move and worsen your position",["Being completely unable to make any move at all","Having to repeat exactly the same move over again","Losing on time during a very fast game of chess"],"It decides many king and pawn endings."],
+    ["What is a skewer?","Attacking a valuable piece with a lesser one behind",["Attacking two enemy pieces at once using a knight","Blocking an enemy check by putting a pawn in the way","Trapping an enemy piece right in the corner of the board"],"It is a pin the other way round."],
+    ["What is the fifty-move rule?","A draw if no capture or pawn move in fifty moves",["A draw that is declared after fifty moves in total","A limit on how long any single game is allowed to last","A rule about repeating exactly the same position again"],"It stops endless shuffling in drawn positions."],
+    ["What is threefold repetition?","The same position occurring three times",["Playing the very same move three times over","Checking the enemy king three times running","Offering your opponent a draw three times"],"Either player may then claim a draw."],
+    ["What is the Elo rating system?","A number measuring playing strength",["A ranking of tournament prize money","A system for pairing players by age","A method of timing chess games"],"Arpad Elo, a physicist, devised it."],
+    ["Which player became world champion in 1972?","Bobby Fischer",["Boris Spassky, whom he beat","Anatoly Karpov, who came later","Mikhail Tal, the attacking wizard"],"The match in Reykjavik became a Cold War symbol."],
+    ["Which computer beat Garry Kasparov in 1997?","Deep Blue",["Deep Thought, its predecessor","AlphaZero, built much later","Stockfish, the modern engine"],"IBM retired the machine soon afterwards."],
+    ["What is the opposition in king and pawn endings?","Kings facing each other with one square between",["The two kings sitting together on the very same diagonal","One king standing directly in front of an enemy passed pawn","The kings placed on opposite sides of the whole board"],"Whoever must move away usually loses ground."],
+    ["What is a passed pawn?","A pawn with no enemy pawns able to stop it",["A pawn that has already moved two squares twice over","A pawn that was captured by another pawn in passing","A pawn that is sitting on the very last row of all"],"Passed pawns must be pushed, as Nimzowitsch said."],
+    ["What is the minimum material needed to force checkmate?","A king and a rook",["A king and a single bishop","A king and a single knight","A king and two knights always"],"King and queen or king and rook both work."],
+    ["Which opening is 1.d4 Nf6 2.c4 e6 3.Nc3 Bb4?","The Nimzo-Indian Defence",["The Queen's Indian Defence","The King's Indian Defence","The Grunfeld Defence"],"Black pins the knight to fight for the e4 square."],
+    ["What is prophylaxis in chess?","Preventing your opponent's plan before it starts",["Attacking on both sides of the whole board at the same time","Trading the pieces off in order to reach a good ending","Playing extremely quickly in order to save time on the clock"],"Nimzowitsch and Karpov were masters of it."],
+    ["What is the Scandinavian Defence?","Black answers 1.e4 with d5 at once",["Black answers the move 1.e4 with c5","Black answers the move 1.d4 with d5","White opens the game with the move 1.c4"],"The queen usually recaptures and then retreats."],
+    ["What is a battery in chess?","Two pieces lined up on the same line",["Two pawns side by side","A knight and bishop working together","A king protected by three pawns"],"A queen behind a bishop on a diagonal is a classic example."]
   ]
 },
 4: {
@@ -9307,12 +9384,34 @@ const DATA = {
     ["What is the Kra Canal proposal?","A cut across Thailand bypassing Malacca",["A canal linking the Caspian to the Black Sea","A waterway through the Isthmus of Panama","A channel joining the Red and Dead Seas"],"It has been discussed for over three hundred years."],
     ["Why is Turkey described as a geographic pivot?","It bridges Europe, Asia and the Middle East",["It contains the source of three great rivers","It is the largest country in the region","It has coastline on the Persian Gulf"],"It controls the Straits and sits beside three unstable regions."],
     ["What geographic factor underpins Japan's foreign policy?","Dependence on imported energy and food",["An unusually long land border to defend","Abundant domestic oil and coal reserves","A shortage of usable deep-water ports"],"Its home islands supply very little of what it burns."]
+  ],
+  chs: [
+    ["What is the Berlin Defence known for?","A drawish endgame after an early queen trade",["A sharp attack launched against the castled king","A pawn sacrifice made for very rapid development","A large queenside space advantage for Black"],"Kramnik used it to dethrone Kasparov in 2000."],
+    ["What is the poisoned pawn variation?","Black grabs the b2 pawn with the queen",["White sacrifices the f7 pawn early","Black offers a pawn on the h-file","White gives up the d4 pawn deliberately"],"It appears most famously in the Najdorf Sicilian."],
+    ["What defines the Najdorf Sicilian?","Black plays a6 on the fifth move",["Black plays e6 on the second move","Black fianchettoes the dark bishop","Black trades on d4 immediately"],"Fischer and Kasparov both made it their weapon."],
+    ["What is the Lucena position?","A winning rook endgame technique",["A drawn king and pawn ending","A checkmate pattern with two bishops","A trap in the Queen's Gambit"],"Building a bridge with the rook is the key idea."],
+    ["What is the Philidor position?","A drawing method in rook endings",["A winning method using two rooks together","An attacking scheme aimed at the g7 square","A pawn structure arising in the French Defence"],"Holding the third rank is the defensive trick."],
+    ["What is a Zwischenzug?","An in-between move before the expected reply",["A move that is repeated in order to gain more time","A move that has to be announced out loud to the opponent","A pawn advance made right in the centre of the board"],"It often wins a tempo in a tactical sequence."],
+    ["What is the Shannon number?","An estimate of possible chess games",["The number of legal chess positions","The rating of the strongest engine","The number of squares a knight can reach"],"It is around ten to the power of one hundred and twenty."],
+    ["What are endgame tablebases?","Perfectly solved databases of simple endings",["Opening books that chess engines store and consult","Records of every single master game that has been played","Tables listing the value of each piece by its position"],"Seven-piece tablebases are complete."],
+    ["Who was the first official world chess champion?","Wilhelm Steinitz",["Emanuel Lasker, who followed him","Paul Morphy, the American genius","Adolf Anderssen, of the Immortal Game"],"He took the title in 1886 and held it for eight years."],
+    ["Which champion held the title for twenty-seven years?","Emanuel Lasker",["Wilhelm Steinitz, the first champion","Jose Raul Capablanca of Cuba","Alexander Alekhine of Russia"],"He reigned from 1894 until 1921."],
+    ["What was AlphaZero notable for?","Learning chess from self-play alone",["Using a huge handcrafted opening book","Being the first engine to beat a human","Running on ordinary home computers"],"It taught itself in a matter of hours."],
+    ["Which opening is the Grunfeld Defence?","Black allows a big centre then attacks it",["Black blockades the whole centre with pawns","White gambits away a pawn on the c-file","Black castles on the queenside immediately"],"It follows 1.d4 Nf6 2.c4 g6 3.Nc3 d5."],
+    ["What is the Marshall Attack?","A pawn sacrifice by Black in the Ruy Lopez",["A kingside attack arising in the French Defence","A rook lift used in the Italian Game","A queenside plan found in the Slav Defence"],"Frank Marshall reputedly saved it for years to use on Capablanca."],
+    ["What is the Evans Gambit?","White offers the b4 pawn in the Italian",["Black offers up the d5 pawn very early on","White gives up a whole knight on f7","Black sacrifices the exchange for activity"],"It aims to build a centre with tempo."],
+    ["What is the Immortal Game famous for?","Anderssen sacrificing almost everything to mate",["Being the very longest game of chess ever recorded","Being the first chess game ever played by a computer","A world championship that was decided by one move"],"He gave up both rooks, a bishop and the queen."],
+    ["What is a windmill in chess?","Repeated discovered checks winning material",["A rook rotating right around the whole board","Four connected pawns advancing all together","A knight circling around the enemy king"],"Torre used it famously against Lasker in 1925."],
+    ["What does the term tempo mean?","A single move counted as a unit of time",["The time remaining on a player's chess clock","The speed at which a whole game is played","The rating points gained from winning a game"],"Losing a tempo can be as costly as losing a pawn."],
+    ["What is the Sveshnikov Sicilian known for?","Accepting a backward d-pawn for activity",["A very quiet and symmetrical pawn structure","An early exchange of all four of the queens","Castling on the queenside as early as move six"],"Carlsen used it in his 2018 title match."],
+    ["What is a fortress in the endgame?","A position the stronger side cannot break down",["A castled king that is protected by three healthy pawns","A rook that has become trapped behind its own pawns","A solid wall of pawns all standing on the same colour"],"Material advantage can be entirely meaningless against one."],
+    ["Which world champion was known as the Iron Tigran?","Tigran Petrosian",["Mikhail Tal, the magician of Riga","Vasily Smyslov, the singer","Boris Spassky, the universal player"],"His prophylactic defence was almost impossible to break."]
   ]
 }
 };
 
 const LEVELS = { 1:{name:"Explorer",emoji:"🐣",sub:"Ages 5–7"}, 2:{name:"Adventurer",emoji:"🚀",sub:"Ages 8–10"}, 3:{name:"Expert",emoji:"🧠",sub:"Ages 11+"}, 4:{name:"Mastermind",emoji:"🎓",sub:"Adults"} };
-const CATS = { cap:{name:"Capitals",emoji:"🏛️"}, flag:{name:"Flags",emoji:"🚩"}, pop:{name:"People",emoji:"👨‍👩‍👧‍👦"}, mtn:{name:"Mountains",emoji:"⛰️"}, riv:{name:"Rivers",emoji:"🌊"}, oce:{name:"Oceans & Seas",emoji:"🐳"}, con:{name:"Continents",emoji:"🗺️"}, lmk:{name:"Landmarks",emoji:"🗽"}, eur:{name:"Europe",emoji:"🏰"}, irl:{name:"Ireland",emoji:"☘️"}, sli:{name:"Sligo",emoji:"🌄"}, soc:{name:"Soccer",emoji:"⚽"}, rug:{name:"Rugby",emoji:"🏉"}, gaa:{name:"Gaelic Football",emoji:"🥅"}, srf:{name:"Surfing",emoji:"🏄"}, glf:{name:"Golf",emoji:"⛳"}, his:{name:"Irish History",emoji:"📜"}, art:{name:"Art",emoji:"🎨"}, ehi:{name:"European History",emoji:"⚔️"}, dis:{name:"Disgusting History",emoji:"🤢"}, sci:{name:"Science",emoji:"🔬"}, sph:{name:"Street Smarts",emoji:"💪"}, lif:{name:"Life Science",emoji:"🌱"}, ear:{name:"Earth Science",emoji:"🌋"}, spc:{name:"Space Science",emoji:"🚀"}, ani:{name:"Animals",emoji:"🦁"}, din:{name:"Dinosaurs",emoji:"🦕"}, mus:{name:"Music",emoji:"🎵"}, sw:{name:"Star Wars",emoji:"🌌"}, hp:{name:"Harry Potter",emoji:"🪄"}, lotr:{name:"Lord of the Rings",emoji:"💍"}, mvl:{name:"Marvel",emoji:"🦸"}, col:{name:"Collectibles",emoji:"🃏"}, shp:{name:"Country Shapes",emoji:"🧩"}, pkm:{name:"Pokémon",emoji:"⚡"}, myt:{name:"Myths & Legends",emoji:"🐉"}, mov:{name:"Movies & TV",emoji:"🎬"}, gam:{name:"Gaming",emoji:"🎮"}, frt:{name:"Fortnite",emoji:"🪂"}, tec:{name:"Tech, AI & Online",emoji:"🤖"}, gal:{name:"Galway",emoji:"🎻"}, kik:{name:"Kilkenny",emoji:"🐈"}, eng:{name:"Engineering",emoji:"🏗️"}, cod:{name:"Coding",emoji:"💻"}, jun:{name:"Jungle Animals",emoji:"🐒"}, sea:{name:"Sea Creatures",emoji:"🐙"}, fst:{name:"First Aid",emoji:"🚑"}, mny:{name:"Money Skills",emoji:"💰"}, hlt:{name:"Healthy Living",emoji:"🥗"}, mth:{name:"Maths",emoji:"🔢"}, wrd:{name:"Weird Facts",emoji:"🤯"}, rec:{name:"World Records",emoji:"🏆"}, srv:{name:"Survival",emoji:"🏕️"}, mcr:{name:"Minecraft",emoji:"⛏️"}, anm:{name:"Anime & Ghibli",emoji:"🍥"}, phy:{name:"Physics",emoji:"⚛️"}, dahl:{name:"Roald Dahl",emoji:"🍫"}, gpo:{name:"Geopolitics",emoji:"🧭"}, igeo:{name:"Irish Geography",emoji:"🗾"}, isci:{name:"Irish Scientists",emoji:"🧪"}, eco:{name:"Economics",emoji:"📈"}, allgeo:{name:"All Geography",emoji:"🌍"}, allsci:{name:"All Science",emoji:"🔭"}, mix:{name:"Mix It Up!",emoji:"🎲"} };
+const CATS = { cap:{name:"Capitals",emoji:"🏛️"}, flag:{name:"Flags",emoji:"🚩"}, pop:{name:"People",emoji:"👨‍👩‍👧‍👦"}, mtn:{name:"Mountains",emoji:"⛰️"}, riv:{name:"Rivers",emoji:"🌊"}, oce:{name:"Oceans & Seas",emoji:"🐳"}, con:{name:"Continents",emoji:"🗺️"}, lmk:{name:"Landmarks",emoji:"🗽"}, eur:{name:"Europe",emoji:"🏰"}, irl:{name:"Ireland",emoji:"☘️"}, sli:{name:"Sligo",emoji:"🌄"}, soc:{name:"Soccer",emoji:"⚽"}, rug:{name:"Rugby",emoji:"🏉"}, gaa:{name:"Gaelic Football",emoji:"🥅"}, srf:{name:"Surfing",emoji:"🏄"}, glf:{name:"Golf",emoji:"⛳"}, his:{name:"Irish History",emoji:"📜"}, art:{name:"Art",emoji:"🎨"}, ehi:{name:"European History",emoji:"⚔️"}, dis:{name:"Disgusting History",emoji:"🤢"}, sci:{name:"Science",emoji:"🔬"}, sph:{name:"Street Smarts",emoji:"💪"}, lif:{name:"Life Science",emoji:"🌱"}, ear:{name:"Earth Science",emoji:"🌋"}, spc:{name:"Space Science",emoji:"🚀"}, ani:{name:"Animals",emoji:"🦁"}, din:{name:"Dinosaurs",emoji:"🦕"}, mus:{name:"Music",emoji:"🎵"}, sw:{name:"Star Wars",emoji:"🌌"}, hp:{name:"Harry Potter",emoji:"🪄"}, lotr:{name:"Lord of the Rings",emoji:"💍"}, mvl:{name:"Marvel",emoji:"🦸"}, col:{name:"Collectibles",emoji:"🃏"}, shp:{name:"Country Shapes",emoji:"🧩"}, pkm:{name:"Pokémon",emoji:"⚡"}, myt:{name:"Myths & Legends",emoji:"🐉"}, mov:{name:"Movies & TV",emoji:"🎬"}, gam:{name:"Gaming",emoji:"🎮"}, frt:{name:"Fortnite",emoji:"🪂"}, tec:{name:"Tech, AI & Online",emoji:"🤖"}, gal:{name:"Galway",emoji:"🎻"}, kik:{name:"Kilkenny",emoji:"🐈"}, eng:{name:"Engineering",emoji:"🏗️"}, cod:{name:"Coding",emoji:"💻"}, jun:{name:"Jungle Animals",emoji:"🐒"}, sea:{name:"Sea Creatures",emoji:"🐙"}, fst:{name:"First Aid",emoji:"🚑"}, mny:{name:"Money Skills",emoji:"💰"}, hlt:{name:"Healthy Living",emoji:"🥗"}, mth:{name:"Maths",emoji:"🔢"}, wrd:{name:"Weird Facts",emoji:"🤯"}, rec:{name:"World Records",emoji:"🏆"}, srv:{name:"Survival",emoji:"🏕️"}, mcr:{name:"Minecraft",emoji:"⛏️"}, anm:{name:"Anime & Ghibli",emoji:"🍥"}, phy:{name:"Physics",emoji:"⚛️"}, dahl:{name:"Roald Dahl",emoji:"🍫"}, chs:{name:"Chess",emoji:"♟️"}, gpo:{name:"Geopolitics",emoji:"🧭"}, igeo:{name:"Irish Geography",emoji:"🗾"}, isci:{name:"Irish Scientists",emoji:"🧪"}, eco:{name:"Economics",emoji:"📈"}, allgeo:{name:"All Geography",emoji:"🌍"}, allsci:{name:"All Science",emoji:"🔭"}, mix:{name:"Mix It Up!",emoji:"🎲"} };
 const COMBO = {
   allgeo:["cap","flag","pop","mtn","riv","oce","con","lmk","shp","eur","gpo","irl","igeo","sli","gal","kik"],
   allsci:["sci","phy","eng","lif","ear","spc","ani","jun","sea","din","cod","tec","isci"]
@@ -9324,6 +9423,7 @@ const GROUPS = [
   {name:"☘️ Ireland", cats:["irl","igeo","isci","his","sli","gal","kik"]},
   {name:"⚽ Sport", cats:["soc","rug","gaa","srf","glf"]},
   {name:"🎬 Movies, Gaming & Tech", cats:["dahl","mov","anm","gam","frt","cod","mcr","pkm","sw","hp","lotr","mvl","col","tec"]},
+  {name:"♟️ Chess", cats:["chs"]},
   {name:"🤯 Weird & Wonderful", cats:["wrd","rec"]},
   {name:"📜 History, Myths & Arts", cats:["ehi","dis","myt","art","mus"]},
   {name:"💪 Life Skills", cats:["sph","fst","srv","mny","eco","hlt"]}
@@ -9571,7 +9671,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v53 · Quizzical Puffin · 8,454 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v54 · Quizzical Puffin · 8,534 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -9598,12 +9698,215 @@ function pickProfile(i){ curP=i; screenHome(); }
 
 /* ================= HOME ================= */
 let sel = { level: load("gq_level",1), cat:"mix" };
+/* ================= CHESS OPENING TRAINER ================= */
+const CH_GLYPH={k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
+const CH_NAME={k:"king",q:"queen",r:"rook",b:"bishop",n:"knight",p:"pawn"};
+const CH_START="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+function chBoard(){
+  return CH_START.split("/").map(row=>{
+    const out=[];
+    for(const c of row){ if(c>="1"&&c<="8"){ for(let i=0;i<+c;i++) out.push(""); } else out.push(c); }
+    return out;
+  });
+}
+const chSq=s=>[8-(+s[1]), s.charCodeAt(0)-97];
+const chName=(r,f)=>String.fromCharCode(97+f)+(8-r);
+function chApply(b,mv){
+  const [r1,f1]=chSq(mv.slice(0,2)), [r2,f2]=chSq(mv.slice(2,4));
+  const p=b[r1][f1];
+  b[r1][f1]=""; b[r2][f2]=p;
+  if((p==="K"||p==="k") && Math.abs(f2-f1)===2){
+    if(f2===6){ b[r1][5]=b[r1][7]; b[r1][7]=""; } else { b[r1][3]=b[r1][0]; b[r1][0]=""; }
+  }
+  if(mv.length>4) b[r2][f2] = (p===p.toUpperCase()) ? mv[4].toUpperCase() : mv[4].toLowerCase();
+}
+const OPENINGS=[
+ {id:"italian",name:"The Italian Game",side:"w",star:1,
+  blurb:"One of the oldest openings there is, played since the 1500s. White develops quickly and points a bishop straight at the weakest square in Black's camp.",
+  moves:["e2e4","e7e5","g1f3","b8c6","f1c4","f8c5","c2c3","g8f6","d2d4"],
+  notes:{0:"Take the centre. The king's pawn opens lines for both the bishop and the queen.",2:"Develop a knight and attack the e5 pawn at the same time.",4:"The bishop takes aim at f7 — the square only the black king defends.",6:"A quiet move preparing to build a big pawn centre with d4.",8:"Now the centre pawns advance together. This is the Giuoco Piano."}},
+ {id:"ruylopez",name:"The Ruy Lopez",side:"w",star:2,
+  blurb:"Also called the Spanish Opening, named after a priest who wrote about it in 1561. It is still the most respected way to meet 1...e5.",
+  moves:["e2e4","e7e5","g1f3","b8c6","f1b5","a7a6","b5a4","g8f6","e1g1"],
+  notes:{0:"Straight to the centre.",2:"Attack e5 and develop.",4:"The bishop pins the knight that is defending e5.",6:"Keep the bishop on the useful diagonal rather than trading it off.",8:"Castle. Get the king safe before the game opens up."}},
+ {id:"scotch",name:"The Scotch Game",side:"w",star:2,
+  blurb:"Named after a correspondence match between London and Edinburgh in 1824. White opens the centre immediately instead of manoeuvring slowly.",
+  moves:["e2e4","e7e5","g1f3","b8c6","d2d4","e5d4","f3d4","f8c5","d4b3"],
+  notes:{0:"The king's pawn, as usual.",2:"Develop and hit e5.",4:"Strike at the centre at once. This is what makes it the Scotch.",6:"Recapture with the knight, which lands beautifully in the centre.",8:"Step back to keep the strong bishop from trading your knight off."}},
+ {id:"kingsgambit",name:"The King's Gambit",side:"w",star:3,
+  blurb:"The wildest opening of the romantic era. White throws a pawn at Black on move two to rip open the f-file and attack.",
+  moves:["e2e4","e7e5","f2f4","e5f4","g1f3","g7g5","f1c4","f8g7","e1g1"],
+  notes:{0:"Open with the king's pawn.",2:"Offer the f-pawn. Take the centre and open lines, but the king gets draughty.",4:"Develop with tempo and stop the black queen coming to h4 with check.",6:"Aim the bishop at f7 while Black is busy hanging on to the pawn.",8:"Castle into the open f-file — that rook is your attacking piece."}},
+ {id:"fourknights",name:"The Four Knights",side:"w",star:1,
+  blurb:"The most natural opening in chess: everybody develops a knight, then a bishop, then castles. A perfect model of opening principles.",
+  moves:["e2e4","e7e5","g1f3","b8c6","b1c3","g8f6","f1b5","f8b4","e1g1","e8g8"],
+  notes:{0:"Centre pawn first.",2:"Knights before bishops.",4:"The second knight, developing towards the centre.",6:"Now the bishop comes out, pinning the knight.",8:"Castle. Six moves, four pieces developed and a safe king."}},
+ {id:"vienna",name:"The Vienna Game",side:"w",star:2,
+  blurb:"A sneaky cousin of the King's Gambit. White develops the queen's knight first, then plays f4 anyway with an extra defender.",
+  moves:["e2e4","e7e5","b1c3","g8f6","f2f4","d7d5","f4e5","f6e4","g1f3"],
+  notes:{0:"The king's pawn opening.",2:"Develop the queen's knight, guarding e4 in advance.",4:"Now the gambit, but with the knight already helping.",6:"Take the pawn and open the position.",8:"Develop the last knight and get ready to castle."}},
+ {id:"englishop",name:"The English Opening",side:"w",star:2,
+  blurb:"White opens on the flank with the c-pawn. It was Howard Staunton's favourite, and it can turn into almost any other opening.",
+  moves:["c2c4","e7e5","b1c3","g8f6","g2g3","f8b4","f1g2","e8g8","g1f3"],
+  notes:{0:"The c-pawn stakes a claim on the light squares in the centre.",2:"Develop towards the centre.",4:"Prepare to fianchetto the bishop on the long diagonal.",6:"The bishop takes the long diagonal and eyes the far corner.",8:"Develop the last knight before castling."}},
+ {id:"queensgambit",name:"The Queen's Gambit",side:"w",star:2,
+  blurb:"Not really a gambit at all — White can usually win the pawn back. It has been the main battleground of world championship matches for a century.",
+  moves:["d2d4","d7d5","c2c4","e7e6","b1c3","g8f6","c1g5","f8e7","e2e3"],
+  notes:{0:"The queen's pawn, claiming the centre.",2:"Offer the c-pawn to pull Black's d-pawn away from the centre.",4:"Develop and add pressure to d5.",6:"Pin the knight so it cannot defend d5 properly.",8:"A modest move that frees the last bishop."}},
+ {id:"london",name:"The London System",side:"w",star:1,
+  blurb:"A calm, reliable set-up you can play against almost anything. The bishop comes out before the e-pawn, so it never gets trapped behind its own pawns.",
+  moves:["d2d4","d7d5","g1f3","g8f6","c1f4","e7e6","e2e3","f8d6","f1d3"],
+  notes:{0:"The queen's pawn.",2:"A natural developing move controlling e5.",4:"The key move: get the bishop out before playing e3.",6:"Now the pawn, safe in the knowledge the bishop is already free.",8:"The bishop points at h7 — a hint of things to come."}},
+ {id:"friedliver",name:"The Fried Liver Attack",side:"w",star:3,
+  blurb:"The most famous trap in junior chess. White sacrifices a knight on f7 to drag the black king out into the open on move six.",
+  moves:["e2e4","e7e5","g1f3","b8c6","f1c4","g8f6","f3g5","d7d5","e4d5","f6d5","g5f7"],
+  notes:{0:"The king's pawn.",2:"Develop and attack e5.",4:"Aim at f7 — remember that square.",6:"A double attack on f7. Cheeky, and it demands an accurate reply.",8:"Take the pawn and open the position for the sacrifice to come.",10:"The knight sacrifice. The king must take, and then it is stranded in the open."}},
+ {id:"sicilian",name:"The Sicilian Defence",side:"b",star:2,
+  blurb:"The most popular answer to 1.e4 in the whole of chess. Black declines a symmetrical game and fights for the centre from the side.",
+  moves:["e2e4","c7c5","g1f3","d7d6","d2d4","c5d4","f3d4","g8f6","b1c3","a7a6"],
+  notes:{1:"Meet the king's pawn from the flank. Black trades a wing pawn for a centre pawn.",3:"Support a future e5 and open a diagonal for the bishop.",5:"Take the pawn. Black now has two centre pawns to White's one.",7:"Develop with a hit on the e4 pawn.",9:"The Najdorf move, controlling b5 and preparing to expand on the queenside."}},
+ {id:"french",name:"The French Defence",side:"b",star:2,
+  blurb:"Solid and stubborn. Black builds a wall of pawns and counterattacks the base of White's chain. The one snag is the bishop stuck behind it.",
+  moves:["e2e4","e7e6","d2d4","d7d5","b1c3","g8f6","c1g5","f8e7","e4e5","f6d7"],
+  notes:{1:"A modest move that prepares to challenge the centre with d5.",3:"Now the challenge. White must decide what to do about the tension.",5:"Develop and pile pressure on the e4 pawn.",7:"Break the pin by putting a defender in the way.",9:"Step back rather than trade, keeping the pieces on for the fight ahead."}},
+ {id:"carokann",name:"The Caro-Kann Defence",side:"b",star:2,
+  blurb:"Like the French, but Black keeps a route out for the light-squared bishop. Karpov, Petrosian and Anand all trusted it.",
+  moves:["e2e4","c7c6","d2d4","d7d5","b1c3","d5e4","c3e4","c8f5","e4g3","f5g6"],
+  notes:{1:"Prepare d5 with the c-pawn, so the bishop is not shut in.",3:"Challenge the centre immediately.",5:"Take the pawn and simplify the centre.",7:"The whole point: get the bishop outside the pawn chain first.",9:"Retreat along the diagonal to keep the bishop safe and useful."}},
+ {id:"scandinavian",name:"The Scandinavian Defence",side:"b",star:1,
+  blurb:"Black challenges the centre on move one. The queen comes out early, which normally breaks the rules — but here she has a safe square waiting.",
+  moves:["e2e4","d7d5","e4d5","d8d5","b1c3","d5a5","d2d4","g8f6","g1f3","c8g4"],
+  notes:{1:"Hit the e-pawn straight away.",3:"Recapture with the queen. She is exposed, but only for a moment.",5:"Step aside from the knight and settle on a safe diagonal.",7:"Develop, controlling the centre.",9:"Pin the knight before playing the pawn moves."}},
+ {id:"kingsindian",name:"The King's Indian Defence",side:"b",star:3,
+  blurb:"Black invites White to build a huge centre, then hurls everything at it. Fischer, Kasparov and Radjabov all made careers out of it.",
+  moves:["d2d4","g8f6","c2c4","g7g6","b1c3","f8g7","e2e4","d7d6","g1f3","e8g8"],
+  notes:{1:"Control e4 with a piece rather than a pawn.",3:"Prepare the fianchetto.",5:"The bishop takes the long diagonal, staring at White's centre.",7:"Support a later e5 break — the whole plan of the opening.",9:"Castle. Now Black is ready to strike back in the centre."}},
+ {id:"nimzo",name:"The Nimzo-Indian Defence",side:"b",star:3,
+  blurb:"Nimzowitsch's idea: control the centre with pieces instead of pawns. Black gives up the bishop pair to wreck White's pawn structure.",
+  moves:["d2d4","g8f6","c2c4","e7e6","b1c3","f8b4","e2e3","e8g8","f1d3","d7d5"],
+  notes:{1:"Fight for e4 with the knight.",3:"Open a path for the dark-squared bishop.",5:"Pin the knight. Without it White cannot easily play e4.",7:"Castle early and stay flexible.",9:"Now challenge the centre directly."}},
+ {id:"scholars",name:"Stopping Scholar's Mate",side:"b",star:1,
+  blurb:"Every beginner meets the four-move mate. This is how you meet it: develop, defend f7, and White's early queen becomes a target.",
+  moves:["e2e4","e7e5","d1h5","b8c6","f1c4","g7g6","h5f3","g8f6","f3b3","f6d5"],
+  notes:{1:"Meet the king's pawn in the centre.",3:"Defend the e5 pawn and develop at the same time.",5:"Block the queen's path to f7. Never panic — just defend.",7:"Develop and gain a move by attacking the wandering queen.",9:"The knight jumps to the centre with tempo. Black is already better."}}
+];
+let chSt=null;
+function chSaveDone(id){
+  try{ const s=load("gq_chess",{}); s[id]=true; save("gq_chess",s); }catch(e){}
+}
+function chDone(){ try{ return load("gq_chess",{}); }catch(e){ return {}; } }
+function screenChess(){
+  const done=chDone(), n=OPENINGS.filter(o=>done[o.id]).length;
+  app.innerHTML=`
+  <div class="topbar"><span class="pill">♞ Opening Trainer</span><span class="pill">${n}/${OPENINGS.length} learned</span></div>
+  <div class="card"><h2>Play the book move</h2>
+    <p style="margin:0 0 12px;line-height:1.45">Pick a famous opening. The board will play one side and you must find the move the masters play. Tap a piece, then tap where it goes.</p>
+    ${OPENINGS.map(o=>`<button class="btn" onclick="chStart('${o.id}')">
+      ${done[o.id]?"✅":"♟"} ${o.name}
+      <small style="opacity:.7;font-weight:600"> · ${o.side==="w"?"you play White":"you play Black"} · ${"★".repeat(o.star)}</small></button>`).join("")}
+  </div>
+  <button class="btn ghost center" onclick="screenHome()">← Back to the quiz</button>`;
+}
+function chStart(id){
+  const o=OPENINGS.find(x=>x.id===id);
+  chSt={o,b:chBoard(),i:0,sel:null,tries:0,score:0,msg:"",done:false,hint:false};
+  chRender();
+  if(chTurn()!==o.side) setTimeout(chAuto,700);
+}
+function chTurn(){ return chSt.i%2===0 ? "w" : "b"; }
+function chAuto(){
+  if(!chSt||chSt.i>=chSt.o.moves.length) return;
+  const mv=chSt.o.moves[chSt.i];
+  chApply(chSt.b,mv);
+  chSt.last=mv; chSt.i++; chSt.sel=null; chSt.hint=false;
+  chSt.msg=""; chCheckEnd(); chRender();
+}
+function chCheckEnd(){
+  if(chSt.i>=chSt.o.moves.length && !chSt.done){
+    chSt.done=true;
+    chSaveDone(chSt.o.id);
+    const p=profiles[curP];
+    p.points+=chSt.score; save("gq_profiles",profiles);
+    try{ sndBadge(); }catch(e){}
+  }
+}
+function chClick(r,f){
+  if(!chSt||chSt.done) return;
+  if(chTurn()!==chSt.o.side) return;
+  const want=chSt.o.moves[chSt.i];
+  const sq=chName(r,f);
+  if(chSt.sel===null){
+    const p=chSt.b[r][f];
+    if(!p) return;
+    const isWhite=p===p.toUpperCase();
+    if((isWhite?"w":"b")!==chSt.o.side) return;
+    chSt.sel=sq; chSt.msg=""; chRender(); return;
+  }
+  if(chSt.sel===sq){ chSt.sel=null; chRender(); return; }
+  const mv=chSt.sel+sq;
+  if(mv===want.slice(0,4)){
+    chApply(chSt.b,want);
+    if(chSt.tries===0 && !chSt.hint) chSt.score+=10;
+    chSt.last=want; chSt.note=chSt.o.notes[chSt.i]||"";
+    chSt.i++; chSt.sel=null; chSt.tries=0; chSt.hint=false;
+    chSt.msg="ok";
+    chCheckEnd(); chRender();
+    try{ sndRight(); }catch(e){}
+    if(!chSt.done && chTurn()!==chSt.o.side) setTimeout(chAuto,900);
+  } else {
+    chSt.tries++; chSt.sel=null; chSt.msg="no";
+    try{ sndWrong(); }catch(e){}
+    chRender();
+  }
+}
+function chHint(){ if(chSt){ chSt.hint=true; chSt.msg=""; chRender(); } }
+function chRender(){
+  const s=chSt, o=s.o, flip=o.side==="b";
+  const want=o.moves[s.i]||"";
+  const hintSq=s.hint?want.slice(0,2):null;
+  const lastFrom=s.last?s.last.slice(0,2):null, lastTo=s.last?s.last.slice(2,4):null;
+  let cells="";
+  for(let rr=0;rr<8;rr++) for(let ff=0;ff<8;ff++){
+    const r=flip?7-rr:rr, f=flip?7-ff:ff;
+    const p=s.b[r][f], sq=chName(r,f);
+    const light=(r+f)%2===0;
+    let cls="chsq "+(light?"lt":"dk");
+    if(sq===s.sel) cls+=" sel";
+    if(sq===hintSq) cls+=" hint";
+    if(sq===lastFrom||sq===lastTo) cls+=" last";
+    const glyph=p?`<span class="${p===p.toUpperCase()?"cw":"cb"}">${CH_GLYPH[p.toLowerCase()]}</span>`:"";
+    cells+=`<div class="${cls}" onclick="chClick(${r},${f})">${glyph}</div>`;
+  }
+  const moveNo=Math.floor(s.i/2)+1;
+  let status;
+  if(s.done) status=`<div class="fact"><b>✓ ${esc(o.name)} complete!</b> +${s.score} points<br><br>${esc(o.blurb)}</div>`;
+  else if(chTurn()!==o.side) status=`<div class="chmsg">Watch — your opponent is replying…</div>`;
+  else if(s.msg==="no") status=`<div class="chmsg bad">That is not the book move. Try again${s.tries>=2?" — or tap Show me":""}.</div>`;
+  else if(s.note && s.msg==="ok") status=`<div class="fact">\u{1F4A1} ${esc(s.note)}</div>`;
+  else status=`<div class="chmsg">Move ${moveNo} — find the move for ${o.side==="w"?"White":"Black"}.</div>`;
+  app.innerHTML=`
+  <div class="topbar"><span class="pill">${esc(o.name)}</span><span class="pill">⭐ ${s.score}</span></div>
+  <div class="card">
+    <div class="chboard">${cells}</div>
+    ${status}
+    <div class="row">
+      ${s.done?`<button class="btn primary center" onclick="screenChess()">Choose another opening</button>`
+              :`<button class="btn ghost center" onclick="chHint()">\u{1F4A1} Show me</button>
+                <button class="btn ghost center" onclick="chStart('${o.id}')">↺ Restart</button>`}
+    </div>
+  </div>
+  <button class="btn ghost center" onclick="screenChess()">← All openings</button>`;
+}
+
 function screenHome(){
   const p=profiles[curP];
   let html = `
   <div class="topbar"><span class="pill">${p.avatar} ${esc(p.name)}</span><span class="pill">⭐ ${p.points} pts</span></div>
   <div class="card"><h2>Choose your level</h2>
     ${Object.entries(LEVELS).map(([k,l])=>`<button class="btn ${sel.level==k?'primary':''}" onclick="setLevel(${k})">${l.emoji} ${l.name} <small style="opacity:.7;font-weight:600"> · ${l.sub}</small></button>`).join("")}
+  </div>
+  <div class="card"><h2>Something different</h2>
+    <button class="btn primary" onclick="screenChess()">♞ Chess Opening Trainer <small style="opacity:.7;font-weight:600"> · play the moves the masters play</small></button>
   </div>
   <div class="card"><h2>Pick a topic</h2>
     <button class="btn primary" onclick="startRound('mix')">🎲 Mix It Up! <small style="opacity:.7;font-weight:600"> · all topics</small></button>
