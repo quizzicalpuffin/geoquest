@@ -89,14 +89,14 @@
   .footerlink { text-align:center; opacity:.75; font-size:.85rem; margin-top:auto; padding:12px 0; }
   .grouphdr { font-weight:800; font-size:1.05rem; margin:16px 0 8px; padding-bottom:5px; border-bottom:2px solid rgba(255,255,255,.3); opacity:.95; }
   .chboard { display:grid; grid-template-columns:repeat(8,1fr); width:100%; max-width:340px; margin:0 auto 14px; border-radius:10px; overflow:hidden; border:3px solid rgba(0,0,0,.4); }
-  .chsq { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:clamp(17px,6.2vw,30px); line-height:1; cursor:pointer; -webkit-user-select:none; user-select:none; }
+  .chsq { aspect-ratio:1; display:flex; align-items:center; justify-content:center; line-height:0; cursor:pointer; -webkit-user-select:none; user-select:none; }
   .chsq.lt { background:#e9dcbb; }
   .chsq.dk { background:#9c7550; }
   .chsq.last { box-shadow: inset 0 0 0 40px rgba(255,217,61,.28); }
   .chsq.sel { box-shadow: inset 0 0 0 3px #2f8f4e, inset 0 0 0 40px rgba(47,143,78,.25); }
   .chsq.hint { box-shadow: inset 0 0 0 3px #FFD93D, inset 0 0 0 40px rgba(255,217,61,.3); }
-  .cw { color:#fff; text-shadow:0 0 1px #000, 0 0 2px #000, 0 1px 2px rgba(0,0,0,.7); }
-  .cb { color:#191919; text-shadow:0 1px 1px rgba(255,255,255,.4); }
+  .chsq svg.chp { width:86%; height:86%; display:block; pointer-events:none; }
+  .chsq.chk { box-shadow: inset 0 0 0 3px #e8604c, inset 0 0 0 40px rgba(232,96,76,.3); }
   .chmsg { text-align:center; font-weight:700; padding:8px 6px 12px; line-height:1.4; }
   .chmsg.bad { color:#ffb3a7; }
   .quitbar { margin-top:18px; padding-bottom:6px; text-align:center; }
@@ -9671,7 +9671,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v54 · Quizzical Puffin · 8,534 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v55 · Quizzical Puffin · 8,534 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -9698,9 +9698,208 @@ function pickProfile(i){ curP=i; screenHome(); }
 
 /* ================= HOME ================= */
 let sel = { level: load("gq_level",1), cat:"mix" };
+function cgClone(p){ return {b:p.b.map(r=>r.slice()), t:p.t, cr:p.cr.slice(), ep:p.ep}; }
+function cgIsW(c){ return c && c===c.toUpperCase(); }
+const CG_N=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+const CG_B=[[-1,-1],[-1,1],[1,-1],[1,1]];
+const CG_R=[[-1,0],[1,0],[0,-1],[0,1]];
+const CG_K=CG_B.concat(CG_R);
+function cgAttacked(b,r,f,byWhite){
+  for(const [dr,df] of CG_N){ const rr=r+dr,ff=f+df; if(rr<0||rr>7||ff<0||ff>7)continue;
+    const p=b[rr][ff]; if(p&&cgIsW(p)===byWhite&&p.toLowerCase()==="n") return true; }
+  for(const [dr,df] of CG_K){ const rr=r+dr,ff=f+df; if(rr<0||rr>7||ff<0||ff>7)continue;
+    const p=b[rr][ff]; if(p&&cgIsW(p)===byWhite&&p.toLowerCase()==="k") return true; }
+  const pd = byWhite?1:-1;  // a white pawn on rr attacks upward (towards lower r)
+  for(const df of [-1,1]){ const rr=r+pd, ff=f+df; if(rr<0||rr>7||ff<0||ff>7)continue;
+    const p=b[rr][ff]; if(p&&cgIsW(p)===byWhite&&p.toLowerCase()==="p") return true; }
+  for(const [dirs,types] of [[CG_B,"bq"],[CG_R,"rq"]])
+    for(const [dr,df] of dirs){
+      let rr=r+dr,ff=f+df;
+      while(rr>=0&&rr<8&&ff>=0&&ff<8){
+        const p=b[rr][ff];
+        if(p){ if(cgIsW(p)===byWhite&&types.includes(p.toLowerCase())) return true; break; }
+        rr+=dr; ff+=df;
+      }
+    }
+  return false;
+}
+function cgFindKing(b,white){
+  const k=white?"K":"k";
+  for(let r=0;r<8;r++)for(let f=0;f<8;f++) if(b[r][f]===k) return [r,f];
+  return null;
+}
+function cgInCheck(p,white){
+  const k=cgFindKing(p.b,white); if(!k) return false;
+  return cgAttacked(p.b,k[0],k[1],!white);
+}
+function cgPseudo(p){
+  const b=p.b, w=p.t==="w", out=[];
+  const push=(r1,f1,r2,f2,pr)=>out.push({a:[r1,f1],z:[r2,f2],p:pr||null});
+  for(let r=0;r<8;r++)for(let f=0;f<8;f++){
+    const pc=b[r][f]; if(!pc||cgIsW(pc)!==w) continue;
+    const t=pc.toLowerCase();
+    if(t==="p"){
+      const d=w?-1:1, start=w?6:1, last=w?0:7;
+      const r1=r+d;
+      if(r1>=0&&r1<8&&!b[r1][f]){
+        if(r1===last){ for(const q of "qrbn") push(r,f,r1,f,q); } else push(r,f,r1,f);
+        const r2=r+2*d;
+        if(r===start&&!b[r2][f]) push(r,f,r2,f);
+      }
+      for(const df of [-1,1]){
+        const ff=f+df; if(ff<0||ff>7||r1<0||r1>7) continue;
+        const tg=b[r1][ff];
+        if(tg&&cgIsW(tg)!==w){ if(r1===last){ for(const q of "qrbn") push(r,f,r1,ff,q);} else push(r,f,r1,ff); }
+        else if(!tg&&p.ep&&p.ep[0]===String.fromCharCode(97+ff)&&+p.ep[1]===8-r1) push(r,f,r1,ff);
+      }
+    } else if(t==="n"){
+      for(const [dr,df] of CG_N){ const rr=r+dr,ff=f+df; if(rr<0||rr>7||ff<0||ff>7)continue;
+        const tg=b[rr][ff]; if(!tg||cgIsW(tg)!==w) push(r,f,rr,ff); }
+    } else if(t==="k"){
+      for(const [dr,df] of CG_K){ const rr=r+dr,ff=f+df; if(rr<0||rr>7||ff<0||ff>7)continue;
+        const tg=b[rr][ff]; if(!tg||cgIsW(tg)!==w) push(r,f,rr,ff); }
+      const home=w?7:0;
+      if(r===home&&f===4&&!cgAttacked(b,home,4,!w)){
+        const kR=w?"K":"k", qR=w?"Q":"q";
+        if(p.cr.includes(kR)&&!b[home][5]&&!b[home][6]&&b[home][7]&&b[home][7].toLowerCase()==="r"
+           &&!cgAttacked(b,home,5,!w)&&!cgAttacked(b,home,6,!w)) push(r,f,home,6);
+        if(p.cr.includes(qR)&&!b[home][3]&&!b[home][2]&&!b[home][1]&&b[home][0]&&b[home][0].toLowerCase()==="r"
+           &&!cgAttacked(b,home,3,!w)&&!cgAttacked(b,home,2,!w)) push(r,f,home,2);
+      }
+    } else {
+      const dirs = t==="b"?CG_B : t==="r"?CG_R : CG_K;
+      for(const [dr,df] of dirs){
+        let rr=r+dr,ff=f+df;
+        while(rr>=0&&rr<8&&ff>=0&&ff<8){
+          const tg=b[rr][ff];
+          if(!tg) push(r,f,rr,ff);
+          else { if(cgIsW(tg)!==w) push(r,f,rr,ff); break; }
+          rr+=dr; ff+=df;
+        }
+      }
+    }
+  }
+  return out;
+}
+function cgMake(p,m){
+  const n=cgClone(p), b=n.b;
+  const [r1,f1]=m.a,[r2,f2]=m.z;
+  const pc=b[r1][f1], t=pc.toLowerCase(), w=cgIsW(pc);
+  const isPawn=t==="p", cap=b[r2][f2];
+  // en passant capture
+  if(isPawn&&!cap&&f1!==f2) b[r1][f2]="";
+  b[r1][f1]=""; b[r2][f2]=m.p?(w?m.p.toUpperCase():m.p):pc;
+  // castling rook
+  if(t==="k"&&Math.abs(f2-f1)===2){
+    if(f2===6){ b[r1][5]=b[r1][7]; b[r1][7]=""; } else { b[r1][3]=b[r1][0]; b[r1][0]=""; }
+  }
+  // castling rights
+  let cr=n.cr;
+  if(t==="k") cr=cr.filter(c=> w ? (c!=="K"&&c!=="Q") : (c!=="k"&&c!=="q"));
+  if(t==="r"){ if(r1===7&&f1===0) cr=cr.filter(c=>c!=="Q"); if(r1===7&&f1===7) cr=cr.filter(c=>c!=="K");
+               if(r1===0&&f1===0) cr=cr.filter(c=>c!=="q"); if(r1===0&&f1===7) cr=cr.filter(c=>c!=="k"); }
+  if(r2===7&&f2===0) cr=cr.filter(c=>c!=="Q"); if(r2===7&&f2===7) cr=cr.filter(c=>c!=="K");
+  if(r2===0&&f2===0) cr=cr.filter(c=>c!=="q"); if(r2===0&&f2===7) cr=cr.filter(c=>c!=="k");
+  n.cr=cr;
+  n.ep = (isPawn&&Math.abs(r2-r1)===2) ? String.fromCharCode(97+f1)+(8-((r1+r2)/2)) : null;
+  n.t = p.t==="w"?"b":"w";
+  return n;
+}
+function cgLegal(p){
+  const out=[];
+  for(const m of cgPseudo(p)){
+    const n=cgMake(p,m);
+    if(!cgInCheck(n,p.t==="w")) out.push(m);
+  }
+  return out;
+}
+function cgNewPos(board){ return {b:board.map(r=>r.slice()), t:"w", cr:["K","Q","k","q"], ep:null}; }
+
+const CG_VAL={p:100,n:320,b:330,r:500,q:900,k:20000};
+const CG_PST={
+ p:[[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],
+    [0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
+ n:[[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],
+    [-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
+ b:[[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],
+    [-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],
+ r:[[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],
+    [-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],
+ q:[[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],
+    [0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],
+ k:[[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],
+    [-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],
+    [20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
+};
+function cgEval(p){
+  let s=0;
+  for(let r=0;r<8;r++)for(let f=0;f<8;f++){
+    const pc=p.b[r][f]; if(!pc) continue;
+    const t=pc.toLowerCase(), w=cgIsW(pc);
+    const v=CG_VAL[t]+CG_PST[t][w?r:7-r][w?f:f];
+    s += w? v : -v;
+  }
+  return p.t==="w"? s : -s;
+}
+function cgOrder(p,ms){
+  return ms.map(m=>{
+    const tg=p.b[m.z[0]][m.z[1]];
+    const at=p.b[m.a[0]][m.a[1]];
+    let sc = tg ? 10*CG_VAL[tg.toLowerCase()] - CG_VAL[at.toLowerCase()] : 0;
+    if(m.p) sc+=800;
+    return {m,sc};
+  }).sort((a,b)=>b.sc-a.sc).map(x=>x.m);
+}
+function cgQuies(p,alpha,beta,depth){
+  let stand=cgEval(p);
+  if(stand>=beta) return beta;
+  if(stand>alpha) alpha=stand;
+  if(depth<=0) return alpha;
+  const caps=cgLegal(p).filter(m=>p.b[m.z[0]][m.z[1]]||m.p);
+  for(const m of cgOrder(p,caps)){
+    const sc=-cgQuies(cgMake(p,m),-beta,-alpha,depth-1);
+    if(sc>=beta) return beta;
+    if(sc>alpha) alpha=sc;
+  }
+  return alpha;
+}
+function cgSearch(p,depth,alpha,beta){
+  if(depth<=0) return cgQuies(p,alpha,beta,3);
+  const ms=cgLegal(p);
+  if(!ms.length) return cgInCheck(p,p.t==="w") ? -90000-depth : 0;
+  for(const m of cgOrder(p,ms)){
+    const sc=-cgSearch(cgMake(p,m),depth-1,-beta,-alpha);
+    if(sc>=beta) return beta;
+    if(sc>alpha) alpha=sc;
+  }
+  return alpha;
+}
+function cgBest(p,depth){
+  const ms=cgLegal(p);
+  if(!ms.length) return null;
+  let best=null,bs=-1e9;
+  for(const m of cgOrder(p,ms)){
+    const sc=-cgSearch(cgMake(p,m),depth-1,-1e9,1e9) + (Math.random()*6|0);
+    if(sc>bs){bs=sc;best=m;}
+  }
+  return best;
+}
+
 /* ================= CHESS OPENING TRAINER ================= */
-const CH_GLYPH={k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
-const CH_NAME={k:"king",q:"queen",r:"rook",b:"bishop",n:"knight",p:"pawn"};
+const CH_BODY={
+ p:'<circle cx="22.5" cy="13" r="5.2"/><path d="M18 18h9c0 5 2 9 4 12H14c2-3 4-7 4-12z"/><path d="M12.5 30h20v3.5h-20z"/>',
+ r:'<path d="M11.5 8h4.5v3.2h4V8h5v3.2h4V8h4.5v8.5h-22z"/><path d="M14 16.5h17l-1.8 13.5H15.8z"/><path d="M12 30h21v3.5H12z"/>',
+ n:'<path d="M13.6 33.5c-.4-6.6 1.3-11.2 4.8-14.4l-2.7-2 1.6-2.9-.8-3.6 3.5-1.4 1.7 2.9c6.5.5 11.6 5.2 12.2 13 .3 3.4.2 6 .1 8.4z"/><path d="M15.7 16.2l-3.1 3.2-1.4-1.8 3-3.2z"/><circle cx="19.8" cy="18.6" r="1.3" fill="#000" opacity=".55" stroke="none"/>',
+ b:'<circle cx="22.5" cy="6.2" r="2.3"/><path d="M22.5 9.2c3.9 3 6 6.8 6 10.4 0 3.7-2.7 6.6-6 7.6-3.3-1-6-3.9-6-7.6 0-3.6 2.1-7.4 6-10.4z"/><path d="M21.7 14.2h1.6v7.6h-1.6z" fill="#000" opacity=".4"/><path d="M19.2 17.4h6.6v1.5h-6.6z" fill="#000" opacity=".4"/><path d="M14.5 27.5h16v3H14.5z"/><path d="M12 30.5h21v3.4H12z"/>',
+ q:'<circle cx="8.6" cy="11" r="2.3"/><circle cx="15.5" cy="8" r="2.3"/><circle cx="22.5" cy="6.8" r="2.4"/><circle cx="29.5" cy="8" r="2.3"/><circle cx="36.4" cy="11" r="2.3"/><path d="M9.4 13.4l3.1 13.6h20l3.1-13.6-5.2 5.6-3.9-8.1-3.6 8.1-3.6-8.1-3.9 8.1z"/><path d="M12 27.5h21v3H12z"/><path d="M11 30.5h23v3.4H11z"/>',
+ k:'<path d="M21.2 3.4h2.6v3.1H27v2.6h-3.2v3.5h-2.6V9.1H18V6.5h3.2z"/><path d="M22.5 12.4c-5.6 0-9.6 3.3-9.6 7.4 0 3.4 2.4 5.8 4.6 7.7h10c2.2-1.9 4.6-4.3 4.6-7.7 0-4.1-4-7.4-9.6-7.4z"/><path d="M12.5 27.5h20v3h-20z"/><path d="M11 30.5h23v3.4H11z"/>'
+};
+function chPiece(t,white){
+  const fill=white?"#f7f7f4":"#20262f", stroke=white?"#1c2836":"#e7dcc2";
+  return '<svg viewBox="0 0 45 45" class="chp" xmlns="http://www.w3.org/2000/svg">'+
+    '<g fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.6" stroke-linejoin="round">'+
+    CH_BODY[t]+'</g><path d="M9 34.5h27v3.4H9z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+}
 const CH_START="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 function chBoard(){
   return CH_START.split("/").map(row=>{
@@ -9711,14 +9910,13 @@ function chBoard(){
 }
 const chSq=s=>[8-(+s[1]), s.charCodeAt(0)-97];
 const chName=(r,f)=>String.fromCharCode(97+f)+(8-r);
-function chApply(b,mv){
-  const [r1,f1]=chSq(mv.slice(0,2)), [r2,f2]=chSq(mv.slice(2,4));
-  const p=b[r1][f1];
-  b[r1][f1]=""; b[r2][f2]=p;
-  if((p==="K"||p==="k") && Math.abs(f2-f1)===2){
-    if(f2===6){ b[r1][5]=b[r1][7]; b[r1][7]=""; } else { b[r1][3]=b[r1][0]; b[r1][0]=""; }
-  }
-  if(mv.length>4) b[r2][f2] = (p===p.toUpperCase()) ? mv[4].toUpperCase() : mv[4].toLowerCase();
+const chMvStr=m=>chName(m.a[0],m.a[1])+chName(m.z[0],m.z[1])+(m.p||"");
+function chFind(pos,str){
+  const want=str.slice(0,4);
+  const ms=cgLegal(pos).filter(m=>chMvStr(m).slice(0,4)===want);
+  if(!ms.length) return null;
+  if(str.length>4){ const q=ms.find(m=>m.p===str[4]); if(q) return q; }
+  return ms.find(m=>m.p==="q") || ms[0];
 }
 const OPENINGS=[
  {id:"italian",name:"The Italian Game",side:"w",star:1,
@@ -9791,16 +9989,14 @@ const OPENINGS=[
   notes:{1:"Meet the king's pawn in the centre.",3:"Defend the e5 pawn and develop at the same time.",5:"Block the queen's path to f7. Never panic — just defend.",7:"Develop and gain a move by attacking the wandering queen.",9:"The knight jumps to the centre with tempo. Black is already better."}}
 ];
 let chSt=null;
-function chSaveDone(id){
-  try{ const s=load("gq_chess",{}); s[id]=true; save("gq_chess",s); }catch(e){}
-}
 function chDone(){ try{ return load("gq_chess",{}); }catch(e){ return {}; } }
+function chSaveDone(id){ try{ const s=load("gq_chess",{}); s[id]=true; save("gq_chess",s); }catch(e){} }
 function screenChess(){
   const done=chDone(), n=OPENINGS.filter(o=>done[o.id]).length;
   app.innerHTML=`
   <div class="topbar"><span class="pill">♞ Opening Trainer</span><span class="pill">${n}/${OPENINGS.length} learned</span></div>
   <div class="card"><h2>Play the book move</h2>
-    <p style="margin:0 0 12px;line-height:1.45">Pick a famous opening. The board will play one side and you must find the move the masters play. Tap a piece, then tap where it goes.</p>
+    <p style="margin:0 0 12px;line-height:1.45">Pick a famous opening. The board plays one side and you must find the move the masters play. Tap a piece, then tap where it goes. When the opening is finished you can play the game out.</p>
     ${OPENINGS.map(o=>`<button class="btn" onclick="chStart('${o.id}')">
       ${done[o.id]?"✅":"♟"} ${o.name}
       <small style="opacity:.7;font-weight:600"> · ${o.side==="w"?"you play White":"you play Black"} · ${"★".repeat(o.star)}</small></button>`).join("")}
@@ -9809,48 +10005,70 @@ function screenChess(){
 }
 function chStart(id){
   const o=OPENINGS.find(x=>x.id===id);
-  chSt={o,b:chBoard(),i:0,sel:null,tries:0,score:0,msg:"",done:false,hint:false};
+  chSt={o,pos:cgNewPos(chBoard()),i:0,sel:null,tries:0,score:0,msg:"",note:"",
+        done:false,hint:false,free:false,over:"",lvl:2,hist:[],last:null,thinking:false};
   chRender();
   if(chTurn()!==o.side) setTimeout(chAuto,700);
 }
-function chTurn(){ return chSt.i%2===0 ? "w" : "b"; }
+function chTurn(){ return chSt.pos.t; }
 function chAuto(){
-  if(!chSt||chSt.i>=chSt.o.moves.length) return;
-  const mv=chSt.o.moves[chSt.i];
-  chApply(chSt.b,mv);
-  chSt.last=mv; chSt.i++; chSt.sel=null; chSt.hint=false;
-  chSt.msg=""; chCheckEnd(); chRender();
+  if(!chSt||chSt.free||chSt.i>=chSt.o.moves.length) return;
+  const m=chFind(chSt.pos,chSt.o.moves[chSt.i]);
+  if(!m) return;
+  chSt.pos=cgMake(chSt.pos,m);
+  chSt.last=chMvStr(m); chSt.i++; chSt.sel=null; chSt.hint=false; chSt.msg=""; chSt.note="";
+  chFinishCheck(); chRender();
 }
-function chCheckEnd(){
+function chFinishCheck(){
   if(chSt.i>=chSt.o.moves.length && !chSt.done){
-    chSt.done=true;
-    chSaveDone(chSt.o.id);
+    chSt.done=true; chSaveDone(chSt.o.id);
     const p=profiles[curP];
-    p.points+=chSt.score; save("gq_profiles",profiles);
+    if(p){ p.points+=chSt.score; save("gq_profiles",profiles); }
     try{ sndBadge(); }catch(e){}
   }
 }
+/* turn a tap pair into a move, understanding "tap the rook to castle" */
+function chResolve(pos,from,to){
+  const legal=cgLegal(pos);
+  let m=legal.find(x=>chMvStr(x).slice(0,4)===from+to);
+  if(m) return m;
+  const [r1,f1]=chSq(from), [r2,f2]=chSq(to);
+  const a=pos.b[r1][f1], b=pos.b[r2][f2];
+  if(a&&b&&a.toLowerCase()==="k"&&b.toLowerCase()==="r"&&cgIsW(a)===cgIsW(b)){
+    const target=f2>f1?6:2;
+    m=legal.find(x=>x.a[0]===r1&&x.a[1]===f1&&x.z[0]===r1&&x.z[1]===target);
+    if(m) return m;
+  }
+  return null;
+}
 function chClick(r,f){
-  if(!chSt||chSt.done) return;
+  if(!chSt||chSt.thinking||chSt.over) return;
+  if(!chSt.free && chSt.done) return;
   if(chTurn()!==chSt.o.side) return;
-  const want=chSt.o.moves[chSt.i];
   const sq=chName(r,f);
   if(chSt.sel===null){
-    const p=chSt.b[r][f];
-    if(!p) return;
-    const isWhite=p===p.toUpperCase();
-    if((isWhite?"w":"b")!==chSt.o.side) return;
+    const p=chSt.pos.b[r][f];
+    if(!p || (cgIsW(p)?"w":"b")!==chSt.o.side) return;
     chSt.sel=sq; chSt.msg=""; chRender(); return;
   }
   if(chSt.sel===sq){ chSt.sel=null; chRender(); return; }
-  const mv=chSt.sel+sq;
-  if(mv===want.slice(0,4)){
-    chApply(chSt.b,want);
+  const from=chSt.sel;
+  const own=chSt.pos.b[r][f];
+  const m=chResolve(chSt.pos,from,sq);
+  if(chSt.free){
+    if(!m){
+      if(own && (cgIsW(own)?"w":"b")===chSt.o.side){ chSt.sel=sq; chSt.msg=""; chRender(); return; }
+      chSt.sel=null; chSt.msg="illegal"; try{sndWrong();}catch(e){} chRender(); return;
+    }
+    chPlayFree(m); return;
+  }
+  const want=chSt.o.moves[chSt.i];
+  if(m && chMvStr(m).slice(0,4)===want.slice(0,4)){
+    chSt.pos=cgMake(chSt.pos,m);
     if(chSt.tries===0 && !chSt.hint) chSt.score+=10;
-    chSt.last=want; chSt.note=chSt.o.notes[chSt.i]||"";
-    chSt.i++; chSt.sel=null; chSt.tries=0; chSt.hint=false;
-    chSt.msg="ok";
-    chCheckEnd(); chRender();
+    chSt.last=chMvStr(m); chSt.note=chSt.o.notes[chSt.i]||"";
+    chSt.i++; chSt.sel=null; chSt.tries=0; chSt.hint=false; chSt.msg="ok";
+    chFinishCheck(); chRender();
     try{ sndRight(); }catch(e){}
     if(!chSt.done && chTurn()!==chSt.o.side) setTimeout(chAuto,900);
   } else {
@@ -9859,41 +10077,113 @@ function chClick(r,f){
     chRender();
   }
 }
-function chHint(){ if(chSt){ chSt.hint=true; chSt.msg=""; chRender(); } }
+/* ---- free play ---- */
+function chPlayOn(){
+  chSt.free=true; chSt.done=false; chSt.msg=""; chSt.note=""; chSt.hint=false; chSt.sel=null;
+  chRender();
+  if(chTurn()!==chSt.o.side) setTimeout(chEngineMove,500);
+}
+function chPlayFree(m){
+  chSt.hist.push({pos:chSt.pos,last:chSt.last});
+  chSt.pos=cgMake(chSt.pos,m);
+  chSt.last=chMvStr(m); chSt.sel=null; chSt.msg=m.p?"promoted":"";
+  try{ sndRight(); }catch(e){}
+  if(chGameOver()) { chRender(); return; }
+  chSt.thinking=true; chRender();
+  setTimeout(chEngineMove,120);
+}
+function chEngineMove(){
+  if(!chSt||chSt.over) { if(chSt) chSt.thinking=false; return; }
+  const budget=[120,420,1100][chSt.lvl-1]||420;
+  let best=null, t0=Date.now();
+  for(let d=1;d<=4;d++){
+    const m=cgBest(chSt.pos,d);
+    if(m) best=m;
+    if(Date.now()-t0>budget) break;
+  }
+  chSt.thinking=false;
+  if(!best){ chGameOver(); chRender(); return; }
+  chSt.hist.push({pos:chSt.pos,last:chSt.last});
+  chSt.pos=cgMake(chSt.pos,best);
+  chSt.last=chMvStr(best); chSt.msg="";
+  chGameOver(); chRender();
+}
+function chGameOver(){
+  const ms=cgLegal(chSt.pos);
+  if(ms.length){ chSt.over=""; return false; }
+  const meToMove = chSt.pos.t===chSt.o.side;
+  if(cgInCheck(chSt.pos,chSt.pos.t==="w")) chSt.over = meToMove ? "lose" : "win";
+  else chSt.over="draw";
+  try{ chSt.over==="win"?sndBadge():sndWrong(); }catch(e){}
+  if(chSt.over==="win"){ const p=profiles[curP]; if(p){ p.points+=50; save("gq_profiles",profiles); } }
+  return true;
+}
+function chTakeBack(){
+  if(!chSt||!chSt.hist.length) return;
+  // undo the engine reply and your own move
+  let s=chSt.hist.pop(); chSt.pos=s.pos; chSt.last=s.last;
+  if(chSt.pos.t!==chSt.o.side && chSt.hist.length){ s=chSt.hist.pop(); chSt.pos=s.pos; chSt.last=s.last; }
+  chSt.over=""; chSt.msg=""; chSt.sel=null; chSt.thinking=false; chRender();
+}
+function chSetLvl(n){ chSt.lvl=n; chRender(); }
+function chHint(){ if(chSt&&!chSt.free){ chSt.hint=true; chSt.msg=""; chRender(); } }
 function chRender(){
-  const s=chSt, o=s.o, flip=o.side==="b";
-  const want=o.moves[s.i]||"";
+  const s=chSt, o=s.o, flip=o.side==="b", pos=s.pos;
+  const want=(!s.free&&o.moves[s.i])||"";
   const hintSq=s.hint?want.slice(0,2):null;
   const lastFrom=s.last?s.last.slice(0,2):null, lastTo=s.last?s.last.slice(2,4):null;
+  const inChk=cgInCheck(pos,pos.t==="w");
+  const kSq=(()=>{ const k=cgFindKing(pos.b,pos.t==="w"); return k?chName(k[0],k[1]):null; })();
   let cells="";
   for(let rr=0;rr<8;rr++) for(let ff=0;ff<8;ff++){
     const r=flip?7-rr:rr, f=flip?7-ff:ff;
-    const p=s.b[r][f], sq=chName(r,f);
-    const light=(r+f)%2===0;
-    let cls="chsq "+(light?"lt":"dk");
+    const p=pos.b[r][f], sq=chName(r,f);
+    let cls="chsq "+(((r+f)%2===0)?"lt":"dk");
+    if(sq===lastFrom||sq===lastTo) cls+=" last";
+    if(inChk&&sq===kSq) cls+=" chk";
     if(sq===s.sel) cls+=" sel";
     if(sq===hintSq) cls+=" hint";
-    if(sq===lastFrom||sq===lastTo) cls+=" last";
-    const glyph=p?`<span class="${p===p.toUpperCase()?"cw":"cb"}">${CH_GLYPH[p.toLowerCase()]}</span>`:"";
+    const glyph=p?chPiece(p.toLowerCase(),cgIsW(p)):"";
     cells+=`<div class="${cls}" onclick="chClick(${r},${f})">${glyph}</div>`;
   }
-  const moveNo=Math.floor(s.i/2)+1;
-  let status;
-  if(s.done) status=`<div class="fact"><b>✓ ${esc(o.name)} complete!</b> +${s.score} points<br><br>${esc(o.blurb)}</div>`;
-  else if(chTurn()!==o.side) status=`<div class="chmsg">Watch — your opponent is replying…</div>`;
-  else if(s.msg==="no") status=`<div class="chmsg bad">That is not the book move. Try again${s.tries>=2?" — or tap Show me":""}.</div>`;
-  else if(s.note && s.msg==="ok") status=`<div class="fact">\u{1F4A1} ${esc(s.note)}</div>`;
-  else status=`<div class="chmsg">Move ${moveNo} — find the move for ${o.side==="w"?"White":"Black"}.</div>`;
+  let status,buttons;
+  if(s.over){
+    const txt = s.over==="win" ? "\u{1F3C6} Checkmate — you win! +50 points"
+              : s.over==="lose" ? "Checkmate. The engine got you this time."
+              : "Stalemate — it is a draw.";
+    status=`<div class="fact"><b>${txt}</b></div>`;
+    buttons=`<button class="btn ghost center" onclick="chTakeBack()">↺ Take back</button>
+             <button class="btn primary center" onclick="chStart('${o.id}')">Play again</button>`;
+  } else if(s.done && !s.free){
+    status=`<div class="fact"><b>✓ ${esc(o.name)} complete!</b> +${s.score} points<br><br>${esc(o.blurb)}</div>`;
+    buttons=`<button class="btn primary center" onclick="chPlayOn()">▶ Play the game on</button>
+             <button class="btn ghost center" onclick="screenChess()">Another opening</button>`;
+  } else if(s.free){
+    const lvls=["Easy","Normal","Tricky"];
+    status=`<div class="chmsg${s.msg==="illegal"?" bad":""}">${
+      s.thinking ? "Thinking…"
+      : s.msg==="illegal" ? "That piece cannot move there."
+      : inChk && pos.t===o.side ? "You are in check!"
+      : s.msg==="promoted" ? "Your pawn promoted to a queen!"
+      : pos.t===o.side ? "Your move — play on from the opening." : "Your opponent is thinking…"}</div>
+      <div class="row">${lvls.map((n,i)=>`<button class="btn ${s.lvl===i+1?"primary":"ghost"} center" style="padding:8px" onclick="chSetLvl(${i+1})">${n}</button>`).join("")}</div>`;
+    buttons=`<button class="btn ghost center" onclick="chTakeBack()">↺ Take back</button>
+             <button class="btn ghost center" onclick="screenChess()">← Openings</button>`;
+  } else {
+    const moveNo=Math.floor(s.i/2)+1;
+    if(chTurn()!==o.side) status=`<div class="chmsg">Watch — your opponent is replying…</div>`;
+    else if(s.msg==="no") status=`<div class="chmsg bad">That is not the book move. Try again${s.tries>=2?" — or tap Show me":""}.</div>`;
+    else if(s.note && s.msg==="ok") status=`<div class="fact">\u{1F4A1} ${esc(s.note)}</div>`;
+    else status=`<div class="chmsg">Move ${moveNo} — find the move for ${o.side==="w"?"White":"Black"}.</div>`;
+    buttons=`<button class="btn ghost center" onclick="chHint()">\u{1F4A1} Show me</button>
+             <button class="btn ghost center" onclick="chStart('${o.id}')">↺ Restart</button>`;
+  }
   app.innerHTML=`
-  <div class="topbar"><span class="pill">${esc(o.name)}</span><span class="pill">⭐ ${s.score}</span></div>
+  <div class="topbar"><span class="pill">${esc(o.name)}${s.free?" · free play":""}</span><span class="pill">⭐ ${s.score}</span></div>
   <div class="card">
     <div class="chboard">${cells}</div>
     ${status}
-    <div class="row">
-      ${s.done?`<button class="btn primary center" onclick="screenChess()">Choose another opening</button>`
-              :`<button class="btn ghost center" onclick="chHint()">\u{1F4A1} Show me</button>
-                <button class="btn ghost center" onclick="chStart('${o.id}')">↺ Restart</button>`}
-    </div>
+    <div class="row">${buttons}</div>
   </div>
   <button class="btn ghost center" onclick="screenChess()">← All openings</button>`;
 }
