@@ -116,6 +116,11 @@ h3{font-size:1.05em}
 .listenbox{margin:.2em 0 .1em}
 .passage{margin-top:10px;padding:12px 14px;border-radius:12px;background:var(--bg);
   border:2px solid var(--line);font-size:1.05em}
+.fiftyrow{margin-top:4px}
+.fiftyrow .btn{margin-bottom:6px}
+.opt.gone{opacity:.32;pointer-events:none;text-decoration:line-through}
+.xppill{display:inline-block;background:var(--gold);color:#3A2A00;border-radius:999px;
+  padding:2px 10px;font-size:.78em;font-weight:800;letter-spacing:0}
 .letterrow{display:flex;flex-wrap:wrap;gap:8px}
 .lettbtn{font:inherit;font-size:1.6em;font-weight:800;letter-spacing:0;
   min-width:52px;height:60px;padding:0 10px;background:var(--panel);color:var(--ink);
@@ -328,6 +333,10 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <div id="qHelp" class="small muted" style="margin:.4em 0 .9em"></div>
       <div id="qOpts"></div>
       <button class="btn gold hidden" id="btnConfirm">Shoot!</button>
+      <div class="fiftyrow">
+        <button class="btn ghost hidden" id="btnFifty">50 : 50 &nbsp;·&nbsp; take away two wrong ones</button>
+        <div class="small muted" id="xpLine"></div>
+      </div>
     </div>
 
     <button class="btn primary hidden" id="btnNext">Next attack &rsaquo;</button>
@@ -1045,7 +1054,7 @@ function sGet(k){ try{ return localStorage.getItem(k); }catch(e){ STORE_OK=false
 function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; MEM[k]=v; } }
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
-  pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0},
+  pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
   opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:""} };
 var S = load();
 function load(){
@@ -1053,7 +1062,8 @@ function load(){
     return Object.assign({},DEFAULT_STATE,o,{
       opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
-      runs:Object.assign({taken:0,scored:0},o.runs||{})
+      runs:Object.assign({taken:0,scored:0},o.runs||{}),
+      xp: o.xp||0, fifties: o.fifties||0
     }); } }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
@@ -1504,6 +1514,8 @@ function renderQuestion(){
   $("qOpts").innerHTML=html;
   $("btnConfirm").classList.toggle("hidden", q.kind!=="double");
   if(q.kind==="double") $("btnConfirm").textContent="Shoot! (pick 2)";
+  M.fiftyUsed=false;
+  refreshFifty();
 
   if(q.kind==="listen"){
     /* CELF-5 presents the whole paragraph first and only then asks the
@@ -1563,6 +1575,39 @@ function renderQuestion(){
   }
 }
 
+/* =======================================================================
+   XP and the fifty-fifty card
+   ======================================================================= */
+var XP_PICKUP=1, XP_GOAL=5, FIFTY_COST=20;
+function addXP(n){ S.xp=(S.xp||0)+n; save(); }
+
+function fiftyAvailable(q){
+  if(!q || q.kind==="letters") return false;
+  return (q.opts.length - q.answers.length) >= 2;
+}
+function refreshFifty(){
+  var q=M && M.queue[M.n];
+  var can=fiftyAvailable(q) && !M.fiftyUsed && !M.locked;
+  $("btnFifty").classList.toggle("hidden", !can);
+  $("btnFifty").disabled = S.xp < FIFTY_COST;
+  $("btnFifty").style.opacity = S.xp < FIFTY_COST ? .5 : 1;
+  $("xpLine").innerHTML = '<span class="xppill">'+(S.xp||0)+' XP</span>'+
+    (can ? (S.xp>=FIFTY_COST ? ' &nbsp;a fifty-fifty costs '+FIFTY_COST
+                             : ' &nbsp;'+(FIFTY_COST-S.xp)+' more for a fifty-fifty') : '');
+}
+function useFifty(){
+  var q=M.queue[M.n];
+  if(M.locked || M.fiftyUsed || !fiftyAvailable(q) || S.xp<FIFTY_COST) return;
+  var wrong=[];
+  q.opts.forEach(function(o,i){ if(q.answers.indexOf(o)<0) wrong.push(i); });
+  shuffle(wrong);
+  var nodes=$("qOpts").children;
+  wrong.slice(0,2).forEach(function(i){ if(nodes[i]) nodes[i].classList.add("gone"); });
+  S.xp-=FIFTY_COST; M.fiftyUsed=true; save();
+  refreshFifty();
+}
+$("btnFifty").addEventListener("click", useFifty);
+
 function updateDots(){
   var d=$("streakDots").children;
   for(var i=0;i<3;i++) d[i].className = i<M.streak ? "lit" : "";
@@ -1576,7 +1621,7 @@ $("qOpts").addEventListener("click", function(ev){
   var sayEl = ev.target.closest("[data-say]");
   if(sayEl && sayEl.classList.contains("say")){ ev.stopPropagation(); say(sayEl.getAttribute("data-say")); return; }
   var b = ev.target.closest("[data-opt]");
-  if(!b || M.locked) return;
+  if(!b || M.locked || b.classList.contains("gone")) return;
   var q=M.queue[M.n];
   var i=+b.getAttribute("data-opt");
   if(q.kind==="letters"){ M.picked=[i]; grade(); return; }
@@ -1598,6 +1643,7 @@ $("btnConfirm").addEventListener("click", function(){
 
 function grade(){
   M.locked=true;
+  $("btnFifty").classList.add("hidden");
   var q=M.queue[M.n];
   var ok, i;
 
@@ -1844,11 +1890,12 @@ function shoot(zone, power){
       $("penRes").textContent="SAVED!"; $("penRes").className="penres saved";
       $("penMsg").textContent="The keeper went the right way.";
     } else {
-      S.pens.scored++;
+      S.pens.scored++; addXP(XP_GOAL);
       placeAt(b, {x:PEN_POS[zone].x, y:PEN_POS[zone].y+6}, 0.62);
       $("penNet").classList.add("ripple");
       $("penRes").textContent="GOAL!"; $("penRes").className="penres scored";
-      $("penMsg").textContent=pick(["Buried it.","Unstoppable.","Right in the corner.","No chance."]);
+      $("penMsg").textContent=pick(["Buried it.","Unstoppable.","Right in the corner.","No chance."])+
+        "  +"+XP_GOAL+" XP";
     }
     save();
     PEN.result = !saved;
@@ -1945,7 +1992,7 @@ var RUN_CFG = {
   rows:8, gap:250, gapVar:70, lead:430, runIn:260, goalAhead:200,
   speed:250, speedEnd:300,
   jumpMs:660, slideMs:640, jumpH:56, laneMs:150,
-  shootMs:900
+  shootMs:900, aimMs:6000
 };
 
 /* Every row has the same shape: one defender sliding in on the ground that
@@ -1958,7 +2005,15 @@ function makeCourse(){
     rows.push({ z:z, slide:p[0], block:p[1], free:p[2], done:false });
     z += RUN_CFG.gap + Math.random()*RUN_CFG.gapVar;
   }
-  return { rows:rows, end:z+RUN_CFG.runIn };
+  /* Bonus balls sit between the rows, in any channel. Going for one often
+     means not sitting in the easy channel, which is the whole point. */
+  var pick_=[];
+  for(var j=0;j<rows.length;j++){
+    if(Math.random()>0.78) continue;
+    var mid = j===0 ? rows[0].z-RUN_CFG.gap*0.55 : (rows[j].z+rows[j-1].z)/2;
+    pick_.push({ z:mid, lane:(Math.random()*3)|0, got:false });
+  }
+  return { rows:rows, picks:pick_, end:z+RUN_CFG.runIn };
 }
 
 function takeRun(cb){
@@ -1966,9 +2021,11 @@ function takeRun(cb){
   RUN.course=makeCourse();
   RUN.dist=0; RUN.lane=1; RUN.laneFrom=1; RUN.laneT=1;
   RUN.state="run"; RUN.stateT=0; RUN.hit=false; RUN.last=0;
-  RUN.startPt=null; RUN.phase="run"; RUN.shootT=0;
+  RUN.startPt=null; RUN.phase="run"; RUN.shootT=0; RUN.aimT=0;
+  RUN.gained=0; RUN.picked=0; RUN.tapAt=0; RUN.tapPt=null;
+  RUN.shotZone="C"; RUN.keepZone="C"; RUN.saved=false;
   $("runRes").innerHTML="&nbsp;"; $("runRes").className="penres";
-  $("runMsg").textContent="Swipe left or right for the free channel. Swipe up to hurdle the sliding tackle.";
+  $("runMsg").textContent="Swipe for the free channel, up to hurdle. Grab the bonus balls on the way.";
   $("runWrap").classList.add("on");
 
   var cv=$("runCanvas");
@@ -1999,6 +2056,14 @@ function runStep(ts){
     if(RUN.stateT>=dur){ RUN.state="run"; RUN.stateT=0; }
   }
 
+  // bonus balls he has just run over
+  for(var b=0;b<RUN.course.picks.length;b++){
+    var pk=RUN.course.picks[b];
+    if(!pk.got && pk.z-RUN.dist <= 0){
+      pk.got=true;
+      if(RUN.lane===pk.lane){ pk.taken=true; RUN.gained+=XP_PICKUP; RUN.picked++; }
+    }
+  }
   // defenders he has just reached
   for(var i=0;i<RUN.course.rows.length;i++){
     var r=RUN.course.rows[i];
@@ -2018,39 +2083,94 @@ function runStep(ts){
   }
 
   if(RUN.dist >= RUN.course.end){
-    // he has reached the penalty spot — now finish it
+    // he has reached the spot — now there is a keeper to beat
     RUN.dist=RUN.course.end;
-    RUN.phase="shoot"; RUN.shootT=0; RUN.state="run";
-    RUN.raf=requestAnimationFrame(runShoot);
+    RUN.phase="aim"; RUN.state="run"; RUN.aimT=0;
+    $("runMsg").textContent="Double tap the part of the goal you want it in.";
+    runDraw();
+    RUN.raf=requestAnimationFrame(runAimStep);
     return;
   }
   runDraw();
   RUN.raf=requestAnimationFrame(runStep);
 }
 
+/* Waiting for him to pick his spot. If he dithers too long the keeper wins
+   the staring contest and it goes down the middle. */
+function runAimStep(ts){
+  if(RUN.phase!=="aim") return;
+  if(!RUN.last) RUN.last=ts;
+  var dt=Math.min(50, ts-RUN.last); RUN.last=ts;
+  RUN.aimT += dt;
+  runDraw();
+  if(RUN.aimT >= RUN_CFG.aimMs){ runTakeShot("C", true); return; }
+  RUN.raf=requestAnimationFrame(runAimStep);
+}
+
+function runTakeShot(zone, rushed){
+  if(RUN.phase!=="aim") return;
+  RUN.phase="shoot"; RUN.shootT=0; RUN.last=0;
+  RUN.shotZone=zone;
+  RUN.keepZone=penKeeperPick(zone);
+  RUN.saved=penIsSaved(zone, RUN.keepZone, rushed?0.45:0.75);
+  S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;   // the keeper remembers your habits
+  if(rushed) $("runMsg").textContent="Too slow — he had to rush it.";
+  RUN.raf=requestAnimationFrame(runShoot);
+}
+
 /* On the spot: he strikes it, the ball flies past the post-height into the
    corner of the net, and the net bulges. */
 function runShoot(ts){
+  if(RUN.phase!=="shoot") return;   // a stray frame after the shot resolved
   if(!RUN.last) RUN.last=ts;
   var dt=Math.min(50, ts-RUN.last); RUN.last=ts;
   RUN.shootT += dt;
   runDraw();
   if(RUN.shootT >= RUN_CFG.shootMs){
-    runFinish(true, "GOAL!", "All the way through, and buried it.");
+    if(RUN.saved){
+      runFinish(false, "SAVED!", "The keeper read it. You still keep your bonus balls.");
+    } else {
+      RUN.gained += XP_GOAL;
+      runFinish(true, "GOAL!", "All the way through, and past the keeper.");
+    }
     return;
   }
   RUN.raf=requestAnimationFrame(runShoot);
 }
 
+/* Which part of the goal he tapped. */
+function runGoalRect(){
+  var gy1=RUN_GROUND-RUN_CFG.goalAhead;
+  return { x0:58, x1:RUN_W-58, y0:gy1-78, y1:gy1 };
+}
+function runZoneFromTap(x,y){
+  var g=runGoalRect(), pad=34;
+  if(x<g.x0-pad || x>g.x1+pad || y<g.y0-pad || y>g.y1+pad) return null;
+  var w=(g.x1-g.x0)/3;
+  if(x < g.x0+w) return y < (g.y0+g.y1)/2 ? "TL" : "BL";
+  if(x > g.x1-w) return y < (g.y0+g.y1)/2 ? "TR" : "BR";
+  return "C";
+}
+function runZonePoint(z){
+  var g=runGoalRect();
+  var xs={TL:g.x0+36, BL:g.x0+36, C:(g.x0+g.x1)/2, TR:g.x1-36, BR:g.x1-36};
+  var ys={TL:g.y0+22, TR:g.y0+22, C:g.y0+40, BL:g.y1-18, BR:g.y1-18};
+  return { x:xs[z], y:ys[z] };
+}
+
 function runFinish(scored, title, msg){
+  if(RUN.phase==="done") return;    // only ever score a run once
   if(RUN.raf) cancelAnimationFrame(RUN.raf);
-  RUN.raf=null; RUN.live=false;
+  RUN.raf=null; RUN.live=false; RUN.phase="done";
   RUN.result=scored;
   S.runs.taken++; if(scored) S.runs.scored++;
+  if(RUN.gained>0) addXP(RUN.gained);
   save();
   $("runRes").textContent=title;
   $("runRes").className="penres "+(scored?"scored":"saved");
-  $("runMsg").textContent=msg;
+  $("runMsg").textContent=msg+(RUN.gained>0
+    ? "  +"+RUN.gained+" XP"+(RUN.picked? " ("+RUN.picked+" bonus ball"+(RUN.picked>1?"s":"")+")":"")
+    : "");
   RUN.resolvedAt=Date.now();
   RUN.timer=setTimeout(runDismiss, 2400);
 }
@@ -2116,6 +2236,13 @@ function runDraw(){
     c.strokeStyle="#FFFFFF"; c.lineWidth=8; c.lineJoin="round";
     c.beginPath(); c.moveTo(gx0,goalY); c.lineTo(gx0,goalY-gh); c.lineTo(gx1,goalY-gh); c.lineTo(gx1,goalY); c.stroke();
   }
+  // bonus balls
+  RUN.course.picks.forEach(function(p){
+    if(p.got) return;
+    var sy = RUN_GROUND - (p.z-d);
+    if(sy < -30 || sy > RUN_H+30) return;
+    runDrawPickup(c, RUN_LANES[p.lane], sy);
+  });
   // defenders
   RUN.course.rows.forEach(function(r){
     var sy = RUN_GROUND - (r.z-d);
@@ -2124,8 +2251,66 @@ function runDraw(){
     runDrawStander(c, RUN_LANES[r.block], sy);
   });
 
+  if(RUN.phase==="aim" || RUN.phase==="shoot"){
+    runDrawKeeper(c);
+    if(RUN.phase==="aim") runDrawAimHelp(c);
+  }
   if(RUN.phase==="shoot") runDrawShot(c, spotY, goalY);
   else runDrawPlayer(c);
+
+  // bonus tally
+  if(RUN.gained>0){
+    c.fillStyle="rgba(0,0,0,.35)"; c.beginPath();
+    c.roundRect ? c.roundRect(10,10,86,26,13) : c.rect(10,10,86,26); c.fill();
+    c.fillStyle="#FFD34D"; c.beginPath(); c.arc(26,23,8,0,6.3); c.fill();
+    c.fillStyle="#3A2A00"; c.font="bold 11px -apple-system,sans-serif"; c.textAlign="center";
+    c.fillText("XP",26,27);
+    c.fillStyle="#FFFFFF"; c.font="bold 14px -apple-system,sans-serif"; c.textAlign="left";
+    c.fillText("+"+RUN.gained, 40, 28);
+    c.textAlign="start";
+  }
+}
+
+function runDrawPickup(c,x,y){
+  var bob=Math.sin(RUN.dist/24)*3;
+  c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+6,13,4,0,0,6.3); c.fill();
+  c.fillStyle="#FFD34D"; c.beginPath(); c.arc(x,y-16+bob,13,0,6.3); c.fill();
+  c.strokeStyle="#C99000"; c.lineWidth=2; c.stroke();
+  runBall(c,x,y-16+bob,8);
+}
+
+/* The opposing keeper, on his line. */
+function runDrawKeeper(c){
+  var g=runGoalRect(), home={x:(g.x0+g.x1)/2, y:g.y1-4}, pos=home, dive=0;
+  if(RUN.phase==="shoot"){
+    var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs), p=runZonePoint(RUN.keepZone);
+    pos={ x:home.x+(p.x-home.x)*Math.min(1,t*1.5), y:home.y+(p.y-home.y)*Math.min(1,t*1.5) };
+    dive = (p.x<home.x?-1:(p.x>home.x?1:0)) * Math.min(1,t*1.5) * 0.7;
+  }
+  c.save();
+  c.translate(pos.x,pos.y); c.rotate(dive);
+  c.fillStyle="#B8E31E"; c.fillRect(-30,-26,60,9);                 // arms
+  c.fillStyle="#F7F7F5"; c.beginPath(); c.arc(-32,-21,6,0,6.3); c.fill();
+  c.beginPath(); c.arc(32,-21,6,0,6.3); c.fill();
+  c.fillStyle="#B8E31E"; c.fillRect(-13,-28,26,26);                // shirt
+  c.fillStyle="#14151A"; c.fillRect(-12,-4,10,12); c.fillRect(2,-4,10,12);
+  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(0,-36,8,0,6.3); c.fill();
+  c.fillStyle="#2B2118"; c.beginPath(); c.arc(0,-38,8,3.35,6.07); c.fill();
+  c.restore();
+}
+
+/* Faint targets so it is obvious the goal is tappable. */
+function runDrawAimHelp(c){
+  var pulse=0.35+0.25*Math.sin(RUN.aimT/220);
+  ["TL","C","TR","BL","BR"].forEach(function(z){
+    var p=runZonePoint(z);
+    c.strokeStyle="rgba(255,255,255,"+pulse+")"; c.lineWidth=3;
+    c.setLineDash([5,5]); c.beginPath(); c.arc(p.x,p.y,17,0,6.3); c.stroke(); c.setLineDash([]);
+  });
+  var left=Math.max(0,(RUN_CFG.aimMs-RUN.aimT)/1000);
+  c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 15px -apple-system,sans-serif"; c.textAlign="center";
+  c.fillText("double tap the goal — "+left.toFixed(1)+"s", RUN_W/2, RUN_GROUND-96);
+  c.textAlign="start";
 }
 
 function runShadow(c,x,y,rx,a){
@@ -2227,11 +2412,12 @@ function runDrawShot(c, spotY, goalY){
   c.fillStyle="#FFFFFF";
   c.fillRect(x-42,g-46,16,10); c.fillRect(x+7,g-56,16,10);         // arms out for balance
   runHead(c,x-10,g-62,10);
-  // ball from the spot into the top corner, rising then dipping into the net
-  var bx0=x+16, by0=g-16, bx1=RUN_W-84, by1=goalY-52;
+  // ball from the spot to wherever he aimed, rising then dipping
+  var target=runZonePoint(RUN.shotZone);
+  var bx0=x+16, by0=g-16, bx1=target.x, by1=target.y;
   var bx=bx0+(bx1-bx0)*t, by=by0+(by1-by0)*t - Math.sin(Math.PI*t)*26;
   runBall(c,bx,by,9-t*1.5);
-  if(t>0.82){                                     // net takes the pace out of it
+  if(t>0.82 && !RUN.saved){                       // net takes the pace out of it
     c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=2;
     var rr=(t-0.82)*90;
     c.beginPath(); c.arc(bx1,by1,rr,0,6.3); c.stroke();
@@ -2241,13 +2427,33 @@ function runDrawShot(c, spotY, goalY){
 (function bindRun(){
   var f=$("runCanvas"); if(!f) return;
   function pt(e){ var r=f.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+  function canvasPt(e){
+    var r=f.getBoundingClientRect();
+    return { x:(e.clientX-r.left)/r.width*RUN_W, y:(e.clientY-r.top)/r.height*RUN_H };
+  }
   f.addEventListener("pointerdown", function(ev){
+    if(RUN.phase==="aim"){ ev.preventDefault(); return; }
     if(!RUN.live) return;
     RUN.startPt=pt(ev);
     try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
     ev.preventDefault();
   });
   f.addEventListener("pointerup", function(ev){
+    if(RUN.phase==="aim"){
+      // double tap on the goal picks the corner
+      var cp=canvasPt(ev), now=Date.now();
+      var near = RUN.tapPt && Math.abs(cp.x-RUN.tapPt.x)<60 && Math.abs(cp.y-RUN.tapPt.y)<60;
+      if(RUN.tapAt && now-RUN.tapAt<450 && near){
+        var z=runZoneFromTap(cp.x,cp.y);
+        RUN.tapAt=0; RUN.tapPt=null;
+        if(z) runTakeShot(z,false);
+        else $("runMsg").textContent="Double tap inside the goal.";
+      } else {
+        RUN.tapAt=now; RUN.tapPt=cp;
+        $("runMsg").textContent="Once more to shoot there.";
+      }
+      ev.preventDefault(); return;
+    }
     if(!RUN.live || !RUN.startPt) return;
     var p=pt(ev), dx=p.x-RUN.startPt.x, dy=p.y-RUN.startPt.y;
     RUN.startPt=null;
@@ -2369,10 +2575,14 @@ $("btnQuit").addEventListener("click", function(){
    ======================================================================= */
 function renderHome(){
   var s=S.season;
+  var xpBit='<p style="margin:.2em 0 .6em"><span class="xppill">'+(S.xp||0)+' XP</span>'+
+    ' <span class="small muted">'+(S.xp>=FIFTY_COST
+      ? 'enough for a fifty-fifty on a question'
+      : (FIFTY_COST-(S.xp||0))+' more earns a fifty-fifty')+'</span></p>';
   if(!s.p){
-    $("seasonBody").innerHTML='<p class="muted">No matches played yet. Your league table will build up here.</p>';
+    $("seasonBody").innerHTML=xpBit+'<p class="muted">No matches played yet. Your league table will build up here.</p>';
   } else {
-    $("seasonBody").innerHTML=
+    $("seasonBody").innerHTML= xpBit +
       '<table><tr><th>Played</th><th class="num">W</th><th class="num">D</th><th class="num">L</th>'+
       '<th class="num">Goals</th><th class="num">Points</th></tr><tr>'+
       '<td>'+s.p+'</td><td class="num">'+s.w+'</td><td class="num">'+s.d+'</td><td class="num">'+s.l+
