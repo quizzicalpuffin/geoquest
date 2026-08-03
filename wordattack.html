@@ -493,6 +493,17 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <div id="parentHistory"></div>
     </div>
     <div class="card">
+      <h2>Controls</h2>
+      <div class="setting">
+        <label for="setDayStreak">Days in a row<br><span class="small muted">Counts consecutive days he finishes a match. Turn off if a broken streak would bother him more than it motivates him.</span></label>
+        <div class="switch"><input type="checkbox" id="setDayStreak" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setOppGoals">Let the other team score<br><span class="small muted">Off means he never goes behind — the match is only about how many he scores.</span></label>
+        <div class="switch"><input type="checkbox" id="setOppGoals" checked><span></span></div>
+      </div>
+    </div>
+    <div class="card">
       <h3>Data</h3>
       <p class="muted small" id="storageNote"></p>
       <button class="btn ghost" id="btnExport">Export progress (text)</button>
@@ -1201,7 +1212,8 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
   avatar:0, days:{last:"",streak:0,best:0},
-  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false} };
+  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false,
+        dayStreak:true,oppGoals:true} };
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1860,7 +1872,7 @@ function grade(){
     updateDots(); updateBall();
     // Deliberately gentle: three misses in a row to concede, never more than
     // three against, and extra time is practice only — it can't cost a goal.
-    if(M.missStreak>=3 && M.them<3 && !M.retried){ M.them++; M.missStreak=0; goalFlash("They score."); }
+    if(S.opts.oppGoals && M.missStreak>=3 && M.them<3 && !M.retried){ M.them++; M.missStreak=0; goalFlash("They score."); }
     var shown = q.kind==="letters"
       ? 'The silent letter is <b>'+q.opts[+q.answers[0]]+'</b>.'
       : 'The answer was <b>'+q.answers.map(function(x){ return q.kind==="join"||q.kind==="tricky"?x:cap(x); }).join("</b> and <b>")+'</b>.';
@@ -2821,7 +2833,7 @@ $("btnQuit").addEventListener("click", function(){
    ======================================================================= */
 function renderHome(){
   var s=S.season;
-  var d=S.days.streak||0;
+  var d=S.opts.dayStreak ? (S.days.streak||0) : 0;
   var dayBit = d>0 ? '<span class="daystreak"><span class="fl">&#9679;</span>'+
       d+' day'+(d===1?'':'s')+' in a row</span> ' : '';
   var xpBit='<p style="margin:.2em 0 .6em">'+dayBit+'<span class="xppill">'+(S.xp||0)+' XP</span>'+
@@ -2902,8 +2914,8 @@ function renderParent(){
     '<tr><th>Questions answered</th><td class="num"><b>'+seen+'</b></td></tr>'+
     '<tr><th>Overall accuracy</th><td class="num"><b>'+pc+'%</b></td></tr>'+
     '<tr><th>Matches played</th><td class="num"><b>'+S.season.p+'</b></td></tr>'+
-    '<tr><th>Days in a row</th><td class="num"><b>'+(S.days.streak||0)+'</b>'+
-      (S.days.best>S.days.streak?' (best '+S.days.best+')':'')+'</td></tr>'+
+    (S.opts.dayStreak ? '<tr><th>Days in a row</th><td class="num"><b>'+(S.days.streak||0)+'</b>'+
+      (S.days.best>S.days.streak?' (best '+S.days.best+')':'')+'</td></tr>' : '')+
     (S.pens.taken?'<tr><th>Penalties scored</th><td class="num"><b>'+S.pens.scored+' of '+S.pens.taken+
       '</b> ('+Math.round(S.pens.scored/S.pens.taken*100)+'%)</td></tr>':'')+
     (S.runs.taken?'<tr><th>Counter attacks</th><td class="num"><b>'+S.runs.scored+' of '+S.runs.taken+
@@ -2984,6 +2996,7 @@ function applyOpts(){
   $("setVoice").checked=o.voice; $("setAutoSay").checked=o.autoSay;
   $("setClock").checked=o.clock; $("setSpace").checked=o.space; $("setSize").value=o.size;
   $("setReader").checked=o.reader;
+  $("setDayStreak").checked=o.dayStreak; $("setOppGoals").checked=o.oppGoals;
   $("btnSound").innerHTML = o.voice ? "&#128266;" : "&#128263;";
   var sw=$("swatches").children;
   for(var i=0;i<sw.length;i++) sw[i].setAttribute("aria-pressed", String((sw[i].getAttribute("data-theme")||"")===(o.theme||"")));
@@ -3020,6 +3033,8 @@ function bindOpt(id,key){
 }
 bindOpt("setVoice","voice"); bindOpt("setAutoSay","autoSay");
 bindOpt("setClock","clock"); bindOpt("setSpace","space"); bindOpt("setReader","reader");
+$("setDayStreak").addEventListener("change",function(){ S.opts.dayStreak=this.checked; save(); renderParent(); });
+$("setOppGoals").addEventListener("change",function(){ S.opts.oppGoals=this.checked; save(); });
 $("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(); applyOpts(); });
 $("swatches").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-theme]"); if(!b) return;
