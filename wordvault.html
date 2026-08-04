@@ -103,9 +103,9 @@ h3{font-size:1.05em}
 .crest b{font-size:1.05em;letter-spacing:.02em}
 .iconbtn{width:44px;height:44px;flex:none;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15em;cursor:pointer;display:grid;place-items:center}
 
-/* ---------- pitch ---------- */
+/* ---------- floor strip ---------- */
 .pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
-  margin-bottom:12px;line-height:0;background:#3E8F5C}
+  margin-bottom:12px;line-height:0;background:#2F6FA8}
 .pitch svg{display:block;width:100%;height:auto}
 .mball{transition:transform .45s cubic-bezier(.2,.8,.3,1);transform-box:view-box;transform-origin:0 0}
 .scoreline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
@@ -206,18 +206,18 @@ body.theme-dark .pill.lg-good{background:#1B3325}
 body.theme-dark .pill.lg-mid{background:#3A3323}
 body.theme-dark .pill.lg-weak{background:#39281A}
 .clockbox{font-weight:800;font-variant-numeric:tabular-nums}
-.goalflash{position:fixed;inset:0;background:rgba(46,125,79,.94);color:#fff;display:grid;place-items:center;
+.goalflash{position:fixed;inset:0;background:rgba(107,63,160,.94);color:#fff;display:grid;place-items:center;
   z-index:99;font-size:2.6em;font-weight:800;letter-spacing:.06em;text-align:center;padding:20px}
 .goalflash>*{grid-area:1/1;justify-self:center;align-self:center}
 .goalflash .burst{width:min(78vw,340px);height:min(78vw,340px);color:rgba(255,255,255,.16);
   animation:burstspin 1.1s linear}
-.goalflash .fball{width:96px;height:96px;color:#14351F;animation:ballpop .55s cubic-bezier(.2,1.5,.4,1)}
+.goalflash .fball{width:96px;height:96px;color:#E9B93A;animation:ballpop .55s cubic-bezier(.2,1.5,.4,1)}
 .goalflash span{position:relative;top:86px;text-shadow:0 3px 10px rgba(0,0,0,.35)}
 @keyframes burstspin{from{transform:rotate(-25deg) scale(.6)}to{transform:rotate(25deg) scale(1.05)}}
 @keyframes ballpop{from{transform:scale(.2) rotate(-90deg)}to{transform:scale(1) rotate(0)}}
 
 /* ---------- penalty ---------- */
-.penwrap{position:fixed;inset:0;background:rgba(18,28,22,.80);z-index:80;display:none;align-items:center;justify-content:center;padding:12px}
+.penwrap{position:fixed;inset:0;background:rgba(28,20,40,.80);z-index:80;display:none;align-items:center;justify-content:center;padding:12px}
 .penwrap.on{display:flex}
 .pencard{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:14px 16px 16px;width:100%;max-width:520px;max-height:96vh;overflow:auto}
 .penhead{font-size:.8em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--pitch)}
@@ -257,15 +257,12 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 <body>
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
   <symbol id="ic-ball" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" fill="#fff" stroke="currentColor" stroke-width="2"/>
-    <path d="M12 6.4 L17 10 L15.1 15.9 H8.9 L7 10 Z" fill="currentColor"/>
-    <path d="M12 2v4.4M17 10l4.4-1.4M15.1 15.9l2.7 3.5M8.9 15.9l-2.7 3.5M7 10L2.6 8.6"
-          stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M12 2.6 l2.86 5.8 6.4.93 -4.63 4.51 1.09 6.37 -5.72 -3.01 -5.72 3.01 1.09 -6.37 -4.63 -4.51 6.4 -.93 Z"
+          fill="#fff" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
   </symbol>
   <symbol id="ic-ball-sm" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="9.5" fill="currentColor"/>
-    <circle cx="12" cy="12" r="9.5" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.6"/>
-    <path d="M12 5.6 L17.1 9.3 L15.2 15.3 H8.8 L6.9 9.3 Z" fill="rgba(0,0,0,.55)"/>
+    <path d="M12 2.2 l2.98 6.04 6.66.97 -4.82 4.7 1.14 6.64 -5.96 -3.13 -5.96 3.13 1.14 -6.64 -4.82 -4.7 6.66 -.97 Z"
+          fill="currentColor" stroke="rgba(0,0,0,.3)" stroke-width="1.4" stroke-linejoin="round"/>
   </symbol>
   <symbol id="ic-syn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
     <path d="M4 9h16M4 15h16"/></g></symbol>
@@ -343,7 +340,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
     </div>
     <div class="card">
       <h1>Pick your event</h1>
-      <p class="muted">12 elements. Three in a row wins a vault — hold to build your run-up.</p>
+      <p class="muted">12 elements. Three in a row wins a floor run — tumble the length of the mat.</p>
       <button class="btn gamebtn g-syn" data-mode="syn"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-syn"/></svg></span><span class="tx"><b>Synonyms</b><span>Words that mean the same</span></span></button>
       <button class="btn gamebtn g-ant" data-mode="ant"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-ant"/></svg></span><span class="tx"><b>Opposites</b><span>Words that mean the reverse</span></span></button>
       <button class="btn gamebtn g-tricky" data-mode="tricky"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-tricky"/></svg></span><span class="tx"><b>Tricky Words</b><span>Words you cannot sound out</span></span></button>
@@ -393,28 +390,26 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <div class="clockbox" id="clockTxt"></div>
     </div>
     <div class="pitch" id="pitch">
-      <svg viewBox="0 0 300 68" role="img" aria-label="Pitch showing how far your attack has advanced">
+      <svg viewBox="0 0 300 68" role="img" aria-label="The floor, showing how far through the routine you are">
         <defs>
           <g id="ballArt">
-            <circle r="9" fill="#FFFFFF" stroke="#1B2430" stroke-width="1.8"/>
-            <path d="M0 -5.2 L4.9 -1.6 L3 4.2 L-3 4.2 L-4.9 -1.6 Z" fill="#1B2430"/>
-            <path d="M0 -9 L0 -5.2 M4.9 -1.6 L8.6 -2.8 M3 4.2 L5.3 7.3 M-3 4.2 L-5.3 7.3 M-4.9 -1.6 L-8.6 -2.8"
-                  stroke="#1B2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            <path d="M0 -9 L2.6 -3.1 L9 -2.2 L4.3 2.2 L5.5 8.6 L0 5.5 L-5.5 8.6 L-4.3 2.2 L-9 -2.2 L-2.6 -3.1 Z"
+                  fill="#F2C230" stroke="#B8860B" stroke-width="1.6" stroke-linejoin="round"/>
           </g>
         </defs>
-        <rect width="300" height="68" fill="#3E8F5C"/>
-        <rect x="0"   width="50" height="68" fill="#46A167"/>
-        <rect x="100" width="50" height="68" fill="#46A167"/>
-        <rect x="200" width="50" height="68" fill="#46A167"/>
-        <g stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none">
-          <path d="M150 2 V66"/>
-          <circle cx="150" cy="34" r="12"/>
-          <path d="M300 10 H268 V58 H300"/>
-          <path d="M300 24 H286 V44 H300"/>
-          <path d="M0 10 H32 V58 H0"/>
+        <rect width="300" height="68" fill="#2F6FA8"/>
+        <rect x="0"   width="50" height="68" fill="#3A7FBC"/>
+        <rect x="100" width="50" height="68" fill="#3A7FBC"/>
+        <rect x="200" width="50" height="68" fill="#3A7FBC"/>
+        <rect x="3" y="3" width="294" height="62" rx="3" fill="none"
+              stroke="rgba(255,255,255,.55)" stroke-width="1.8"/>
+        <g stroke="rgba(255,255,255,.30)" stroke-width="1.4" fill="none">
+          <path d="M150 4 V64"/><path d="M75 4 V64"/><path d="M225 4 V64"/>
         </g>
-        <circle cx="150" cy="34" r="2" fill="rgba(255,255,255,.7)"/>
-        <circle cx="278" cy="34" r="2" fill="rgba(255,255,255,.7)"/>
+        <g fill="#D8A93F">
+          <rect x="262" y="14" width="34" height="40" rx="4"/>
+          <rect x="262" y="14" width="34" height="9" rx="4" fill="#E9C25E"/>
+        </g>
         <g class="mball" id="ball" style="transform:translate(36px,34px)"><use href="#ballArt"/></g>
       </svg>
     </div>
@@ -422,7 +417,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <svg class="sdot" viewBox="0 0 24 24"><use href="#ic-ball-sm"/></svg>
       <svg class="sdot" viewBox="0 0 24 24"><use href="#ic-ball-sm"/></svg>
       <svg class="sdot" viewBox="0 0 24 24"><use href="#ic-ball-sm"/></svg>
-      <span class="streaklabel" id="streakLabel">three in a row wins a vault</span>
+      <span class="streaklabel" id="streakLabel">three in a row wins a floor run</span>
     </div>
 
     <div class="card" id="qCard">
@@ -446,7 +441,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   <section class="screen" id="scFT">
     <div class="board">
       <div class="bt">Full time</div>
-      <div class="bn"><span>Word Attack FC</span><span id="ftOpp">Visitors</span></div>
+      <div class="bn"><span>Word Vault GC</span><span id="ftOpp">Visitors</span></div>
       <div class="bs" id="ftScore">0 – 0</div>
     </div>
     <div class="card">
@@ -577,80 +572,14 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   </div>
 </div>
 
-<!-- ================= PENALTY ================= -->
-<div class="penwrap" id="penWrap">
-  <div class="pencard">
-    <div class="penhead">Vault</div>
-    <h2 style="margin:.1em 0 .2em">Three in a row — you're on the vault.</h2>
-    <p class="small muted" id="penMsg" style="margin:0">Swipe from the gymnast towards a landing spot. Or just tap the spot you want.</p>
-    <div class="penfield" id="penField">
-      <svg viewBox="0 0 400 320" role="img" aria-label="Vault: the table, the springboard and the landing mat">
-        <defs>
-          <g id="ballArt2">
-            <ellipse cx="0" cy="0" rx="7" ry="11" fill="#7A3FA8"/>
-            <circle cx="0" cy="-13" r="6" fill="#E9C39C"/>
-            <path d="M0 -18 a6 6 0 0 1 6 5 q-6 -3 -12 0 a6 6 0 0 1 6 -5z" fill="#3A2418"/>
-            <rect x="-13" y="-6" width="9" height="4" rx="2" fill="#E9C39C"/>
-            <rect x="4" y="-6" width="9" height="4" rx="2" fill="#E9C39C"/>
-            <rect x="-5" y="9" width="4" height="10" rx="2" fill="#E9C39C"/>
-            <rect x="1" y="9" width="4" height="10" rx="2" fill="#E9C39C"/>
-          </g>
-        </defs>
-
-        <rect width="400" height="150" fill="#E7DCC6"/>
-        <g fill="#C8A97A">
-          <rect x="14" y="10" width="7" height="132"/><rect x="46" y="10" width="7" height="132"/>
-          <rect x="347" y="10" width="7" height="132"/><rect x="379" y="10" width="7" height="132"/>
-        </g>
-        <g fill="#D9C3A0">
-          <rect x="14" y="28" width="39" height="6"/><rect x="14" y="54" width="39" height="6"/>
-          <rect x="14" y="80" width="39" height="6"/><rect x="14" y="106" width="39" height="6"/>
-          <rect x="347" y="28" width="39" height="6"/><rect x="347" y="54" width="39" height="6"/>
-          <rect x="347" y="80" width="39" height="6"/><rect x="347" y="106" width="39" height="6"/>
-        </g>
-        <rect y="146" width="400" height="8" fill="#A8875C"/>
-        <rect y="154" width="400" height="166" fill="#E3D3B4"/>
-        <rect y="196" width="400" height="124" rx="10" fill="#2F6FA8"/>
-        <rect y="196" width="400" height="124" rx="10" fill="none" stroke="#24567F" stroke-width="4"/>
-        <g stroke="rgba(255,255,255,.35)" stroke-width="2">
-          <path d="M0 240 H400"/><path d="M0 282 H400"/>
-        </g>
-
-        <rect x="150" y="150" width="100" height="20" rx="10" fill="#C9532F"/>
-        <rect x="150" y="150" width="100" height="7" rx="3.5" fill="#E0754D"/>
-        <rect x="186" y="168" width="12" height="30" fill="#8C8C92"/>
-        <rect x="202" y="168" width="12" height="30" fill="#8C8C92"/>
-        <path d="M168 300 L232 300 L246 284 L154 284 Z" fill="#D8A93F"/>
-        <path d="M154 284 L246 284" stroke="#B78B23" stroke-width="3"/>
-
-        <circle class="ptarget" data-zone="TL" cx="118" cy="216" r="19"/>
-        <circle class="ptarget" data-zone="C"  cx="200" cy="216" r="19"/>
-        <circle class="ptarget" data-zone="TR" cx="282" cy="216" r="19"/>
-        <circle class="ptarget" data-zone="BL" cx="100" cy="264" r="19"/>
-        <circle class="ptarget" data-zone="BR" cx="300" cy="264" r="19"/>
-
-        <g class="pkeeper" id="penKeeper" style="transform:translate(200px,182px)">
-          <g class="kbody"><circle r="0" fill="none"/></g>
-        </g>
-        <rect id="penNet" class="pennet" x="0" y="196" width="400" height="124" fill="none"/>
-        <g class="pball" id="penBall" style="transform:translate(200px,292px)"><use href="#ballArt2"/></g>
-      </svg>
-    </div>
-    <div class="penres" id="penRes">&nbsp;</div>
-    <div class="powerwrap">
-      <div class="powertrack"><i id="penPowerFill"></i></div>
-      <div class="powerlabel"><span>Power</span><span id="penPowerTxt">Hold to run up</span></div>
-    </div>
-  </div>
-</div>
-
+<!-- ================= DATA ================= -->
 <script>
 /* Squad data: 96 headwords from Rita Treacy's "Synonyms 96 most common" list.
    Synonyms filtered to age-appropriate options. t = tier (1 easy, 2 mid, 3 hard).
    s = example sentence containing the headword (used for the through-ball round). */
 const SQUAD = [
 {w:"amazing",t:1,y:["incredible","unbelievable","wonderful","fantastic","astonishing","fabulous","astounding"],s:"That routine on the beam was amazing."},
-{w:"anger",t:3,y:["enrage","infuriate","madden","exasperate"],s:"The unfair penalty began to anger the crowd."},
+{w:"anger",t:3,y:["enrage","infuriate","madden","exasperate"],s:"The unfair score began to anger the crowd."},
 {w:"angry",t:1,y:["mad","furious","enraged","annoyed","raging","indignant","exasperated"],s:"The coach was angry about the untidy landing."},
 {w:"answer",t:1,y:["reply","respond","retort","acknowledge"],s:"She put up her hand to answer the question."},
 {w:"ask",t:1,y:["question","enquire","request","query","quiz","demand","inquire"],s:"She wanted to ask the coach about training."},
@@ -1608,7 +1537,6 @@ var ATTACKS=12;
 
 function startMatch(mode, level){
   // clear any penalty left pending from a match that was restarted or abandoned
-  $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
   $("runWrap").classList.remove("on"); RUN.live=false; RUN.done=null;
   if(RUN.raf){ cancelAnimationFrame(RUN.raf); RUN.raf=null; }
   var MD=MODES[mode];
@@ -1884,8 +1812,7 @@ function grade(){
     if(M.streak>=3){
       M.streak=0; M.pens++;
       $("btnConfirm").classList.add("hidden");
-      // Alternate the reward: penalty, counter attack, penalty, ...
-      var reward = (M.rewards % 2 === 0) ? takePenalty : takeRun;
+      var reward = takeRun;
       M.rewards++;
       setTimeout(function(){
         reward(function(scored){
@@ -1928,10 +1855,6 @@ function grade(){
    ======================================================================= */
 /* Target positions are spread so that adjacent zones are at least 21 degrees
    apart as seen from the ball — a sloppy swipe still lands where he meant. */
-var PEN_POS = {                      // SVG user units inside the 400x320 scene
-  TL:{x:118,y:128}, TR:{x:282,y:128}, C:{x:200,y:128}, BL:{x:100,y:190}, BR:{x:300,y:190}
-};
-var PEN_KEEPER_HOME={x:200,y:182}, PEN_BALL_HOME={x:200,y:272};
 /* Tuned by simulation to land on roughly one save in three:
      mixed shooter 33% saved · same corner every time 42% · top corners only 32%
    The keeper leans a little on where you've put your past penalties, so
@@ -1948,19 +1871,6 @@ var PEN_ADJ = { TL:["BL"], BL:["TL","C"], TR:["BR"], BR:["TR","C"], C:["BL","BR"
 /* Map a swipe onto whichever corner it actually points at on screen.
    Uses the real pixel geometry of the goal rather than fixed angle bands,
    so "swipe towards the corner you can see" always does what it looks like. */
-function penZoneFromSwipe(dx,dy){
-  if(Math.sqrt(dx*dx+dy*dy) < 20) return null;      // too short — let him retake
-  // The SVG scales uniformly, so on-screen angles match scene angles exactly.
-  var swipe = Math.atan2(-dy, dx), best=null, bd=1e9;
-  for(var z in PEN_POS){
-    var tx = PEN_POS[z].x - PEN_BALL_HOME.x;
-    var ty = PEN_POS[z].y - PEN_BALL_HOME.y;
-    var d = Math.abs(Math.atan2(-ty, tx) - swipe);
-    if(d > Math.PI) d = 2*Math.PI - d;
-    if(d < bd){ bd = d; best = z; }
-  }
-  return best;
-}
 function penKeeperPick(shot){
   var zones=["TL","TR","C","BL","BR"];
   if(Math.random() < PEN_TUNING.reflex) return shot;          // read it
@@ -1988,201 +1898,12 @@ function penIsSaved(shot,keep,power){
    gets there, too hard and it clears the crossbar. The bar keeps sweeping
    so a missed window is never fatal — you just wait for the next one. */
 var PEN_POWER = { weak:0.45, sweetLo:0.55, sweetHi:1.00, max:1.15, scale:1.30, sweep:1400 };
-function chargePower(ms){
-  var t=(ms % (PEN_POWER.sweep*2)) / (PEN_POWER.sweep*2);
-  var tri = t < 0.5 ? t*2 : (1-t)*2;          // 0 -> 1 -> 0
-  return tri * PEN_POWER.scale;
-}
 function powerMult(p){
   if(p < PEN_POWER.weak)    return 1.45;
   if(p < PEN_POWER.sweetLo) return 1.15;
   if(p <= PEN_POWER.sweetHi) return 0.80;
   return 0.95;
 }
-function powerBand(p){
-  if(p > PEN_POWER.max)     return "over";
-  if(p < PEN_POWER.weak)    return "weak";
-  if(p >= PEN_POWER.sweetLo && p <= PEN_POWER.sweetHi) return "good";
-  return "";
-}
-var POWER_WORD = { weak:"Too soft", good:"Perfect!", over:"Too much!", "":"OK" };
-
-function startCharge(){
-  PEN.charging=true; PEN.chargeT0=Date.now();
-  var step=function(){
-    if(!PEN.charging) return;
-    PEN.power=chargePower(Date.now()-PEN.chargeT0);
-    showPower(PEN.power);
-    PEN.raf=requestAnimationFrame(step);
-  };
-  step();
-}
-function stopCharge(){
-  PEN.charging=false;
-  if(PEN.raf) cancelAnimationFrame(PEN.raf);
-  PEN.raf=null;
-}
-function showPower(p){
-  var band=powerBand(p);
-  var fill=$("penPowerFill");
-  fill.style.width=Math.min(p/PEN_POWER.scale,1)*100+"%";
-  fill.className=band;
-  $("penPowerTxt").textContent = p<=0.02 ? "Power" : POWER_WORD[band];
-}
-
-var PEN = { live:false, done:null, startPt:null, aim:null, timer:null, result:false };
-
-function placeAt(el,p,scale){ el.style.transform="translate("+p.x+"px,"+p.y+"px)"+(scale?" scale("+scale+")":""); }
-function penReset(){
-  var k=$("penKeeper"), b=$("penBall");
-  k.className="pkeeper"; k.style.transition="none"; b.style.transition="none";
-  placeAt(k,PEN_KEEPER_HOME); placeAt(b,PEN_BALL_HOME);
-  void k.getBoundingClientRect();
-  k.style.transition=""; b.style.transition="";
-  var t=$("penField").querySelectorAll(".ptarget");
-  for(var i=0;i<t.length;i++) t[i].classList.remove("hot");
-  $("penNet").classList.remove("ripple");
-  $("penRes").innerHTML="&nbsp;"; $("penRes").className="penres";
-  b.style.transitionDuration="";
-  stopCharge(); PEN.power=0; showPower(0);
-  PEN.resolvedAt=0;                    // must not carry over from the last penalty
-  $("penPowerTxt").textContent="Hold to run up";
-  $("penMsg").textContent="Hold to build your run-up, drag to pick your landing, then let go.";
-}
-function takePenalty(cb){
-  PEN.done=cb; PEN.live=true;
-  penReset();
-  $("penWrap").classList.add("on");
-}
-function highlight(z){
-  var t=$("penField").querySelectorAll(".ptarget");
-  for(var i=0;i<t.length;i++) t[i].classList.toggle("hot", t[i].getAttribute("data-zone")===z);
-}
-function shoot(zone, power){
-  if(!PEN.live) return;
-  PEN.live=false;
-  if(power==null) power=0.7;            // a plain tap gets a safe, solid strike
-  highlight(zone); showPower(power);
-  S.pens.taken++; S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;
-
-  var over = power > PEN_POWER.max;
-  var keep=penKeeperPick(zone);
-  var saved = over ? false : penIsSaved(zone,keep,power);
-  var k=$("penKeeper"), b=$("penBall");
-
-  placeAt(k, PEN_POS[keep]);
-  if(PEN_POS[keep].x < 190) k.classList.add("dive-l");
-  else if(PEN_POS[keep].x > 210) k.classList.add("dive-r");
-  else k.classList.add("dive-u");
-  // harder strikes travel faster
-  b.style.transitionDuration = (0.46 - Math.min(power,1)*0.20)+"s";
-  if(over) placeAt(b, {x:PEN_POS[zone].x, y:-30}, 0.7);
-  else placeAt(b, PEN_POS[zone], 0.85);
-
-  setTimeout(function(){
-    if(over){
-      $("penRes").textContent="OVER-ROTATED!"; $("penRes").className="penres saved";
-      $("penMsg").textContent="Too much run-up — ease off a little next time.";
-      save(); PEN.result=false;
-      PEN.resolvedAt=Date.now();
-      PEN.timer=setTimeout(penDismiss, 2600);
-      return;
-    }
-    if(saved){
-      placeAt(b, {x:(PEN_POS[keep].x<200?30:370), y:250}, 0.7);
-      $("penRes").textContent="STEPPED OFF"; $("penRes").className="penres saved";
-      $("penMsg").textContent="A step on the landing — so close.";
-    } else {
-      S.pens.scored++; addXP(XP_GOAL);
-      placeAt(b, {x:PEN_POS[zone].x, y:PEN_POS[zone].y+6}, 0.62);
-      $("penNet").classList.add("ripple");
-      $("penRes").textContent="STUCK IT!"; $("penRes").className="penres scored";
-      $("penMsg").textContent=pick(["Stuck it.","Arms up, no wobble.","Textbook landing.","Judges love that."])+
-        "  +"+XP_GOAL+" XP";
-    }
-    save();
-    PEN.result = !saved;
-    // hold the result on screen, then straight back to the questions
-    PEN.resolvedAt=Date.now();
-    PEN.timer=setTimeout(penDismiss, saved?2600:2800);
-  }, 430);
-}
-function penDismiss(){
-  if(PEN.timer){ clearTimeout(PEN.timer); PEN.timer=null; }
-  if(!PEN.done) return;
-  $("penWrap").classList.remove("on");
-  var cb=PEN.done; PEN.done=null;
-  cb(PEN.result);
-}
-
-(function bindPenalty(){
-  var f=$("penField");
-  function localPt(ev){
-    var r=f.getBoundingClientRect();
-    return { x:ev.clientX-r.left, y:ev.clientY-r.top, w:r.width, h:r.height };
-  }
-  f.addEventListener("pointerdown", function(ev){
-    if(!PEN.live) return;
-    try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
-    PEN.startPt=localPt(ev); PEN.downAt=Date.now();
-    PEN.aim="C"; highlight("C");         // show the default so it is never a surprise
-    startCharge();                       // bar starts sweeping the moment he holds
-    $("penMsg").textContent="Drag to pick your landing. Let go when the bar is in the green.";
-    ev.preventDefault();
-  });
-  f.addEventListener("pointermove", function(ev){
-    if(!PEN.live || !PEN.startPt) return;
-    var p=localPt(ev);
-    var z=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
-    if(z){ PEN.aim=z; highlight(z); }    // keep the last good aim if he wobbles
-    ev.preventDefault();
-  });
-  f.addEventListener("pointerup", function(ev){
-    if(!PEN.live || !PEN.startPt) return;
-    var held=Date.now()-PEN.downAt;
-    // Power comes from how long he held, not from the animation frames — the
-    // bar is only the picture of it, and browsers throttle frames when a tab
-    // is not in front. Read it before stopping the loop.
-    var pw=chargePower(Date.now()-PEN.chargeT0);
-    stopCharge(); PEN.power=pw; showPower(pw);
-    var p=localPt(ev);
-    var swiped=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
-    var z=swiped, straight=false;
-    if(!z){
-      // a quick tap on a corner: aim there and give it a safe, solid strike
-      var sx=p.x/p.w*400, sy=p.y/p.h*320, best=null, bd=1e9;
-      for(var key in PEN_POS){
-        var d=Math.pow(PEN_POS[key].x-sx,2)+Math.pow(PEN_POS[key].y-sy,2);
-        if(d<bd){ bd=d; best=key; }
-      }
-      if(best && bd < 70*70){ z=best; if(held<260) pw=null; }
-    }
-    // Held it long enough to build power but never picked a corner — take the
-    // shot anyway rather than throwing the charge away. Straight down the middle.
-    if(!z && held>=260){ z = PEN.aim || "C"; straight=!swiped; }
-    PEN.startPt=null;
-    if(z){
-      if(straight) $("penMsg").textContent="No landing picked — straight down the middle.";
-      shoot(z, pw);
-    } else {
-      highlight(null); showPower(0);
-      $("penMsg").textContent="Hold, drag towards a landing spot, then let go.";
-    }
-    ev.preventDefault();
-  });
-  f.addEventListener("pointercancel", function(){
-    // iOS can take the touch away mid-hold; say so rather than failing silently
-    stopCharge(); PEN.startPt=null; highlight(null); showPower(0);
-    if(PEN.live) $("penMsg").textContent="Lost it — hold again to restart your run-up.";
-  });
-
-  // tap to skip the celebration — but not for the first moment, so the tap
-  // that took the penalty cannot bounce straight through and skip it
-  $("penWrap").addEventListener("click", function(){
-    if(!PEN.live && PEN.done && PEN.resolvedAt && Date.now()-PEN.resolvedAt > 900) penDismiss();
-  });
-})();
-
 /* =======================================================================
    COUNTER ATTACK — the running game, alternating with the penalty.
    Three channels. Swipe sideways to switch, up to hurdle a sliding tackle,
@@ -2591,15 +2312,6 @@ function runArrow(c,x,y,dir){
   c.closePath(); c.fill();
 }
 
-function runBall(c,x,y,r){
-  c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
-  c.strokeStyle="#1B2430"; c.lineWidth=2; c.stroke();
-  c.fillStyle="#1B2430"; c.beginPath();
-  for(var i=0;i<5;i++){ var a=-Math.PI/2+i*2*Math.PI/5;
-    c[i?"lineTo":"moveTo"](x+Math.cos(a)*r*0.52, y+Math.sin(a)*r*0.52); }
-  c.closePath(); c.fill();
-}
-
 /* One figure used by the runner, the finishing strike and the avatar picker,
    so what he picks is exactly what he sees on the pitch.
    pose: 'run' | 'jump' | 'slide' | 'stand' | 'kick'  */
@@ -2858,7 +2570,6 @@ $("ftReview").addEventListener("click",function(ev){ var s=ev.target.closest("[d
 
 $("btnQuit").addEventListener("click", function(){
   if(M && M.timer) clearInterval(M.timer);
-  $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
   $("runWrap").classList.remove("on"); RUN.live=false; RUN.done=null;
   if(RUN.raf){ cancelAnimationFrame(RUN.raf); RUN.raf=null; }
   renderHome(); show("scHome");
@@ -2952,8 +2663,6 @@ function renderParent(){
     '<tr><th>Matches played</th><td class="num"><b>'+S.season.p+'</b></td></tr>'+
     (S.opts.dayStreak ? '<tr><th>Days in a row</th><td class="num"><b>'+(S.days.streak||0)+'</b>'+
       (S.days.best>S.days.streak?' (best '+S.days.best+')':'')+'</td></tr>' : '')+
-    (S.pens.taken?'<tr><th>Vaults stuck</th><td class="num"><b>'+S.pens.scored+' of '+S.pens.taken+
-      '</b> ('+Math.round(S.pens.scored/S.pens.taken*100)+'%)</td></tr>':'')+
     (S.runs.taken?'<tr><th>Floor runs</th><td class="num"><b>'+S.runs.scored+' of '+S.runs.taken+
       '</b> ('+Math.round(S.runs.scored/S.runs.taken*100)+'%)</td></tr>':'')+
     '</table>';
@@ -3003,14 +2712,14 @@ function renderParent(){
     : "Heads up: this browser is blocking saved data (common when opening a file directly). Progress will only last for this session — use Export below, or add the app to your Home Screen.";
 }
 $("btnExport").addEventListener("click",function(){
-  var lines=["Word Attack FC — progress export","Date: "+new Date().toLocaleString(),"",
+  var lines=["Word Vault GC — progress export","Date: "+new Date().toLocaleString(),"",
     "Season: P"+S.season.p+" W"+S.season.w+" D"+S.season.d+" L"+S.season.l+" Pts"+S.season.pts,"","Word,Seen,Correct,Accuracy%"];
   for(var k in S.stats){ var st=S.stats[k]; lines.push(k+","+st.seen+","+st.right+","+Math.round(st.right/st.seen*100)); }
   var txt=lines.join("\n");
   try{
     var b=new Blob([txt],{type:"text/plain"});
     var a=document.createElement("a"); a.href=URL.createObjectURL(b);
-    a.download="word-attack-progress.txt"; a.click();
+    a.download="word-vault-progress.txt"; a.click();
   }catch(e){ alert(txt); }
 });
 $("btnReset").addEventListener("click",function(){
@@ -3115,20 +2824,19 @@ applyOpts();
 fillVoiceList();
 renderHome();
 
-/* Add ?play=run or ?play=pen to the address to drop straight into a minigame
+/* Add ?play=run to the address to drop straight into the floor routine
    and keep replaying it. Handy for testing the feel without answering
    twelve questions first. Practice runs are not counted in the season. */
 (function testHook(){
-  var m=/[?&]play=(run|pen)/.exec(location.search);
+  var m=/[?&]play=(run)/.exec(location.search);
   if(!m) return;
-  var isRun = m[1]==="run";
+
   var again=function(){
     setTimeout(function(){
-      var before = isRun ? {t:S.runs.taken,s:S.runs.scored} : {t:S.pens.taken,s:S.pens.scored};
-      (isRun?takeRun:takePenalty)(function(){
+      var before = {t:S.runs.taken,s:S.runs.scored};
+      takeRun(function(){
         // roll the counters back so practice does not skew the parent zone
-        if(isRun){ S.runs.taken=before.t; S.runs.scored=before.s; }
-        else { S.pens.taken=before.t; S.pens.scored=before.s; }
+        S.runs.taken=before.t; S.runs.scored=before.s;
         save(); again();
       });
     }, 450);
