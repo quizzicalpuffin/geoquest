@@ -1849,47 +1849,15 @@ function grade(){
 }
 
 /* =======================================================================
-   PENALTY SHOOT-OUT
-   Swipe from the ball towards a corner (or tap a corner). The keeper is
-   tuned so roughly one in three is saved — see PEN_TUNING below.
+   FLOOR ROUTINE
+   Three correct in a row wins a run the length of the floor: swipe for the
+   clear lane, up to leap a beam, and collect the stars. Reaching the end,
+   she picks a landing spot and always sticks it — the run can only ever be
+   cut short by the mats and beams on the way, never by the landing.
    ======================================================================= */
-/* Target positions are spread so that adjacent zones are at least 21 degrees
-   apart as seen from the ball — a sloppy swipe still lands where he meant. */
-/* Tuned by simulation to land on roughly one save in three:
-     mixed shooter 33% saved · same corner every time 42% · top corners only 32%
-   The keeper leans a little on where you've put your past penalties, so
-   hammering the same corner all night starts to get punished — but only mildly. */
-var PEN_TUNING = {
-  reflex:0.10,        // he simply reads the shot
-  readHistory:0.15,   // else: guesses from your past penalties
-  sameZone:{TL:0.74,TR:0.74,C:0.77,BL:0.80,BR:0.80},  // save odds when he guesses right
-  adjacent:0.30,      // got a hand to it (same side, wrong height)
-  wrong:0.07          // freak save
-};
-var PEN_ADJ = { TL:["BL"], BL:["TL","C"], TR:["BR"], BR:["TR","C"], C:["BL","BR"] };
-
 /* Map a swipe onto whichever corner it actually points at on screen.
    Uses the real pixel geometry of the goal rather than fixed angle bands,
    so "swipe towards the corner you can see" always does what it looks like. */
-function penKeeperPick(shot){
-  var zones=["TL","TR","C","BL","BR"];
-  if(Math.random() < PEN_TUNING.reflex) return shot;          // read it
-  if(Math.random() < PEN_TUNING.readHistory){                 // study the taker
-    var hist=S.pens.zones, tot=0, w=zones.map(function(z){ var v=(hist[z]||0)+0.6; tot+=v; return v; });
-    var r=Math.random()*tot, acc=0;
-    for(var i=0;i<zones.length;i++){ acc+=w[i]; if(r<=acc) return zones[i]; }
-  }
-  return zones[(Math.random()*zones.length)|0];
-}
-function penIsSaved(shot,keep,power){
-  var base;
-  if(shot===keep) base = PEN_TUNING.sameZone[shot];
-  else if((PEN_ADJ[shot]||[]).indexOf(keep)>=0) base = PEN_TUNING.adjacent;
-  else base = PEN_TUNING.wrong;
-  base *= powerMult(power==null?0.7:power);
-  return Math.random() < Math.min(base, 0.95);
-}
-
 /* Power bands, FC style. A weak shot is easy to save; the sweet spot beats
    the keeper more often; belting it is only slightly worse than the sweet
    spot, but past 100% it clears the bar entirely (handled in shoot). */
@@ -1897,13 +1865,6 @@ function penIsSaved(shot,keep,power){
    Let go in the green and you strike it properly; too soft and the keeper
    gets there, too hard and it clears the crossbar. The bar keeps sweeping
    so a missed window is never fatal — you just wait for the next one. */
-var PEN_POWER = { weak:0.45, sweetLo:0.55, sweetHi:1.00, max:1.15, scale:1.30, sweep:1400 };
-function powerMult(p){
-  if(p < PEN_POWER.weak)    return 1.45;
-  if(p < PEN_POWER.sweetLo) return 1.15;
-  if(p <= PEN_POWER.sweetHi) return 0.80;
-  return 0.95;
-}
 /* =======================================================================
    COUNTER ATTACK — the running game, alternating with the penalty.
    Three channels. Swipe sideways to switch, up to hurdle a sliding tackle,
@@ -2058,10 +2019,9 @@ function runTakeShot(zone, rushed){
   if(RUN.phase!=="aim") return;
   RUN.phase="shoot"; RUN.shootT=0; RUN.last=0;
   RUN.shotZone=zone;
-  RUN.keepZone=penKeeperPick(zone);
-  RUN.saved=penIsSaved(zone, RUN.keepZone, rushed?0.45:0.75);
-  S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;   // the keeper remembers your habits
-  if(rushed) $("runMsg").textContent="Too slow — she had to rush the landing.";
+  RUN.keepZone=zone;              // the judge simply watches wherever she lands
+  RUN.saved=false;                // she gets the length of the floor: the landing always sticks
+  if(rushed) $("runMsg").textContent="Out of time — she picked the middle and went for it.";
   RUN.raf=requestAnimationFrame(runShoot);
 }
 
@@ -2229,14 +2189,12 @@ function runDrawPickup(c,x,y){
   c.strokeStyle="#C99000"; c.lineWidth=2; c.stroke();
 }
 
-/* The judge at the edge of the mat. She leans towards the spot she is
-   watching most closely — land away from her and it scores clean. */
+/* The judge at the edge of the mat. She turns to follow the landing. */
 function runDrawKeeper(c){
   var g=runGoalRect(), home={x:(g.x0+g.x1)/2, y:g.y1-4}, pos=home, lean=0;
   if(RUN.phase==="shoot"){
-    var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs), p=runZonePoint(RUN.keepZone);
-    pos={ x:home.x+(p.x-home.x)*Math.min(1,t*1.5), y:home.y+(p.y-home.y)*Math.min(1,t*1.5) };
-    lean = (p.x<home.x?-1:(p.x>home.x?1:0)) * Math.min(1,t*1.5) * 0.28;
+    var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs), p=runZonePoint(RUN.shotZone);
+    lean = (p.x<home.x?-1:(p.x>home.x?1:0)) * Math.min(1,t*1.5) * 0.12;  // just a turn of the head
   }
   c.save();
   c.translate(pos.x,pos.y); c.rotate(lean);
@@ -2266,9 +2224,8 @@ function runDrawAimHelp(c){
     c.strokeStyle="rgba(255,255,255,"+pulse+")"; c.lineWidth=3;
     c.setLineDash([5,5]); c.beginPath(); c.arc(p.x,p.y,17,0,6.3); c.stroke(); c.setLineDash([]);
   });
-  var left=Math.max(0,(RUN_CFG.aimMs-RUN.aimT)/1000);
   c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 15px -apple-system,sans-serif"; c.textAlign="center";
-  c.fillText("double tap the mat — "+left.toFixed(1)+"s", RUN_W/2, RUN_GROUND-96);
+  c.fillText("double tap where you want to land", RUN_W/2, RUN_GROUND-96);
   c.textAlign="start";
 }
 
