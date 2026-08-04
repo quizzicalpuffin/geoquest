@@ -1740,8 +1740,8 @@ function updateDots(){
   var d=$("streakDots").querySelectorAll(".sdot");
   for(var i=0;i<3;i++) d[i].className.baseVal = "sdot" + (i<M.streak ? " lit" : "");
   var left=3-M.streak;
-  $("streakLabel").textContent = M.streak===0 ? "three in a row wins a vault"
-    : (left===1 ? "one more for a vault" : left+" more for a vault");
+  $("streakLabel").textContent = M.streak===0 ? "three in a row wins a floor run"
+    : (left===1 ? "one more for a floor run" : left+" more for a floor run");
 }
 function updateBall(){
   var x=[36,110,190,262][Math.min(M.streak,3)];
@@ -2545,7 +2545,7 @@ function endMatch(){
   $("ftLine").textContent = M.right+" of "+total+" correct ("+pc+"%). "+
     (res==="w" ? "Three points." : res==="d" ? "One point." : "No points — but every miss is a word learned.");
   $("ftStats").innerHTML='<div class="bar'+(pc<60?" warn":"")+'"><i style="width:'+pc+'%"></i></div>'+
-    (M.pens ? '<p class="small" style="margin-top:.7em">Vaults won: <b>'+M.pens+
+    (M.pens ? '<p class="small" style="margin-top:.7em">Floor runs won: <b>'+M.pens+
               '</b> · scored: <b>'+M.pensScored+'</b>'+
               (M.pens-M.pensScored ? ' · saved: <b>'+(M.pens-M.pensScored)+'</b>' : '')+'</p>'
             : '<p class="small muted" style="margin-top:.7em">No vaults this round — three in a row wins you one.</p>');
