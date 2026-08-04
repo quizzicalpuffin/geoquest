@@ -111,16 +111,16 @@
   .chmsg { text-align:center; font-weight:700; padding:8px 6px 12px; line-height:1.4; }
   .chmsg.bad { color:#ffb3a7; }
   .say { display:inline-flex; align-items:center; justify-content:center; font-family:inherit;
-    font-size:1rem; line-height:1; cursor:pointer; flex:none; -webkit-user-select:none; user-select:none;
-    background:rgba(0,0,0,.25); color:#fff; border:1px solid rgba(255,255,255,.3);
-    border-radius:10px; padding:6px 9px; margin-left:8px; }
+    font-size:1.05rem; line-height:1; cursor:pointer; flex:none; -webkit-user-select:none; user-select:none;
+    background:rgba(0,0,0,.32); color:#fff; border:1px solid rgba(255,255,255,.45);
+    border-radius:11px; padding:7px 10px; margin-left:8px; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   .say:active { transform:scale(.92); }
   .say.qsay { margin:0 0 0 10px; vertical-align:middle; }
   .qrow { display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:18px; }
   .qrow .question { margin-bottom:0; }
   #opts .btn { position:relative; }
-  #opts .btn .say { position:absolute; right:8px; top:50%; transform:translateY(-50%); margin:0;
-    background:rgba(0,0,0,.14); border-color:rgba(0,0,0,.22); color:#1b3a4d; }
+  #opts .btn .say { position:absolute; right:7px; top:50%; transform:translateY(-50%); margin:0;
+    background:#1b4a6b; border-color:rgba(255,255,255,.45); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); }
   #opts .btn .say:active { transform:translateY(-50%) scale(.9); }
   #opts .btn.hassay { padding-right:52px; }
   .expl { margin:10px 0 4px; }
@@ -10143,7 +10143,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v62 · Quizzical Puffin · 8,958 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v63 · Quizzical Puffin · 8,958 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -10952,14 +10952,14 @@ function screenHome(){
   <div class="row">
     <button class="btn ghost center" onclick="screenBadges()">🏅 Badges</button>
     <button class="btn ghost center" onclick="toggleSound()">${soundOn?"🔊 Sound On":"🔇 Sound Off"}</button>
-    <button class="btn ghost center" onclick="ttsCycle()">${TTS_OK?TTS_LABEL[ttsMode]:"🔇 No voice"}</button>
     <button class="btn ghost center" onclick="screenProfiles()">👥 Switch</button>
-  </div>`;
+  </div>
+  ${TTS_OK?`<button class="btn ghost center" onclick="ttsCycle()">${TTS_LABEL[ttsMode]}</button>`:""}`;
   app.innerHTML=html;
 }
 function setLevel(l){ sel.level=l; save("gq_level",l); screenHome(); }
 /* ================= READ ALOUD ================= */
-let ttsMode = load("gq_tts", 0);       /* 0 off · 1 tap to read · 2 read automatically */
+let ttsMode = load("gq_tts", 1);       /* 0 off · 1 tap to read · 2 read automatically */
 let ttsVoice = null, ttsPrimed = false;
 const TTS_OK = (typeof window!=="undefined") && ("speechSynthesis" in window);
 function ttsPick(){
@@ -11014,7 +11014,7 @@ function ttsPrime(){
     speechSynthesis.speak(u); ttsPrimed=true;
   }catch(e){}
 }
-const TTS_LABEL = ["🔇 Voice off","🔊 Voice: tap to read","🗣️ Voice: read aloud"];
+const TTS_LABEL = ["🔇 Read-aloud: off","🔊 Read-aloud: tap the speakers","🗣️ Read-aloud: reads every question"];
 function ttsCycle(){
   ttsMode = (ttsMode+1)%3;
   save("gq_tts", ttsMode);
