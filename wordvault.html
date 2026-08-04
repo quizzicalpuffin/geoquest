@@ -1246,7 +1246,7 @@ var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, histor
         dayStreak:true,oppGoals:true} };
 var S = load();
 function load(){
-  try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
+  try{ var raw=sGet("wordvault.v1"); if(raw){ var o=JSON.parse(raw);
     return Object.assign({},DEFAULT_STATE,o,{
       opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
@@ -1256,7 +1256,7 @@ function load(){
     }); } }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
-function save(){ sSet("wordattack.v1", JSON.stringify(S)); }
+function save(){ sSet("wordvault.v1", JSON.stringify(S)); }
 
 /* =======================================================================
    Conflict map — two headwords "conflict" if their word families overlap
