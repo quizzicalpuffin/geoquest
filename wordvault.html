@@ -1,0 +1,3128 @@
+<!DOCTYPE html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Word Vault">
+<meta name="theme-color" content="#F7F0E1">
+<title>Word Vault</title>
+<style>
+:root{
+  --bg:#F7F0E1; --panel:#FFFCF4; --ink:#22303D; --ink-soft:#5C6B78;
+  --line:#E2D6BE; --pitch:#6B3FA0; --pitch-dk:#54307E;
+  --gold:#E8A317; --good:#2E7D4F; --miss:#C2681A;
+  --fs:1;           /* text size multiplier */
+  --ls:0.005em;     /* letter spacing */
+  --ws:0.04em;      /* word spacing */
+  --lh:1.6;
+  --radius:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Verdana,Tahoma,sans-serif;
+  font-size:calc(17px * var(--fs));
+  letter-spacing:var(--ls); word-spacing:var(--ws); line-height:var(--lh);
+  -webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body.theme-blue{--bg:#E9F1F7;--panel:#FBFDFF;--line:#CBDCE8}
+body.theme-mint{--bg:#E8F3EC;--panel:#FAFFFB;--line:#C9E1D2}
+body.theme-grey{--bg:#EDEDEA;--panel:#FAFAF8;--line:#D8D8D3}
+/* Dark. Off-white text on charcoal rather than white on black — pure white
+   on pure black smears for a lot of readers. */
+body.theme-dark{--bg:#161A1D;--panel:#1E252A;--ink:#E9E6E0;--ink-soft:#9FACB4;
+  --line:#333D45;--pitch:#8B5FC0;--pitch-dk:#6B4499;--good:#5FBF87;--miss:#E2924C}
+body.theme-dark .feedback.ok,body.theme-dark .opt.right,body.theme-dark .lettbtn.right,
+body.theme-dark .gridwords span.s2{background:#1B3325;border-color:var(--good)}
+body.theme-dark .feedback.no,body.theme-dark .opt.wrongpick,body.theme-dark .lettbtn.wrongpick,
+body.theme-dark .gridwords span.s0{background:#39281A;border-color:var(--miss)}
+body.theme-dark .opt.picked,body.theme-dark .gridwords span.s1{background:#3A3323;border-color:var(--gold)}
+body.theme-dark .sentence mark{background:#5A4818;color:#FFE9A8}
+body.theme-dark .board{background:#0E1316;border-color:#070A0C}
+body.theme-dark .powertrack{background:linear-gradient(90deg,
+  #2C3339 0 42.3%, #24422F 42.3% 76.9%, #2C3339 76.9% 88.5%, #493322 88.5% 100%)}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 40px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .18s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---------- generic bits ---------- */
+h1,h2,h3{line-height:1.25;margin:0 0 .5em}
+h1{font-size:1.75em;letter-spacing:0.01em}
+h2{font-size:1.3em}
+h3{font-size:1.05em}
+.muted{color:var(--ink-soft)}
+.small{font-size:.85em}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.hero{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;line-height:0;margin-bottom:14px}
+.hero svg{display:block;width:100%;height:auto}
+.board{background:#14251C;border:2px solid #0C1811;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;color:#EAF3ED}
+.board .bt{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:#7FBF9A}
+.board .bs{font-size:2.6em;font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;line-height:1.1}
+.board .bn{display:flex;justify-content:space-between;gap:10px;font-size:.85em;color:#B9D6C6}
+.btn{
+  display:block;width:100%;text-align:left;font:inherit;letter-spacing:inherit;word-spacing:inherit;
+  background:var(--panel);color:var(--ink);border:2px solid var(--line);
+  border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer;
+  transition:transform .08s,border-color .12s,background .12s;
+}
+.btn:active{transform:scale(.985)}
+.btn.primary{background:var(--pitch);border-color:var(--pitch-dk);color:#fff;text-align:center;font-weight:700}
+/* Next sits right under the answers and stays pinned to the bottom of the
+   screen, so it never needs scrolling to reach. */
+#btnNext{position:sticky;bottom:12px;z-index:6;box-shadow:0 4px 14px rgba(20,40,28,.28)}
+.btn.gold{background:var(--gold);border-color:#C4870B;color:#3A2A00;text-align:center;font-weight:700}
+.btn.ghost{text-align:center}
+/* Each game gets its own badge and colour so they are told apart at a glance */
+.gamebtn{display:flex;align-items:center;gap:12px;border-left-width:8px}
+.gamebtn .ic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  background:var(--bg);border:2px solid var(--line)}
+.gamebtn .ic svg{width:24px;height:24px}
+.gamebtn .tx{flex:1;min-width:0}
+.gamebtn b{display:block;font-size:1.05em}
+.gamebtn .tx span{display:block;font-size:.85em;color:var(--ink-soft);margin-top:2px}
+.g-syn{border-left-color:#2E7D4F}    .g-syn .ic{color:#2E7D4F}
+.g-ant{border-left-color:#B4442E}    .g-ant .ic{color:#B4442E}
+.g-tricky{border-left-color:#1F6FB2} .g-tricky .ic{color:#1F6FB2}
+.g-spell{border-left-color:#8A5AC2}  .g-spell .ic{color:#8A5AC2}
+.g-sent{border-left-color:#C08A12}   .g-sent .ic{color:#C08A12}
+.g-listen{border-left-color:#0E8C8C} .g-listen .ic{color:#0E8C8C}
+.g-team{border-left-color:#C2506E}   .g-team .ic{color:#C2506E}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .btn{flex:1 1 0;min-width:130px}
+.pill{display:inline-block;background:var(--bg);border:2px solid var(--line);border-radius:999px;padding:3px 11px;font-size:.8em;font-weight:700}
+
+/* ---------- header ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.crest{display:flex;align-items:center;gap:10px}
+.crest .badge{width:36px;height:40px;flex:none;display:block}
+.crest b{font-size:1.05em;letter-spacing:.02em}
+.iconbtn{width:44px;height:44px;flex:none;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15em;cursor:pointer;display:grid;place-items:center}
+
+/* ---------- pitch ---------- */
+.pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
+  margin-bottom:12px;line-height:0;background:#3E8F5C}
+.pitch svg{display:block;width:100%;height:auto}
+.mball{transition:transform .45s cubic-bezier(.2,.8,.3,1);transform-box:view-box;transform-origin:0 0}
+.scoreline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
+.scoreline .sc{font-size:1.5em;letter-spacing:.04em}
+.streakdots{display:flex;gap:7px;align-items:center}
+.sdot{width:22px;height:22px;color:var(--line);transition:color .2s,transform .2s}
+.sdot.lit{color:var(--gold);transform:scale(1.12)}
+.streaklabel{font-size:.78em;color:var(--ink-soft);margin-left:6px}
+
+/* ---------- question ---------- */
+.qtype{font-size:.8em;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--pitch);
+  display:flex;align-items:center;gap:7px}
+.qtypeic{width:17px;height:17px;flex:none}
+/* the question card carries the game's colour down its left edge */
+#qCard{border-left-width:8px}
+#qCard.g-syn{border-left-color:#2E7D4F}   #qCard.g-syn .qtype{color:#2E7D4F}
+#qCard.g-ant{border-left-color:#B4442E}   #qCard.g-ant .qtype{color:#B4442E}
+#qCard.g-tricky{border-left-color:#1F6FB2} #qCard.g-tricky .qtype{color:#1F6FB2}
+#qCard.g-spell{border-left-color:#8A5AC2} #qCard.g-spell .qtype{color:#8A5AC2}
+#qCard.g-sent{border-left-color:#C08A12}  #qCard.g-sent .qtype{color:#C08A12}
+#qCard.g-listen{border-left-color:#0E8C8C} #qCard.g-listen .qtype{color:#0E8C8C}
+#qCard.g-team{border-left-color:#C2506E}  #qCard.g-team .qtype{color:#C2506E}
+.target{font-size:2.1em;font-weight:800;letter-spacing:.01em;margin:.15em 0 .1em;display:inline-block}
+.sentence{font-size:1.18em;margin:.3em 0 .1em}
+.sentence mark{background:#FFE9A8;color:inherit;padding:2px 5px;border-radius:6px;font-weight:800}
+.opt{position:relative;padding-right:52px}
+.opt .say{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:10px;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font-size:.95em}
+.opt.picked{border-color:var(--gold);background:#FFF6DF}
+.opt.right{border-color:var(--good);background:#E4F1E8}
+.opt.wrongpick{border-color:var(--miss);background:#FBEADB}
+.opt .tick{float:right;font-weight:800}
+.listenbox{margin:.2em 0 .1em}
+.passage{margin-top:10px;padding:12px 14px;border-radius:12px;background:var(--bg);
+  border:2px solid var(--line);font-size:1.05em}
+.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.avcard{border:2px solid var(--line);border-radius:14px;background:var(--bg);padding:8px 6px 10px;
+  cursor:pointer;text-align:center;font:inherit;color:inherit;transition:border-color .12s,transform .08s}
+.avcard:active{transform:scale(.97)}
+.avcard.on{border-color:var(--pitch);border-width:3px;background:var(--panel)}
+.avcard canvas{display:block;width:100%;height:auto}
+.avcard b{display:block;font-size:.78em;margin-top:4px}
+.daystreak{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:2px solid var(--line);
+  border-radius:999px;padding:3px 12px;font-size:.82em;font-weight:700}
+.daystreak .fl{color:#E8712A;font-size:1.05em}
+.voicelist{max-height:230px;overflow:auto;border:2px solid var(--line);border-radius:12px;padding:8px}
+.voicebtn{margin-bottom:6px;padding:11px 12px}
+.voicebtn.on{border-color:var(--pitch);background:var(--bg);font-weight:700}
+.fiftyrow{margin-top:4px}
+.fiftyrow .btn{margin-bottom:6px}
+.opt.gone{opacity:.32;pointer-events:none;text-decoration:line-through}
+.xppill{display:inline-block;background:var(--gold);color:#3A2A00;border-radius:999px;
+  padding:2px 10px;font-size:.78em;font-weight:800;letter-spacing:0}
+.letterrow{display:flex;flex-wrap:wrap;gap:8px}
+.lettbtn{font:inherit;font-size:1.6em;font-weight:800;letter-spacing:0;
+  min-width:52px;height:60px;padding:0 10px;background:var(--panel);color:var(--ink);
+  border:2px solid var(--line);border-radius:12px;cursor:pointer;transition:transform .08s,border-color .12s,background .12s}
+.lettbtn:active{transform:scale(.96)}
+.lettbtn.right{border-color:var(--good);background:#E4F1E8}
+.lettbtn.wrongpick{border-color:var(--miss);background:#FBEADB}
+.feedback{border-radius:14px;padding:14px 16px;margin:4px 0 12px;border:2px solid}
+.feedback.ok{background:#E4F1E8;border-color:var(--good)}
+.feedback.no{background:#FBEADB;border-color:var(--miss)}
+.feedback b{font-size:1.1em}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:.92em}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)}
+td.num,th.num{text-align:right}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--pitch)}
+.bar.warn i{background:var(--miss)}
+
+/* ---------- settings ---------- */
+.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.setting:last-child{border-bottom:none}
+.setting label{flex:1}
+.switch{position:relative;width:54px;height:32px;flex:none}
+.switch input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer;position:relative;z-index:2}
+.switch span{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:.15s;pointer-events:none}
+.switch span:after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked + span{background:var(--pitch)}
+.switch input:checked + span:after{transform:translateX(22px)}
+input[type=range]{width:150px;accent-color:var(--pitch)}
+.swatches{display:flex;gap:8px}
+.swatches button{width:38px;height:38px;border-radius:10px;border:3px solid var(--line);cursor:pointer}
+.swatches button[aria-pressed=true]{border-color:var(--ink)}
+.hidden{display:none !important}
+.gridwords{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.gridwords span{border:2px solid var(--line);border-radius:8px;padding:5px 6px;font-size:.8em;text-align:center;background:var(--panel)}
+.gridwords span.s2{background:#E4F1E8;border-color:var(--good)}
+.gridwords span.s1{background:#FFF6DF;border-color:var(--gold)}
+.gridwords span.s0{background:#FBEADB;border-color:var(--miss)}
+.pill.lg-good{background:#E4F1E8;border-color:var(--good)}
+.pill.lg-mid{background:#FFF6DF;border-color:var(--gold)}
+.pill.lg-weak{background:#FBEADB;border-color:var(--miss)}
+body.theme-dark .pill.lg-good{background:#1B3325}
+body.theme-dark .pill.lg-mid{background:#3A3323}
+body.theme-dark .pill.lg-weak{background:#39281A}
+.clockbox{font-weight:800;font-variant-numeric:tabular-nums}
+.goalflash{position:fixed;inset:0;background:rgba(46,125,79,.94);color:#fff;display:grid;place-items:center;
+  z-index:99;font-size:2.6em;font-weight:800;letter-spacing:.06em;text-align:center;padding:20px}
+.goalflash>*{grid-area:1/1;justify-self:center;align-self:center}
+.goalflash .burst{width:min(78vw,340px);height:min(78vw,340px);color:rgba(255,255,255,.16);
+  animation:burstspin 1.1s linear}
+.goalflash .fball{width:96px;height:96px;color:#14351F;animation:ballpop .55s cubic-bezier(.2,1.5,.4,1)}
+.goalflash span{position:relative;top:86px;text-shadow:0 3px 10px rgba(0,0,0,.35)}
+@keyframes burstspin{from{transform:rotate(-25deg) scale(.6)}to{transform:rotate(25deg) scale(1.05)}}
+@keyframes ballpop{from{transform:scale(.2) rotate(-90deg)}to{transform:scale(1) rotate(0)}}
+
+/* ---------- penalty ---------- */
+.penwrap{position:fixed;inset:0;background:rgba(18,28,22,.80);z-index:80;display:none;align-items:center;justify-content:center;padding:12px}
+.penwrap.on{display:flex}
+.pencard{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:14px 16px 16px;width:100%;max-width:520px;max-height:96vh;overflow:auto}
+.penhead{font-size:.8em;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--pitch)}
+.penfield{position:relative;border-radius:12px;overflow:hidden;line-height:0;cursor:crosshair;
+  touch-action:none;user-select:none;-webkit-user-select:none;margin:.5em 0}
+.penfield svg{display:block;width:100%;height:auto}
+.ptarget{fill:rgba(255,255,255,.10);stroke:rgba(255,255,255,.85);stroke-width:2.5;stroke-dasharray:5 4;
+  transition:fill .14s,stroke .14s,r .14s}
+.ptarget.hot{fill:#E8A317;stroke:#fff;stroke-dasharray:none;stroke-width:3}
+.pkeeper,.pball{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:view-box;transform-origin:0 0}
+.kbody{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:fill-box;transform-origin:50% 68%}
+.pkeeper{display:none}
+.pkeeper.dive-l .kbody{transform:rotate(-42deg)}
+.pkeeper.dive-r .kbody{transform:rotate(42deg)}
+.pkeeper.dive-u .kbody{transform:translateY(-3px) scale(1.04)}
+.pennet{transform-box:view-box;transform-origin:200px 208px}
+.pennet.ripple{animation:netbulge .55s ease-out}
+@keyframes netbulge{0%{transform:none}35%{transform:scaleY(1.07) scaleX(1.015)}100%{transform:none}}
+/* power meter — the green band is the sweet spot, the amber tail is too much */
+.powerwrap{margin:.4em 0 0}
+.powertrack{position:relative;height:26px;border-radius:13px;overflow:hidden;border:2px solid var(--line);
+  background:linear-gradient(90deg,
+    #E4DAC2 0 42.3%, #BFE0CB 42.3% 76.9%, #E4DAC2 76.9% 88.5%, #F0C9A6 88.5% 100%)}
+.powertrack i{display:block;height:100%;width:0;background:var(--pitch)}
+.powertrack i.weak{background:#9AA8A0}
+.powertrack i.good{background:var(--good)}
+.powertrack i.over{background:var(--miss)}
+.powerlabel{display:flex;justify-content:space-between;font-size:.8em;font-weight:700;color:var(--ink-soft);margin-top:3px}
+.runfield{margin:.5em 0 0;border-radius:12px;overflow:hidden;line-height:0;
+  touch-action:none;user-select:none;-webkit-user-select:none;background:#2F6FA8}
+.runfield canvas{display:block;width:100%;height:auto}
+.penres{font-size:1.45em;font-weight:800;text-align:center;margin:.35em 0 .1em}
+.penres.scored{color:var(--good)}
+.penres.saved{color:var(--miss)}
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
+  <symbol id="ic-ball" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="#fff" stroke="currentColor" stroke-width="2"/>
+    <path d="M12 6.4 L17 10 L15.1 15.9 H8.9 L7 10 Z" fill="currentColor"/>
+    <path d="M12 2v4.4M17 10l4.4-1.4M15.1 15.9l2.7 3.5M8.9 15.9l-2.7 3.5M7 10L2.6 8.6"
+          stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ic-ball-sm" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9.5" fill="currentColor"/>
+    <circle cx="12" cy="12" r="9.5" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.6"/>
+    <path d="M12 5.6 L17.1 9.3 L15.2 15.3 H8.8 L6.9 9.3 Z" fill="rgba(0,0,0,.55)"/>
+  </symbol>
+  <symbol id="ic-syn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+    <path d="M4 9h16M4 15h16"/></g></symbol>
+  <symbol id="ic-ant" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 8h13M12 4l4 4-4 4"/><path d="M21 16H8m4 4-4-4 4-4"/></g></symbol>
+  <symbol id="ic-tricky" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+    <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21"/></g></symbol>
+  <symbol id="ic-spell" viewBox="0 0 24 24"><g fill="currentColor">
+    <path d="M3 6h5l1.6 6H15a4 4 0 0 1 4 4v2H5a2 2 0 0 1-2-2Z"/></g>
+    <path d="M3 20h17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="ic-sent" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+    <path d="M10 8H7a4 4 0 0 0 0 8h3M14 8h3a4 4 0 0 1 0 8h-3M8.5 12h7"/></g></symbol>
+  <symbol id="ic-listen" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+    <path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14h3v6H5.5A1.5 1.5 0 0 1 4 18.5Z" fill="currentColor"/>
+    <path d="M20 14h-3v6h1.5a1.5 1.5 0 0 0 1.5-1.5Z" fill="currentColor"/></g></symbol>
+  <symbol id="ic-team" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round">
+    <rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M8 8.5h8M8 12.5h8M8 16.5h5"/></g></symbol>
+  <symbol id="ic-burst" viewBox="0 0 100 100">
+    <g fill="currentColor"><path d="M50 0l7 26 19-19-9 26 26-9-19 19 26 7-26 7 19 19-26-9 9 26-19-19-7 26-7-26-19 19 9-26-26 9 19-19L0 50l26-7L7 24l26 9-9-26 19 19z"/></g></symbol>
+</defs></svg>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="crest">
+      <svg class="badge" viewBox="0 0 40 44" role="img" aria-label="Word Vault crest">
+        <path d="M20 1 L38 7 V24 C38 34 30 40 20 43 C10 40 2 34 2 24 V7 Z" fill="#6B3FA0" stroke="#4A2B72" stroke-width="2"/>
+        <path d="M20 1 L38 7 V13 H2 V7 Z" fill="#E8A317"/>
+        <circle cx="20" cy="26" r="8.5" fill="#FFFFFF" stroke="#4A2B72" stroke-width="1.6"/>
+        <path d="M20 20.5 l1.9 4.2 4.6.5-3.4 3.1.9 4.5-4-2.3-4 2.3.9-4.5-3.4-3.1 4.6-.5z" fill="#4A2B72"/>
+        <text x="20" y="11.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#3A2A00"
+              font-family="-apple-system,BlinkMacSystemFont,sans-serif">WV</text>
+      </svg>
+      <b>WORD&nbsp;VAULT</b>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="iconbtn" id="btnSound" title="Sound">&#128266;</button>
+      <button class="iconbtn" id="btnSettings" title="Settings">&#9881;</button>
+    </div>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen on" id="scHome">
+    <div class="hero">
+      <svg viewBox="0 0 400 120" role="img" aria-label="A gym with a beam, bars and a landing mat">
+        <rect width="400" height="120" fill="#E7DCC6"/>
+        <g fill="#C8A97A">
+          <rect x="14" y="8" width="6" height="66"/><rect x="40" y="8" width="6" height="66"/>
+          <rect x="354" y="8" width="6" height="66"/><rect x="380" y="8" width="6" height="66"/>
+        </g>
+        <g fill="#D9C3A0">
+          <rect x="14" y="22" width="32" height="5"/><rect x="14" y="42" width="32" height="5"/>
+          <rect x="354" y="22" width="32" height="5"/><rect x="354" y="42" width="32" height="5"/>
+        </g>
+        <rect y="74" width="400" height="46" fill="#2F6FA8"/>
+        <rect y="74" width="400" height="5" fill="#24567F"/>
+        <rect x="120" y="60" width="160" height="9" rx="4" fill="#A87139"/>
+        <rect x="150" y="69" width="9" height="14" fill="#8C8C92"/>
+        <rect x="241" y="69" width="9" height="14" fill="#8C8C92"/>
+        <rect x="292" y="86" width="86" height="26" rx="6" fill="#D8A93F"/>
+        <g transform="translate(200,58)">
+          <ellipse rx="7" ry="11" fill="#7A3FA8"/>
+          <circle cy="-13" r="6" fill="#E9C39C"/>
+          <path d="M0 -18 a6 6 0 0 1 6 5 q-6 -3 -12 0 a6 6 0 0 1 6 -5z" fill="#3A2418"/>
+          <rect x="-14" y="-8" width="10" height="4" rx="2" fill="#E9C39C" transform="rotate(-35 -9 -6)"/>
+          <rect x="4" y="-8" width="10" height="4" rx="2" fill="#E9C39C" transform="rotate(35 9 -6)"/>
+          <rect x="-5" y="9" width="4" height="11" rx="2" fill="#E9C39C"/>
+          <rect x="1" y="9" width="4" height="11" rx="2" fill="#E9C39C"/>
+        </g>
+      </svg>
+    </div>
+    <div class="card">
+      <h1>Pick your event</h1>
+      <p class="muted">12 elements. Three in a row wins a vault — hold to build your run-up.</p>
+      <button class="btn gamebtn g-syn" data-mode="syn"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-syn"/></svg></span><span class="tx"><b>Synonyms</b><span>Words that mean the same</span></span></button>
+      <button class="btn gamebtn g-ant" data-mode="ant"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-ant"/></svg></span><span class="tx"><b>Opposites</b><span>Words that mean the reverse</span></span></button>
+      <button class="btn gamebtn g-tricky" data-mode="tricky"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-tricky"/></svg></span><span class="tx"><b>Tricky Words</b><span>Words you cannot sound out</span></span></button>
+      <button class="btn gamebtn g-spell" data-mode="spell"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-spell"/></svg></span><span class="tx"><b>Sticking Points</b><span>Spellings that catch people out</span></span></button>
+      <button class="btn gamebtn g-sent" data-mode="sent"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-sent"/></svg></span><span class="tx"><b>Build the Routine</b><span>Joining sentences that make sense</span></span></button>
+      <button class="btn gamebtn g-listen" data-mode="listen"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-listen"/></svg></span><span class="tx"><b>Listen In</b><span>Listen, then answer — no reading</span></span></button>
+      <button class="btn gamebtn g-team" data-mode="team"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-team"/></svg></span><span class="tx"><b>Group Work</b><span>Which words belong together</span></span></button>
+    </div>
+    <div class="card" id="seasonCard">
+      <h2>Your competition</h2>
+      <div id="seasonBody"></div>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="btnAvatar">Your gymnast</button>
+      <button class="btn ghost" id="btnSquad">Word list</button>
+      <button class="btn ghost" id="btnParent">Parent zone</button>
+    </div>
+  </section>
+
+  <!-- ================= AVATAR ================= -->
+  <section class="screen" id="scAvatar">
+    <div class="card">
+      <h1>Pick your gymnast</h1>
+      <p class="muted">This is who tumbles and takes the vaults.</p>
+      <div class="avgrid" id="avGrid"></div>
+    </div>
+    <button class="btn ghost" id="btnHomeAvatar">Done</button>
+  </section>
+
+  <!-- ================= LEVEL ================= -->
+  <section class="screen" id="scLevel">
+    <div class="card">
+      <h1 id="lvTitle">Synonyms</h1>
+      <p class="muted" id="lvSub"></p>
+      <button class="btn primary" data-level="1">Beginner &nbsp;·&nbsp; easier</button>
+      <button class="btn primary" data-level="2">Club &nbsp;·&nbsp; mixed</button>
+      <button class="btn primary" data-level="3">Elite &nbsp;·&nbsp; hardest</button>
+    </div>
+    <button class="btn ghost" id="btnHomeLevel">Back</button>
+  </section>
+
+  <!-- ================= MATCH ================= -->
+  <section class="screen" id="scMatch">
+    <div class="scoreline">
+      <div><span class="pill" id="attackNo">Element 1 of 12</span></div>
+      <div class="sc" id="scoreTxt">0 – 0</div>
+      <div class="clockbox" id="clockTxt"></div>
+    </div>
+    <div class="pitch" id="pitch">
+      <svg viewBox="0 0 300 68" role="img" aria-label="Pitch showing how far your attack has advanced">
+        <defs>
+          <g id="ballArt">
+            <circle r="9" fill="#FFFFFF" stroke="#1B2430" stroke-width="1.8"/>
+            <path d="M0 -5.2 L4.9 -1.6 L3 4.2 L-3 4.2 L-4.9 -1.6 Z" fill="#1B2430"/>
+            <path d="M0 -9 L0 -5.2 M4.9 -1.6 L8.6 -2.8 M3 4.2 L5.3 7.3 M-3 4.2 L-5.3 7.3 M-4.9 -1.6 L-8.6 -2.8"
+                  stroke="#1B2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </g>
+        </defs>
+        <rect width="300" height="68" fill="#3E8F5C"/>
+        <rect x="0"   width="50" height="68" fill="#46A167"/>
+        <rect x="100" width="50" height="68" fill="#46A167"/>
+        <rect x="200" width="50" height="68" fill="#46A167"/>
+        <g stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none">
+          <path d="M150 2 V66"/>
+          <circle cx="150" cy="34" r="12"/>
+          <path d="M300 10 H268 V58 H300"/>
+          <path d="M300 24 H286 V44 H300"/>
+          <path d="M0 10 H32 V58 H0"/>
+        </g>
+        <circle cx="150" cy="34" r="2" fill="rgba(255,255,255,.7)"/>
+        <circle cx="278" cy="34" r="2" fill="rgba(255,255,255,.7)"/>
+        <g class="mball" id="ball" style="transform:translate(36px,34px)"><use href="#ballArt"/></g>
+      </svg>
+    </div>
+    <div class="streakdots" id="streakDots" style="margin-bottom:12px">
+      <svg class="sdot" viewBox="0 0 24 24"><use href="#ic-ball-sm"/></svg>
+      <svg class="sdot" viewBox="0 0 24 24"><use href="#ic-ball-sm"/></svg>
+      <svg class="sdot" viewBox="0 0 24 24"><use href="#ic-ball-sm"/></svg>
+      <span class="streaklabel" id="streakLabel">three in a row wins a vault</span>
+    </div>
+
+    <div class="card" id="qCard">
+      <div class="qtype" id="qType">Pick the pass</div>
+      <div id="qStem"></div>
+      <div id="qHelp" class="small muted" style="margin:.4em 0 .9em"></div>
+      <div id="qOpts"></div>
+      <button class="btn gold hidden" id="btnConfirm">Go!</button>
+      <div class="fiftyrow">
+        <button class="btn ghost hidden" id="btnFifty">50 : 50 &nbsp;·&nbsp; take away two wrong ones</button>
+        <div class="small muted" id="xpLine"></div>
+      </div>
+    </div>
+
+    <button class="btn primary hidden" id="btnNext">Next element &rsaquo;</button>
+    <div id="fbBox"></div>
+    <button class="btn ghost" id="btnQuit">Leave the gym</button>
+  </section>
+
+  <!-- ================= FULL TIME ================= -->
+  <section class="screen" id="scFT">
+    <div class="board">
+      <div class="bt">Full time</div>
+      <div class="bn"><span>Word Attack FC</span><span id="ftOpp">Visitors</span></div>
+      <div class="bs" id="ftScore">0 – 0</div>
+    </div>
+    <div class="card">
+      <h1 id="ftHead">Full time</h1>
+      <p id="ftLine" class="muted"></p>
+      <div id="ftStats"></div>
+    </div>
+    <div class="card" id="ftReviewCard">
+      <h2>Words to work on</h2>
+      <div id="ftReview"></div>
+    </div>
+    <button class="btn primary" id="btnPlayAgain">Play again</button>
+    <button class="btn ghost" id="btnHomeFT">Back to home</button>
+  </section>
+
+  <!-- ================= SQUAD ================= -->
+  <section class="screen" id="scSquad">
+    <div class="card">
+      <h1>Word list</h1>
+      <p class="muted small">All 96 words from the list. Tap any word to hear it and see its synonyms.</p>
+      <div class="small" style="margin-bottom:10px">
+        <span class="pill lg-good">Strong</span>
+        <span class="pill lg-mid">Getting there</span>
+        <span class="pill lg-weak">Needs work</span>
+      </div>
+      <div class="gridwords" id="squadGrid"></div>
+    </div>
+    <div class="card hidden" id="squadDetail"></div>
+    <button class="btn ghost" id="btnHomeSquad">Back to home</button>
+  </section>
+
+  <!-- ================= PARENT ================= -->
+  <section class="screen" id="scParent">
+    <div class="card">
+      <h1>Parent zone</h1>
+      <div id="parentSummary"></div>
+    </div>
+    <div class="card">
+      <h2>By game</h2>
+      <div id="parentByMode"></div>
+    </div>
+    <div class="card">
+      <h2>Weakest items</h2>
+      <p class="muted small">Sorted by accuracy. These are the ones worth revisiting out loud.</p>
+      <div id="parentWeak"></div>
+    </div>
+    <div class="card">
+      <h2>Recent matches</h2>
+      <div id="parentHistory"></div>
+    </div>
+    <div class="card">
+      <h2>Controls</h2>
+      <div class="setting">
+        <label for="setDayStreak">Days in a row<br><span class="small muted">Counts consecutive days she finishes a round. Turn off if a broken streak would bother her more than it motivates her.</span></label>
+        <div class="switch"><input type="checkbox" id="setDayStreak" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setOppGoals">Let the other club score<br><span class="small muted">Off means she never goes behind — the round is only about what she scores.</span></label>
+        <div class="switch"><input type="checkbox" id="setOppGoals" checked><span></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Data</h3>
+      <p class="muted small" id="storageNote"></p>
+      <button class="btn ghost" id="btnExport">Export progress (text)</button>
+      <button class="btn ghost" id="btnReset">Reset all progress</button>
+    </div>
+    <button class="btn ghost" id="btnHomeParent">Back to home</button>
+  </section>
+
+  <!-- ================= SETTINGS ================= -->
+  <section class="screen" id="scSettings">
+    <div class="card">
+      <h1>Settings</h1>
+      <div class="setting">
+        <label for="setVoice">Read words aloud<br><span class="small muted">Tap the speaker on any word</span></label>
+        <div class="switch"><input type="checkbox" id="setVoice" checked><span></span></div>
+      </div>
+      <div class="setting" style="display:block">
+        <label style="display:block;margin-bottom:6px">Which voice
+          <br><span class="small muted" id="voiceHint">Tap one to hear it</span></label>
+        <div class="voicelist" id="voiceList"></div>
+      </div>
+      <div class="setting">
+        <label for="setReader">A grown-up reads the passage<br><span class="small muted">Shows the words for you to read aloud, then hides them. No robot voice.</span></label>
+        <div class="switch"><input type="checkbox" id="setReader"><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setAutoSay">Say the answer after a miss<br><span class="small muted">Hearing it helps it stick</span></label>
+        <div class="switch"><input type="checkbox" id="setAutoSay" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setClock">Match clock<br><span class="small muted">Off by default — no time pressure</span></label>
+        <div class="switch"><input type="checkbox" id="setClock"><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setSpace">Extra letter spacing<br><span class="small muted">Wider gaps between letters and words</span></label>
+        <div class="switch"><input type="checkbox" id="setSpace" checked><span></span></div>
+      </div>
+      <div class="setting">
+        <label for="setSize">Text size</label>
+        <input type="range" id="setSize" min="90" max="145" step="5" value="105">
+      </div>
+      <div class="setting">
+        <label>Background colour<br><span class="small muted">Some readers find tinted paper easier</span></label>
+        <div class="swatches" id="swatches">
+          <button data-theme="" style="background:#F7F0E1" aria-pressed="true" title="Cream"></button>
+          <button data-theme="theme-blue" style="background:#E9F1F7" aria-pressed="false" title="Blue"></button>
+          <button data-theme="theme-mint" style="background:#E8F3EC" aria-pressed="false" title="Mint"></button>
+          <button data-theme="theme-grey" style="background:#EDEDEA" aria-pressed="false" title="Grey"></button>
+          <button data-theme="theme-dark" style="background:#1E252A" aria-pressed="false" title="Dark"></button>
+        </div>
+      </div>
+    </div>
+    <button class="btn primary" id="btnHomeSet">Done</button>
+  </section>
+
+</div>
+
+<!-- ================= RUN ================= -->
+<div class="penwrap" id="runWrap">
+  <div class="pencard">
+    <div class="penhead">Floor routine</div>
+    <h2 style="margin:.1em 0 .2em">Your floor routine — tumble the length of it.</h2>
+    <p class="small muted" id="runMsg" style="margin:0">Swipe left or right for the clear lane. Swipe up to leap the beam.</p>
+    <div class="runfield"><canvas id="runCanvas" width="360" height="520"></canvas></div>
+    <div class="penres" id="runRes">&nbsp;</div>
+  </div>
+</div>
+
+<!-- ================= PENALTY ================= -->
+<div class="penwrap" id="penWrap">
+  <div class="pencard">
+    <div class="penhead">Vault</div>
+    <h2 style="margin:.1em 0 .2em">Three in a row — you're on the vault.</h2>
+    <p class="small muted" id="penMsg" style="margin:0">Swipe from the ball towards a corner of the net. Or just tap the corner you want.</p>
+    <div class="penfield" id="penField">
+      <svg viewBox="0 0 400 320" role="img" aria-label="Vault: the table, the springboard and the landing mat">
+        <defs>
+          <pattern id="wallbars" width="26" height="26" patternUnits="userSpaceOnUse">
+            <rect width="26" height="26" fill="#E7DCC6"/>
+            <rect x="2" y="0" width="5" height="26" fill="#C8A97A"/>
+            <rect x="19" y="0" width="5" height="26" fill="#C8A97A"/>
+            <rect x="0" y="10" width="26" height="5" fill="#D9C3A0"/>
+          </pattern>
+          <g id="ballArt2">
+            <ellipse cx="0" cy="0" rx="7" ry="11" fill="#7A3FA8"/>
+            <circle cx="0" cy="-13" r="6" fill="#E9C39C"/>
+            <path d="M0 -18 a6 6 0 0 1 6 5 q-6 -3 -12 0 a6 6 0 0 1 6 -5z" fill="#3A2418"/>
+            <rect x="-13" y="-6" width="9" height="4" rx="2" fill="#E9C39C"/>
+            <rect x="4" y="-6" width="9" height="4" rx="2" fill="#E9C39C"/>
+            <rect x="-5" y="9" width="4" height="10" rx="2" fill="#E9C39C"/>
+            <rect x="1" y="9" width="4" height="10" rx="2" fill="#E9C39C"/>
+          </g>
+        </defs>
+
+        <rect width="400" height="150" fill="url(#wallbars)"/>
+        <rect y="146" width="400" height="8" fill="#A8875C"/>
+        <rect y="154" width="400" height="166" fill="#E3D3B4"/>
+        <rect y="196" width="400" height="124" rx="10" fill="#2F6FA8"/>
+        <rect y="196" width="400" height="124" rx="10" fill="none" stroke="#24567F" stroke-width="4"/>
+        <g stroke="rgba(255,255,255,.35)" stroke-width="2">
+          <path d="M0 240 H400"/><path d="M0 282 H400"/>
+        </g>
+
+        <rect x="150" y="150" width="100" height="20" rx="10" fill="#C9532F"/>
+        <rect x="150" y="150" width="100" height="7" rx="3.5" fill="#E0754D"/>
+        <rect x="186" y="168" width="12" height="30" fill="#8C8C92"/>
+        <rect x="202" y="168" width="12" height="30" fill="#8C8C92"/>
+        <path d="M168 300 L232 300 L246 284 L154 284 Z" fill="#D8A93F"/>
+        <path d="M154 284 L246 284" stroke="#B78B23" stroke-width="3"/>
+
+        <circle class="ptarget" data-zone="TL" cx="118" cy="216" r="19"/>
+        <circle class="ptarget" data-zone="C"  cx="200" cy="216" r="19"/>
+        <circle class="ptarget" data-zone="TR" cx="282" cy="216" r="19"/>
+        <circle class="ptarget" data-zone="BL" cx="100" cy="264" r="19"/>
+        <circle class="ptarget" data-zone="BR" cx="300" cy="264" r="19"/>
+
+        <g class="pkeeper" id="penKeeper" style="transform:translate(200px,182px)">
+          <g class="kbody"><circle r="0" fill="none"/></g>
+        </g>
+        <rect id="penNet" class="pennet" x="0" y="196" width="400" height="124" fill="none"/>
+        <g class="pball" id="penBall" style="transform:translate(200px,292px)"><use href="#ballArt2"/></g>
+      </svg>
+    </div>
+    <div class="penres" id="penRes">&nbsp;</div>
+    <div class="powerwrap">
+      <div class="powertrack"><i id="penPowerFill"></i></div>
+      <div class="powerlabel"><span>Power</span><span id="penPowerTxt">Hold to run up</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Squad data: 96 headwords from Rita Treacy's "Synonyms 96 most common" list.
+   Synonyms filtered to age-appropriate options. t = tier (1 easy, 2 mid, 3 hard).
+   s = example sentence containing the headword (used for the through-ball round). */
+const SQUAD = [
+{w:"amazing",t:1,y:["incredible","unbelievable","wonderful","fantastic","astonishing","fabulous","astounding"],s:"That routine on the beam was amazing."},
+{w:"anger",t:3,y:["enrage","infuriate","madden","exasperate"],s:"The unfair penalty began to anger the crowd."},
+{w:"angry",t:1,y:["mad","furious","enraged","annoyed","raging","indignant","exasperated"],s:"The coach was angry about the untidy landing."},
+{w:"answer",t:1,y:["reply","respond","retort","acknowledge"],s:"She put up her hand to answer the question."},
+{w:"ask",t:1,y:["question","enquire","request","query","quiz","demand","inquire"],s:"She wanted to ask the coach about training."},
+{w:"awful",t:1,y:["dreadful","terrible","horrible","unpleasant","bad","poor"],s:"The weather was awful for the display."},
+{w:"bad",t:1,y:["evil","wicked","rotten","poor","harmful"],s:"That was a bad fall and it really hurt."},
+{w:"beautiful",t:1,y:["pretty","lovely","gorgeous","stunning","elegant","handsome","attractive","dazzling","splendid"],s:"It was a beautiful turn on the beam."},
+{w:"begin",t:1,y:["start","open","launch","commence","initiate","originate"],s:"The next routine will begin in ten minutes."},
+{w:"big",t:1,y:["enormous","huge","immense","gigantic","vast","colossal","large","sizable","grand"],s:"There was a big crowd in the hall."},
+{w:"brave",t:2,y:["courageous","fearless","daring","heroic","bold","valiant"],s:"It was a brave move on the high bar."},
+{w:"break",t:1,y:["fracture","shatter","smash","snap","wreck","rupture","crash","demolish"],s:"Careful, or you might break the window."},
+{w:"bright",t:2,y:["shining","gleaming","brilliant","vivid","glowing","shiny","sparkling","shimmering","radiant"],s:"The lights in the hall were very bright."},
+{w:"calm",t:2,y:["peaceful","tranquil","serene","composed","unruffled","quiet","still","mild","smooth"],s:"She stayed calm and stuck the landing."},
+{w:"come",t:1,y:["approach","advance","arrive","near","reach"],s:"Watch the coach come towards you."},
+{w:"cool",t:1,y:["chilly","cold","frosty","icy","wintry","frigid"],s:"The air in the hall was cool that evening."},
+{w:"crooked",t:2,y:["bent","twisted","curved","hooked","zigzag"],s:"The old bench looked crooked after the move."},
+{w:"cry",t:1,y:["weep","sob","wail","bawl","howl","shout","yell","scream"],s:"She tried not to cry when she slipped."},
+{w:"cut",t:1,y:["slash","slice","carve","chop","gash","prick","nick","sever"],s:"He fell and got a cut on his knee."},
+{w:"dangerous",t:2,y:["risky","unsafe","perilous","hazardous"],s:"The wet steps can be dangerous."},
+{w:"dark",t:1,y:["gloomy","dim","murky","shadowy","dusky","unlit","shaded","black"],s:"It was too dark to keep playing."},
+{w:"decide",t:1,y:["choose","settle","determine","resolve","pick"],s:"The judges had to decide quickly."},
+{w:"definite",t:3,y:["certain","sure","positive","clear","obvious","determined","distinct"],s:"That was a definite wobble."},
+{w:"delicious",t:1,y:["tasty","appetising","scrumptious","luscious","savoury","delightful","enjoyable"],s:"The pasta after training was delicious."},
+{w:"describe",t:2,y:["portray","recount","narrate","depict","relate","picture","represent","report","record"],s:"Can you describe the winning routine?"},
+{w:"destroy",t:2,y:["ruin","demolish","flatten","raze","wreck","waste","extinguish"],s:"The storm could destroy the old roof."},
+{w:"difference",t:3,y:["contrast","gap","distinction","dissimilarity"],s:"There was a big difference between the two clubs."},
+{w:"do",t:1,y:["perform","complete","accomplish","achieve","execute"],s:"She had a lot of training to do."},
+{w:"dull",t:2,y:["boring","tiresome","dreary","tedious","humdrum","slow","lifeless"],s:"The first hour was a dull session."},
+{w:"eager",t:2,y:["keen","enthusiastic","fervent","raring","interested"],s:"She was eager to get on the floor."},
+{w:"end",t:1,y:["finish","conclude","close","halt","terminate"],s:"The buzzer brought the routine to an end."},
+{w:"enjoy",t:1,y:["relish","savour","appreciate","delight in","like"],s:"She really does enjoy training on a Saturday."},
+{w:"explain",t:2,y:["clarify","define","interpret","justify","elaborate"],s:"The coach had to explain the new routine."},
+{w:"fair",t:2,y:["just","impartial","unbiased","even-handed","objective","honest"],s:"The judges were fair to both clubs."},
+{w:"fall",t:1,y:["drop","descend","tumble","topple","plunge"],s:"She watched the chalk fall onto the mat."},
+{w:"false",t:2,y:["fake","untrue","counterfeit","fraudulent","bogus"],s:"That was a false start in the race."},
+{w:"famous",t:2,y:["well-known","renowned","celebrated","eminent","noted"],s:"She met a famous gymnast at the display."},
+{w:"fast",t:1,y:["quick","rapid","speedy","swift","fleet","hasty","snappy"],s:"Her tumbling is incredibly fast."},
+{w:"fat",t:1,y:["plump","stout","chubby","tubby","rotund","chunky","burly","bulky"],s:"The cat had grown fat over the winter."},
+{w:"fear",t:2,y:["fright","dread","terror","alarm","panic","dismay","anxiety","scare"],s:"She trained without any fear at all."},
+{w:"fly",t:1,y:["soar","glide","hover","sail","skim","coast","cruise"],s:"She watched her sister fly over the bar."},
+{w:"funny",t:1,y:["humorous","amusing","comical","droll","hilarious","comic","laughable","silly"],s:"Her story about the coach was funny."},
+{w:"get",t:1,y:["obtain","acquire","gain","procure","secure","fetch","find","accumulate"],s:"Go and get your grips from the bag."},
+{w:"go",t:1,y:["depart","leave","proceed","withdraw","exit","move","travel"],s:"It is time to go to training."},
+{w:"good",t:1,y:["excellent","fine","superb","splendid","first-rate","superior","wonderful","marvellous"],s:"That was a good first attempt."},
+{w:"great",t:2,y:["remarkable","outstanding","mighty","grand","noteworthy","worthy","powerful"],s:"It was a great landing at the very end."},
+{w:"gross",t:3,y:["crude","coarse","vulgar","indecent","uncouth","improper","rude"],s:"She thought the joke was a bit gross."},
+{w:"happy",t:1,y:["pleased","delighted","cheerful","joyful","glad","contented","satisfied","elated"],s:"She was happy with the result."},
+{w:"hate",t:1,y:["despise","loathe","detest","abhor","dislike","disapprove"],s:"She began to hate falling."},
+{w:"have",t:1,y:["possess","own","hold","contain","bear","acquire","gain","maintain"],s:"They have a display on Saturday."},
+{w:"help",t:1,y:["aid","assist","support","serve","befriend","encourage","relieve"],s:"The coach came over to help her up."},
+{w:"hide",t:1,y:["conceal","cover","mask","screen","camouflage","cloak"],s:"She tried to hide her disappointment."},
+{w:"hurry",t:1,y:["rush","hasten","bustle","scurry","run","speed","race","urge","accelerate"],s:"They had to hurry to catch the bus."},
+{w:"hurt",t:1,y:["injure","harm","damage","wound","afflict","distress","pain"],s:"She did not want to hurt her wrist again."},
+{w:"idea",t:2,y:["thought","notion","concept","belief","opinion","conception","plan","view"],s:"She had a clever idea for her floor music."},
+{w:"important",t:2,y:["vital","essential","significant","crucial","principal","necessary","critical","valuable","primary"],s:"It was an important day for the club."},
+{w:"interesting",t:3,y:["fascinating","engaging","gripping","intriguing","absorbing"],s:"The book about surfing was interesting."},
+{w:"keep",t:1,y:["retain","preserve","maintain","withhold","sustain","hold"],s:"You can keep the medal."},
+{w:"kill",t:2,y:["slay","assassinate","murder","exterminate","destroy"],s:"A hard frost can kill the young plants."},
+{w:"lazy",t:2,y:["idle","inactive","sluggish","slothful"],s:"She was too lazy to warm up properly."},
+{w:"little",t:1,y:["tiny","small","minute","petite","miniature","puny"],s:"There was only a little time left."},
+{w:"look",t:1,y:["gaze","stare","glance","peer","behold","see","watch","survey","study"],s:"Look at the space at the end of the beam."},
+{w:"love",t:1,y:["adore","cherish","treasure","worship","admire","like","fancy","appreciate","savour"],s:"She would love to compete in the national final."},
+{w:"make",t:1,y:["create","build","form","produce","construct","originate","invent","design","manufacture"],s:"They can make a routine out of almost nothing."},
+{w:"mark",t:2,y:["label","tag","stamp","brand","imprint","impress"],s:"There was a chalk mark on the new beam."},
+{w:"mischievous",t:3,y:["naughty","playful","prankish","impish","roguish"],s:"His little sister had a mischievous grin."},
+{w:"move",t:1,y:["travel","shift","budge","stir","journey","go","creep","crawl","drag"],s:"She had to move quickly into position."},
+{w:"moody",t:3,y:["grumpy","sulky","irritable","touchy","peevish","changeable","glum","sullen"],s:"She gets moody when she is tired."},
+{w:"neat",t:2,y:["tidy","orderly","trim","spruce","shipshape","clean","smart","elegant"],s:"That was a neat bit of footwork."},
+{w:"new",t:1,y:["fresh","modern","recent","novel","current","original","unusual"],s:"She got a new leotard for her birthday."},
+{w:"old",t:1,y:["ancient","aged","elderly","antique","veteran","used","worn"],s:"The old crash mat was falling apart."},
+{w:"part",t:1,y:["portion","share","piece","section","fragment","fraction"],s:"She only did part of the routine."},
+{w:"place",t:1,y:["spot","area","location","site","region","plot","position"],s:"The beach is his favourite place."},
+{w:"plan",t:2,y:["scheme","design","blueprint","strategy","arrangement","plot"],s:"The coach had a plan for the second half."},
+{w:"popular",t:2,y:["well-liked","favoured","accepted","approved","favourite","celebrated","common"],s:"Gymnastics is popular in Sligo."},
+{w:"predicament",t:3,y:["dilemma","quandary","plight","pickle","scrape","problem","spot","jam"],s:"Losing her grips was a real predicament."},
+{w:"put",t:1,y:["place","set","lay","position","deposit","attach","establish","assign"],s:"Put your kit in the bag."},
+{w:"quiet",t:1,y:["silent","still","hushed","soundless","mute","tranquil","peaceful","calm","restful"],s:"The whole stadium went quiet."},
+{w:"right",t:1,y:["correct","accurate","factual","proper","precise","true","just","honest"],s:"She gave the right answer."},
+{w:"run",t:1,y:["sprint","race","dash","bolt","gallop","speed","hurry","hasten","rush"],s:"She can run the length of the floor."},
+{w:"say",t:1,y:["state","declare","utter","remark","mention"],s:"She did not say a word until it was over."},
+{w:"scared",t:1,y:["afraid","frightened","alarmed","terrified","fearful","panicked","timid","shy"],s:"She was scared of the high beam."},
+{w:"show",t:1,y:["display","exhibit","present","reveal","demonstrate"],s:"Show me your new trick."},
+{w:"slow",t:1,y:["unhurried","gradual","leisurely","sluggish","slack","tedious"],s:"It was a slow start to the session."},
+{w:"stop",t:1,y:["cease","halt","pause","discontinue","quit","end"],s:"The coach had to stop the session."},
+{w:"story",t:1,y:["tale","myth","legend","fable","anecdote","account","narrative"],s:"She wrote a funny story about a bird."},
+{w:"strange",t:1,y:["odd","peculiar","unusual","weird","outlandish","unfamiliar","uncommon","curious"],s:"It was a strange landing off the bars."},
+{w:"take",t:1,y:["grab","seize","grasp","capture","snatch","hold","catch","acquire"],s:"She will take the last turn."},
+{w:"tell",t:1,y:["inform","notify","reveal","disclose","divulge","relate"],s:"Tell me what happened at the end."},
+{w:"think",t:1,y:["believe","consider","reckon","judge","contemplate","assume","reflect"],s:"I think we can win this one."},
+{w:"trouble",t:2,y:["difficulty","distress","bother","hardship","misfortune","anxiety","worry"],s:"The whole club was in serious trouble."},
+{w:"true",t:1,y:["genuine","real","actual","authentic","truthful","accurate","right","proper","precise"],s:"That story is actually true."},
+{w:"ugly",t:2,y:["hideous","unsightly","grotesque","repulsive","monstrous","horrible","unpleasant"],s:"It was an ugly fall from the top bar."},
+{w:"unhappy",t:1,y:["sad","miserable","gloomy","downhearted","sorrowful","unfortunate","depressed","glum"],s:"She was unhappy about her score."},
+{w:"use",t:2,y:["employ","utilise","expend","consume","exercise","spend"],s:"Use your left hand more often."},
+{w:"wrong",t:1,y:["incorrect","inaccurate","mistaken","erroneous","improper","unsuitable"],s:"She got the answer wrong."}
+];
+
+/* ---- ANTONYMS: Rita's next step once the synonyms are learned ---- */
+const OPPOSITES = [
+{w:"amazing",t:2,a:["ordinary","unremarkable","dull"]},
+{w:"angry",t:1,a:["calm","pleased","content"]},
+{w:"answer",t:1,a:["question","ask"]},
+{w:"awful",t:1,a:["wonderful","lovely","excellent"]},
+{w:"bad",t:1,a:["good","fine","excellent"]},
+{w:"beautiful",t:1,a:["ugly","hideous","plain"]},
+{w:"begin",t:1,a:["end","finish","stop"]},
+{w:"big",t:1,a:["small","tiny","little"]},
+{w:"brave",t:2,a:["cowardly","fearful","timid"]},
+{w:"break",t:1,a:["mend","fix","repair"]},
+{w:"bright",t:2,a:["dull","dim","gloomy"]},
+{w:"calm",t:2,a:["stormy","wild","frantic"]},
+{w:"come",t:1,a:["go","leave","depart"]},
+{w:"cool",t:1,a:["warm","hot","boiling"]},
+{w:"crooked",t:2,a:["straight","level"]},
+{w:"cry",t:1,a:["laugh","giggle","chuckle"]},
+{w:"dangerous",t:2,a:["safe","harmless","secure"]},
+{w:"dark",t:1,a:["bright","light","sunny"]},
+{w:"definite",t:3,a:["uncertain","doubtful","unsure"]},
+{w:"delicious",t:2,a:["disgusting","tasteless","revolting"]},
+{w:"destroy",t:2,a:["build","create","construct"]},
+{w:"difference",t:3,a:["similarity","likeness","sameness"]},
+{w:"dull",t:2,a:["exciting","fascinating","lively"]},
+{w:"eager",t:3,a:["reluctant","unwilling","hesitant"]},
+{w:"end",t:1,a:["begin","start","commence"]},
+{w:"enjoy",t:1,a:["hate","loathe","detest"]},
+{w:"fair",t:2,a:["unfair","biased","unjust"]},
+{w:"fall",t:1,a:["rise","climb","ascend"]},
+{w:"false",t:2,a:["true","genuine","real"]},
+{w:"famous",t:2,a:["unknown","obscure","forgotten"]},
+{w:"fast",t:1,a:["slow","sluggish","unhurried"]},
+{w:"fat",t:1,a:["thin","slim","skinny"]},
+{w:"fear",t:2,a:["courage","bravery","confidence"]},
+{w:"funny",t:1,a:["serious","solemn","grave"]},
+{w:"get",t:1,a:["give","lose","surrender"]},
+{w:"go",t:1,a:["stay","remain","arrive"]},
+{w:"good",t:1,a:["bad","evil","poor"]},
+{w:"happy",t:1,a:["sad","miserable","gloomy"]},
+{w:"hate",t:1,a:["love","adore","cherish"]},
+{w:"help",t:2,a:["hinder","obstruct","block"]},
+{w:"hide",t:1,a:["show","reveal","display"]},
+{w:"hurry",t:2,a:["dawdle","dally","linger"]},
+{w:"hurt",t:1,a:["heal","soothe","comfort"]},
+{w:"important",t:2,a:["trivial","minor","unimportant"]},
+{w:"interesting",t:3,a:["boring","tedious","dreary"]},
+{w:"keep",t:1,a:["lose","discard","abandon"]},
+{w:"lazy",t:2,a:["hardworking","energetic","industrious"]},
+{w:"little",t:1,a:["big","huge","enormous"]},
+{w:"love",t:1,a:["hate","loathe","despise"]},
+{w:"make",t:1,a:["destroy","demolish","ruin"]},
+{w:"moody",t:3,a:["cheerful","even-tempered","sunny"]},
+{w:"neat",t:2,a:["messy","untidy","scruffy"]},
+{w:"new",t:1,a:["old","ancient","worn"]},
+{w:"old",t:1,a:["new","modern","fresh"]},
+{w:"popular",t:2,a:["unpopular","disliked","shunned"]},
+{w:"quiet",t:1,a:["loud","noisy","deafening"]},
+{w:"right",t:1,a:["wrong","incorrect","mistaken"]},
+{w:"scared",t:1,a:["brave","fearless","confident"]},
+{w:"show",t:1,a:["hide","conceal","cover"]},
+{w:"slow",t:1,a:["fast","quick","rapid"]},
+{w:"stop",t:1,a:["start","begin","continue"]},
+{w:"strange",t:2,a:["normal","ordinary","familiar"]},
+{w:"take",t:1,a:["give","offer","return"]},
+{w:"trouble",t:2,a:["ease","calm","peace"]},
+{w:"true",t:1,a:["false","untrue","fake"]},
+{w:"ugly",t:2,a:["beautiful","lovely","handsome"]},
+{w:"unhappy",t:1,a:["happy","cheerful","delighted"]},
+{w:"wrong",t:1,a:["right","correct","accurate"]}
+];
+
+/* ---- SPELLING: built from Tom's own Vernon errors.
+   r = rule: 'silent' (thumb->thum, honest->onest, straight->strait)
+             'double' (arrive->arive, million->milon)
+             'end'    (shovel->shuvle, length->lenth, except->exept)
+   sl = the silent letter, for the "ghost player" round. ---- */
+const SPELLS = [
+{w:"earth",r:"team",sl:"",t:1,bad:["eather","erth"]},
+{w:"young",r:"team",sl:"",t:1,bad:["yuing","yung"]},
+{w:"crowded",r:"team",sl:"",t:1,bad:["croudid","crowdid"]},
+{w:"reason",r:"team",sl:"",t:2,bad:["reasen","reeson"]},
+{w:"ground",r:"team",sl:"",t:1,bad:["grownd","gruond"]},
+{w:"mouth",r:"team",sl:"",t:1,bad:["mowth","muoth"]},
+{w:"shout",r:"team",sl:"",t:1,bad:["showt","shute"]},
+{w:"brown",r:"team",sl:"",t:1,bad:["broun","browne"]},
+{w:"coast",r:"team",sl:"",t:2,bad:["cost","coste"]},
+{w:"dream",r:"team",sl:"",t:1,bad:["dreem","driem"]},
+{w:"beach",r:"team",sl:"",t:1,bad:["beech","beache"]},
+{w:"cloud",r:"team",sl:"",t:1,bad:["clowd","clould"]},
+{w:"heard",r:"team",sl:"",t:2,bad:["herd","heared"]},
+{w:"learn",r:"team",sl:"",t:2,bad:["lern","lurn"]},
+{w:"pencil",r:"soft",sl:"",t:1,bad:["pensel","pencle"]},
+{w:"office",r:"soft",sl:"",t:2,bad:["ofice","offise"]},
+{w:"circle",r:"soft",sl:"",t:1,bad:["sircle","circel"]},
+{w:"city",r:"soft",sl:"",t:1,bad:["sity","citty"]},
+{w:"ice",r:"soft",sl:"",t:1,bad:["ise","eyce"]},
+{w:"face",r:"soft",sl:"",t:1,bad:["fase","faice"]},
+{w:"race",r:"soft",sl:"",t:1,bad:["rase","raice"]},
+{w:"dance",r:"soft",sl:"",t:1,bad:["danse","dans"]},
+{w:"page",r:"soft",sl:"",t:1,bad:["paje","padge"]},
+{w:"giant",r:"soft",sl:"",t:2,bad:["jiant","gyant"]},
+{w:"gentle",r:"soft",sl:"",t:2,bad:["jentle","gentel"]},
+{w:"bridge",r:"soft",sl:"",t:2,bad:["brige","bridg"]},
+{w:"complete",r:"magic",sl:"",t:2,bad:["compleet","complet"]},
+{w:"hope",r:"magic",sl:"",t:1,bad:["hoap","hop"]},
+{w:"bike",r:"magic",sl:"",t:1,bad:["byke","bik"]},
+{w:"cake",r:"magic",sl:"",t:1,bad:["caik","cak"]},
+{w:"time",r:"magic",sl:"",t:1,bad:["tighm","tim"]},
+{w:"note",r:"magic",sl:"",t:1,bad:["noat","not"]},
+{w:"plane",r:"magic",sl:"",t:1,bad:["plain","plan"]},
+{w:"stripe",r:"magic",sl:"",t:2,bad:["strype","strip"]},
+{w:"smile",r:"magic",sl:"",t:1,bad:["smiel","smil"]},
+{w:"stone",r:"magic",sl:"",t:1,bad:["stoan","ston"]},
+{w:"honey",r:"end",sl:"",t:1,bad:["honea","huny"]},
+{w:"money",r:"end",sl:"",t:1,bad:["munny","monny"]},
+{w:"monkey",r:"end",sl:"",t:1,bad:["munky","monkie"]},
+{w:"million",r:"end",sl:"",t:2,bad:["milyin","milion"]},
+{w:"station",r:"end",sl:"",t:2,bad:["stashun","staton"]},
+{w:"action",r:"end",sl:"",t:2,bad:["akshun","acton"]},
+{w:"wanted",r:"end",sl:"",t:1,bad:["wantid","wonted"]},
+{w:"landed",r:"end",sl:"",t:1,bad:["landid","landded"]},
+{w:"rabbit",r:"double",sl:"",t:1,bad:["rabit","rabbet"]},
+{w:"dinner",r:"double",sl:"",t:1,bad:["diner","dinnar"]},
+{w:"happy",r:"double",sl:"",t:1,bad:["hapy","happi"]},
+{w:"little",r:"double",sl:"",t:1,bad:["litle","littel"]},
+{w:"better",r:"double",sl:"",t:1,bad:["beter","bettar"]},
+{w:"summer",r:"double",sl:"",t:1,bad:["sumer","summar"]},
+{w:"bottle",r:"double",sl:"",t:1,bad:["botle","bottel"]},
+{w:"ladder",r:"double",sl:"",t:2,bad:["lader","laddar"]},
+{w:"thumb",r:"silent",sl:"b",t:1,bad:["thoom","thum"]},
+{w:"lamb",r:"silent",sl:"b",t:1,bad:["lam","lamm"]},
+{w:"knee",r:"silent",sl:"k",t:1,bad:["nee","knea"]},
+{w:"write",r:"silent",sl:"w",t:1,bad:["rite","wright"]},
+{w:"half",r:"silent",sl:"l",t:1,bad:["haf","hald"]},
+{w:"listen",r:"silent",sl:"t",t:2,bad:["lisen","lissen"]},
+{w:"wrist",r:"silent",sl:"w",t:2,bad:["rist","wrisst"]},
+{w:"climb",r:"silent",sl:"b",t:1,bad:["clime","clim"]}
+];
+
+/* ---- CONNECTIVES: aimed at Formulated Sentences (SS 10, age equiv 9:07)
+   and specifically at clause-order errors like Tom's
+   "Until the shop opens the girl can buy her bike." ---- */
+const JOINS = [
+{c:"because",t:1,stem:"She was out of breath",a:"because she had tumbled the whole length of the floor.",
+ d:["because she was standing still.","because the routine had not started.","because she sat on the bench."]},
+{c:"so",t:1,stem:"The beam was slippery with chalk,",a:"so the coach wiped it down.",
+ d:["so they added another routine.","so the mats grew softer.","so she wore her tracksuit."]},
+{c:"but",t:1,stem:"She swung into the handstand well,",a:"but she wobbled at the top.",
+ d:["but she held it perfectly.","but the skill was flawless.","but the crowd went home."]},
+{c:"although",t:2,stem:"Although she was exhausted,",a:"she kept working on her landing.",
+ d:["she stopped training.","she sat down straight away.","she went home early."]},
+{c:"until",t:2,stem:"Until the judge raised her hand,",a:"nobody was allowed to start the routine.",
+ d:["everybody went home.","the competition was over.","they all had their dinner."]},
+{c:"unless",t:2,stem:"You cannot compete on Saturday",a:"unless you come to training first.",
+ d:["unless you are the best gymnast.","unless you want to compete.","unless the sun is shining."]},
+{c:"before",t:1,stem:"She always chalks her hands",a:"before she jumps up to the bars.",
+ d:["before she takes her grips off.","before she was born.","before the season ended."]},
+{c:"after",t:1,stem:"They hugged their coach",a:"after the last gymnast finished.",
+ d:["after the warm-up began.","after they arrived at the gym.","after breakfast on Monday."]},
+{c:"while",t:2,stem:"She stretched beside the mat",a:"while she waited for her turn.",
+ d:["while she was asleep in bed.","while the season was finished.","while she ate her dinner."]},
+{c:"if",t:1,stem:"If you land with your feet apart,",a:"the judges will take marks off.",
+ d:["the judges will add extra marks.","your landing will be perfect.","you will need sun cream."]},
+{c:"since",t:3,stem:"Since she hurt her wrist in January,",a:"she has not trained on the bars.",
+ d:["she has won every competition.","she has never been injured.","she will train next January."]},
+{c:"however",t:3,stem:"The team performed beautifully.",a:"However, they still finished second.",
+ d:["However, they won easily.","However, they scored top marks.","However, everyone was delighted."]},
+{c:"because",t:1,stem:"The crowd started cheering",a:"because she stuck the landing perfectly.",
+ d:["because the routine had not begun.","because nothing had happened.","because they were leaving."]},
+{c:"so",t:2,stem:"She forgot her grips at home,",a:"so she had to borrow a pair.",
+ d:["so she won three medals.","so she was made captain.","so she tumbled much higher."]},
+{c:"but",t:2,stem:"Surfing looks easy from the beach,",a:"but standing up is very hard.",
+ d:["but it is simple to do.","but anyone can do it first time.","but the sea is wet."]},
+{c:"although",t:3,stem:"Although Sligo is a small county,",a:"it has produced some fine gymnasts.",
+ d:["it is a very large county.","it has no gymnastics clubs.","it is beside the sea."]},
+{c:"until",t:2,stem:"Until she learned the rule,",a:"she kept spelling the word wrongly.",
+ d:["she spelled it perfectly.","she never made mistakes.","she stopped writing."]},
+{c:"unless",t:3,stem:"The competition will go ahead",a:"unless the judges decide the hall is too cold.",
+ d:["unless the teams turn up.","unless everyone is ready.","unless the sun comes out."]},
+{c:"before",t:2,stem:"Check the springboard is straight",a:"before you start your run-up.",
+ d:["before your feet hit the mat.","before the coach moves it away.","before you salute the judges."]},
+{c:"after",t:2,stem:"She only felt the pain",a:"after the excitement wore off.",
+ d:["after she woke up that morning.","after she put her leotard on.","after the season started."]},
+{c:"while",t:3,stem:"While the others were still arguing,",a:"she quietly practised her cartwheel.",
+ d:["she joined in the argument.","she had already gone home.","she was fast asleep."]},
+{c:"if",t:2,stem:"If you keep your eyes on the end of the beam,",a:"you will wobble far less.",
+ d:["you will fall off at once.","you will not see anything.","you will fall asleep."]},
+{c:"because",t:2,stem:"The coach was worried",a:"because nobody was standing by to spot her.",
+ d:["because the routine went well.","because her gymnasts were winning.","because she was very happy."]},
+{c:"so",t:1,stem:"She practised every evening,",a:"so her handstand got much steadier.",
+ d:["so she forgot how to tumble.","so she never improved.","so she stopped training."]},
+{c:"but",t:1,stem:"The waves looked small from the shore,",a:"but they were huge close up.",
+ d:["but they were even smaller.","but there were no waves.","but the beach was busy."]},
+{c:"although",t:2,stem:"Although the beam is only ten centimetres wide,",a:"she walked along it without looking down.",
+ d:["she could not reach it.","the beam is very wide indeed.","she stayed on the floor."]},
+{c:"if",t:1,stem:"If nobody moves the springboard,",a:"the next gymnast will trip over it.",
+ d:["the next gymnast will vault safely.","it will not move at all.","she will leave the gym."]},
+{c:"until",t:1,stem:"Keep your arms up until",a:"the judges have finished writing.",
+ d:["you saluted at the start.","the routine had already ended.","you get to the beam first."]}
+];
+
+/* ---- TRICKY WORDS: for the "limited sight vocabulary" Rita noted.
+   Every option is visually confusable, so context alone will not
+   carry him — he has to look at the letters. ---- */
+const TRICKY = [
+{t:1,s:"He could hear the crowd ___ the tunnel wall.",a:"through",d:["though","thought","trough"]},
+{t:2,s:"She ___ she had lost her balance, but she held on.",a:"thought",d:["through","though","taught"]},
+{t:1,s:"They put ___ grips in the changing room.",a:"their",d:["there","they're","thier"]},
+{t:1,s:"Leave the bag over ___ by the bench.",a:"there",d:["their","they're","thier"]},
+{t:1,s:"Do you know ___ the competition is being held?",a:"where",d:["were","wear","whare"]},
+{t:1,s:"They ___ the best team on the day.",a:"were",d:["where","wear","weer"]},
+{t:2,s:"The hall went completely ___ before her routine.",a:"quiet",d:["quite","quit","quilt"]},
+{t:2,s:"That was ___ the best routine of the season.",a:"quite",d:["quiet","quit","quick"]},
+{t:1,s:"She took her tracksuit ___ at the door.",a:"off",d:["of","offe","ov"]},
+{t:1,s:"He is the captain ___ the under-elevens.",a:"of",d:["off","ov","uv"]},
+{t:2,s:"He is taller ___ his older brother.",a:"than",d:["then","that","thin"]},
+{t:2,s:"We warmed up, and ___ the music started.",a:"then",d:["than","them","when"]},
+{t:3,s:"Do not ___ your gum shield again.",a:"lose",d:["loose","loos","looze"]},
+{t:3,s:"His laces were far too ___ and he tripped.",a:"loose",d:["lose","luce","looce"]},
+{t:2,s:"The ___ was too wet to play in.",a:"weather",d:["whether","wether","weathur"]},
+{t:3,s:"Nobody knew ___ the game would go ahead.",a:"whether",d:["weather","wether","wheather"]},
+{t:1,s:"Have you got ___ leotard in the car?",a:"your",d:["you're","yore","yours"]},
+{t:2,s:"I think ___ playing really well today.",a:"you're",d:["your","yore","yours"]},
+{t:2,s:"She ___ her grips to the gym in a bag.",a:"brought",d:["bought","brough","braught"]},
+{t:2,s:"Her dad ___ her new grips for her birthday.",a:"bought",d:["brought","bough","baught"]},
+{t:2,s:"The coach ___ her cleanly as she came off the bars.",a:"caught",d:["cought","court","coughed"]},
+{t:1,s:"Her best ___ trains at the other club.",a:"friend",d:["freind","frend","friund"]},
+{t:1,s:"The judge ___ that the routine was too short.",a:"said",d:["sed","saide","says"]},
+{t:1,s:"She wobbled ___ in the whole routine.",a:"once",d:["onse","wonce","ones"]},
+{t:1,s:"Nobody knew ___ had moved the springboard.",a:"who",d:["how","hoo","whoo"]},
+{t:2,s:"I ___ we had trained a bit harder.",a:"could",d:["cood","coud","culd"]},
+{t:1,s:"Would you like to ___ to training with me?",a:"come",d:["some","came","comme"]},
+{t:2,s:"She did not ___ to leave the gym.",a:"want",d:["went","wont","wunt"]},
+{t:2,s:"He filled in the ___ before joining the club.",a:"form",d:["from","forme","fourm"]},
+{t:1,s:"The parents came ___ all over the county.",a:"from",d:["form","frome","fromm"]},
+{t:3,s:"She hit the springboard at exactly the right ___.",a:"angle",d:["angel","anlge","angul"]},
+{t:3,s:"He waited an ___ for the bus to Sligo.",a:"hour",d:["our","howr","houre"]},
+{t:3,s:"He could not ___ that he had missed.",a:"accept",d:["except","acept","exept"]},
+{t:3,s:"Everyone performed well ___ the youngest gymnast.",a:"except",d:["accept","exept","acsept"]},
+{t:2,s:"He ran hard for a whole ___ without stopping.",a:"week",d:["weak","weke","weeke"]},
+{t:2,s:"He felt ___ after being ill for days.",a:"weak",d:["week","weake","wek"]},
+{t:1,s:"She has ___ pairs of grips in the bag.",a:"two",d:["to","too","tow"]},
+{t:1,s:"The mat was ___ heavy for her to lift.",a:"too",d:["to","two","tow"]},
+{t:1,s:"He passed it ___ the winger.",a:"to",d:["too","two","toe"]},
+{t:1,s:"I ___ the answer to that one.",a:"know",d:["now","no","knew"]},
+{t:2,s:"He ___ the way to the ground already.",a:"knew",d:["new","know","now"]},
+{t:1,s:"There is ___ time left on the clock.",a:"no",d:["know","now","not"]},
+{t:1,s:"They ___ the county final last year.",a:"won",d:["one","own","wan"]},
+{t:1,s:"She only needed ___ more mark to win.",a:"one",d:["won","own","once"]},
+{t:1,s:"Can you ___ the crowd from here?",a:"hear",d:["here","heart","heard"]},
+{t:1,s:"Leave your kit over ___ by the wall.",a:"here",d:["hear","hare","her"]},
+{t:2,s:"Please ___ your name on the sheet.",a:"write",d:["right","rite","white"]},
+{t:2,s:"Turn ___ at the end of the road.",a:"right",d:["write","rite","ripe"]},
+{t:2,s:"This is ___ home gym.",a:"our",d:["are","hour","or"]},
+{t:2,s:"They ___ winning at half time.",a:"are",d:["our","hour","art"]},
+{t:2,s:"What are you going to ___ on Saturday?",a:"wear",d:["where","ware","weir"]},
+{t:2,s:"He was ___ waiting for the bus.",a:"bored",d:["board","broad","bread"]},
+{t:2,s:"The teacher wrote it on the ___.",a:"board",d:["bored","broad","beard"]},
+{t:2,s:"She ___ the ribbon high into the air.",a:"threw",d:["through","thrown","throw"]},
+{t:2,s:"Can I have a ___ of that cake?",a:"piece",d:["peace","price","pierce"]},
+{t:2,s:"The wind ___ the door of the hall open.",a:"blew",d:["blue","below","blow"]},
+{t:2,s:"She ___ like to compete on the beam.",a:"would",d:["wood","could","world"]},
+{t:2,s:"He ate the ___ thing in one go.",a:"whole",d:["hole","while","howl"]},
+{t:2,s:"He ___ his dinner before training.",a:"ate",d:["eight","eat","eaten"]},
+{t:2,s:"There are ___ gymnasts left to perform.",a:"eight",d:["ate","eighth","weight"]},
+{t:2,s:"A ___ of cows blocked the lane.",a:"herd",d:["heard","hard","head"]},
+{t:2,s:"I ___ the music start from the car park.",a:"heard",d:["herd","hard","heart"]},
+{t:1,s:"He has ___ here before.",a:"been",d:["bean","bin","being"]},
+{t:1,s:"I can ___ the beam from here.",a:"see",d:["sea","seen","sees"]},
+{t:1,s:"The ___ came out for the second half.",a:"sun",d:["son","sunk","spun"]},
+{t:1,s:"Can I have ___ water please?",a:"some",d:["sum","same","come"]},
+{t:2,s:"There were too ___ gymnasts on the floor.",a:"many",d:["any","mane","money"]},
+{t:2,s:"She told a funny ___ about her first competition.",a:"tale",d:["tail","table","tame"]},
+{t:2,s:"A ___ ran right across the field.",a:"hare",d:["hair","here","share"]},
+{t:2,s:"The ___ landed at Knock airport.",a:"plane",d:["plain","plan","place"]},
+{t:2,s:"That was a ___ landing at the very end.",a:"great",d:["grate","greet","treat"]},
+{t:2,s:"The main road was very ___ this morning.",a:"busy",d:["bury","buzy","bust"]},
+{t:3,s:"He went home early ___ he was tired.",a:"because",d:["becuase","becouse","beacuse"]},
+{t:3,s:"It was a ___ day for the final.",a:"beautiful",d:["beutiful","beautifull","beatiful"]},
+{t:3,s:"His birthday is in ___.",a:"February",d:["Febuary","Februry","Febrary"]},
+{t:3,s:"Training is on a ___ evening.",a:"Wednesday",d:["Wensday","Wedensday","Wendsday"]},
+{t:3,s:"There were a lot of ___ at the display.",a:"people",d:["peaple","peopel","pepole"]},
+{t:3,s:"He had had ___ of losing.",a:"enough",d:["enuff","enougth","anough"]},
+{t:3,s:"The story made everyone ___.",a:"laugh",d:["laff","lauch","laught"]},
+{t:3,s:"He walks to ___ every morning.",a:"school",d:["skool","schoool","shcool"]},
+{t:3,s:"Are you ___ that is the right way?",a:"sure",d:["shore","shure","sore"]},
+{t:3,s:"He takes no ___ in his tea.",a:"sugar",d:["suger","shugar","sugur"]},
+{t:3,s:"Wait one more ___ and we will go.",a:"minute",d:["minit","minuet","mineute"]},
+{t:3,s:"The ___ in the team all trained together.",a:"women",d:["woman","wimen","womin"]},
+{t:3,s:"That ___ over there is the manager.",a:"woman",d:["women","womun","wooman"]},
+{t:3,s:"Do not ___ the beam with your hands.",a:"touch",d:["tuch","toutch","tought"]},
+{t:3,s:"It was a ___ routine to learn.",a:"tough",d:["touch","though","thought"]},
+{t:3,s:"The old floor mat felt very ___.",a:"rough",d:["rouge","ruff","through"]},
+{t:3,s:"She is still too ___ for the senior squad.",a:"young",d:["yong","youn","yound"]},
+{t:3,s:"They are the best club in the ___.",a:"country",d:["county","countery","contry"]},
+{t:3,s:"My ___ plays for the other club.",a:"cousin",d:["cusin","cousine","couson"]},
+{t:3,s:"He was in ___ for being late again.",a:"trouble",d:["truble","troble","troubel"]},
+{t:3,s:"Our ___ came first in the quiz.",a:"group",d:["groop","gruop","groupe"]},
+{t:3,s:"He had to ___ he could do it.",a:"prove",d:["proove","prov","proof"]},
+{t:3,s:"Put your ___ in the wash.",a:"clothes",d:["cloths","clothse","clows"]},
+{t:3,s:"___ grips are these on the bench?",a:"whose",d:["house","hose","those"]},
+{t:3,s:"She ___ the hoop from one hand to the other.",a:"passed",d:["past","paste","pased"]},
+{t:3,s:"It is well ___ your bedtime.",a:"past",d:["passed","pass","pasta"]},
+{t:3,s:"Camels live out in the ___.",a:"desert",d:["dessert","deserve","decent"]},
+{t:3,s:"Take a deep ___ before you begin.",a:"breath",d:["breathe","bread","breadth"]},
+{t:2,s:"He rode the ___ along the strand.",a:"horse",d:["house","hoarse","hose"]},
+{t:2,s:"He can ___ better than anyone in the class.",a:"sing",d:["sign","sting","singe"]},
+{t:2,s:"He wins it ___ single time.",a:"every",d:["evrey","evry","everey"]},
+{t:1,s:"She spent ___ the session on the beam.",a:"half",d:["haf","hald","have"]}
+];
+
+/* ---- TEAM SHEET: mirrors the CELF-5 Word Classes subtest, where the
+   student picks which two words are related — by category, by what they are
+   used for, by where they are found, or by time. That subtest was SS 10,
+   his weakest content area, and it is what prompted the synonym work. ---- */
+const CLASSES = [
+{t:1,r:"are all birds",g:["robin","swallow","heron","magpie","wren"]},
+{t:1,r:"are all fish",g:["salmon","trout","mackerel","herring"]},
+{t:1,r:"are all fruit",g:["apple","banana","pear","plum"]},
+{t:1,r:"are all vegetables",g:["carrot","turnip","cabbage","parsnip"]},
+{t:1,k:["wood"],r:"are all trees",g:["oak","ash","willow","birch"]},
+{t:1,r:"are all kinds of weather",g:["hail","drizzle","thunder","frost"]},
+{t:2,r:"are all musical instruments",g:["piano","violin","trumpet","banjo"]},
+{t:2,r:"are all metals",g:["iron","copper","silver","lead"]},
+{t:2,k:["home"],r:"are all pieces of furniture",g:["wardrobe","dresser","bookcase","sideboard"]},
+{t:1,k:["wear"],r:"are all clothes",g:["jumper","trousers","scarf","jacket"]},
+{t:1,r:"are all vehicles",g:["lorry","van","bus","jeep"]},
+{t:2,k:["tool"],r:"are all tools",g:["hammer","spanner","chisel","screwdriver"]},
+{t:2,r:"are all insects",g:["beetle","wasp","moth","earwig"]},
+{t:3,r:"are all shapes",g:["hexagon","cylinder","pyramid","cube"]},
+{t:1,r:"are all things you write with",g:["pencil","biro","chalk","crayon"]},
+{t:2,k:["tool"],r:"are all things you cut with",g:["scissors","saw","shears","blade"]},
+{t:2,k:["gauge"],r:"are all things that measure something",g:["ruler","scales","clock","thermometer"]},
+{t:1,r:"are all things that give light",g:["torch","lamp","candle","lantern"]},
+{t:2,k:["hold"],r:"are all things you carry things in",g:["rucksack","basket","bucket","suitcase"]},
+{t:1,k:["home"],r:"are all things you sit on",g:["stool","bench","couch","saddle"]},
+{t:2,k:["wear"],r:"are all things that keep you dry",g:["umbrella","raincoat","tent","canopy"]},
+{t:3,r:"are all things that make a sound louder",g:["microphone","speaker","megaphone","amplifier"]},
+{t:1,k:["gauge","hold"],r:"are all found in a kitchen",g:["kettle","oven","fridge","sink"]},
+{t:1,r:"are all found on a beach",g:["dune","shell","seaweed","pebble"]},
+{t:2,k:["gauge"],r:"are all found in a hospital",g:["ward","stretcher","bandage","surgeon"]},
+{t:2,k:["hold"],r:"are all found on a farm",g:["barn","silage","byre","haystack"]},
+{t:2,k:["wood"],r:"are all found in a forest",g:["bark","moss","fern","trunk"]},
+{t:1,r:"are all things you find in a gym",g:["beam","bars","vault","trampoline"]},
+{t:3,r:"are all found in a library",g:["catalogue","librarian","index","bookmark"]},
+{t:1,r:"are all times of day",g:["dawn","noon","dusk","midnight"]},
+{t:1,r:"are all seasons",g:["spring","autumn","winter","summer"]},
+{t:2,r:"are all months",g:["January","March","October","August"]},
+{t:2,r:"are all lengths of time",g:["minute","hour","decade","century"]},
+{t:3,r:"all mean very soon",g:["shortly","presently","imminently","directly"]}
+];
+
+/* ---- COMMENTARY: spoken passages, nothing to decode.
+   Understanding Spoken Paragraphs and Recalling Sentences were both SS 12
+   while reading accuracy was SS 85, so with the print taken away he can work
+   well above his reading age. Match scenes are fictional; the factual ones
+   stick to settled general knowledge. ---- */
+const PASSAGES = [
+{t:1,p:"Puffins spend most of the year far out at sea. They only come to land in spring, to nest in burrows on cliffs and islands. A puffin can carry a whole beakful of small fish at once, sometimes more than ten, without dropping any.",
+ q:[{q:"Where do puffins spend most of the year?",a:"Far out at sea",d:["In burrows on cliffs","On farmland","In forests"]},
+    {q:"When do puffins come to land?",a:"In spring",d:["In autumn","Every night","They never do"]}]},
+{t:1,p:"The waves at Strandhill roll in from the Atlantic, and on a big day they can be taller than a person. Surfers wait out beyond the break, sitting on their boards, watching the horizon. When the right wave comes they turn, paddle hard, and stand up.",
+ q:[{q:"What are the surfers watching?",a:"The horizon",d:["The beach","Their feet","The car park"]},
+    {q:"What do they do when the right wave comes?",a:"Turn, paddle hard and stand up",d:["Swim back to shore","Sit down on the board","Wave at the beach"]}]},
+{t:1,p:"Bees visit flowers to collect nectar, which they turn into honey. As a bee moves from flower to flower, yellow pollen sticks to its body and rubs off on the next plant. Without that accidental delivery, many of the fruits and vegetables we eat would never grow.",
+ q:[{q:"What do bees turn nectar into?",a:"Honey",d:["Pollen","Wax","Nectar juice"]},
+    {q:"Why does the passage call it an accidental delivery?",a:"The bee is not trying to do it",d:["The bee is careless","The pollen is heavy","The flowers ask for it"]}]},
+{t:1,p:"A competition beam is four metres long and only ten centimetres wide, about the width of a school ruler. It stands more than a metre above the floor. Gymnasts learn every skill on a line painted on the ground first, then on a low beam, and only then on the real one.",
+ q:[{q:"How wide is a competition beam?",a:"About ten centimetres",d:["About a metre","About four metres","About half a metre"]},
+    {q:"Where do gymnasts learn a new skill first?",a:"On a line painted on the floor",d:["On the high beam","In the air","On the vault"]}]},
+{t:1,p:"Aoife had fallen off the beam at every competition that year. At the county final she stepped up last, walked to the end, and turned without a wobble. She landed with both feet planted, and the whole hall stood up.",
+ q:[{q:"What had happened to Aoife earlier that year?",a:"She had fallen off the beam every time",d:["She had won every competition","She had never used the beam","She had been injured"]},
+    {q:"When did she take her turn?",a:"Last",d:["First","Halfway through","She did not take one"]},
+    {q:"How do you know it mattered?",a:"The whole hall stood up",d:["She was wearing new grips","It was only a training session","Nobody was watching"]}]},
+{t:1,p:"Benbulben stands over the north of County Sligo like a great stone table. Its flat top and steep sides were carved by ice during the last ice age, when a glacier ground its way past. On a clear day you can see it from far out at sea.",
+ q:[{q:"What shaped Benbulben?",a:"Ice during the last ice age",d:["A river","The wind","People digging"]},
+    {q:"What is the top of it like?",a:"Flat",d:["Pointed","Rounded","Split in two"]}]},
+{t:1,p:"The Sun is a star, and eight planets travel around it. Earth is the third of those planets. The Sun is so large that more than a million Earths could fit inside it, and yet it is only an average sized star compared with others in the galaxy.",
+ q:[{q:"Which planet is Earth?",a:"The third",d:["The first","The eighth","The largest"]},
+    {q:"How does the Sun compare with other stars?",a:"It is about average sized",d:["It is the biggest of all","It is the smallest of all","It is not really a star"]}]},
+{t:1,p:"Cian was quickest off the blocks, but he breathed too often in the middle of the race and lost his rhythm. In the last length he stopped breathing altogether and drove for the wall. He touched second, a fingertip behind the boy in lane four.",
+ q:[{q:"Where did Cian finish?",a:"Second",d:["First","Third","Last"]},
+    {q:"What went wrong in the middle of the race?",a:"He breathed too often and lost his rhythm",d:["He was slow off the blocks","He swam the wrong way","He stopped completely"]}]},
+{t:1,p:"Heat from the sun turns water in the sea into vapour, which rises and cools into clouds. When the droplets in a cloud grow heavy enough, they fall as rain. Rivers then carry that water back down to the sea, and the whole journey begins again.",
+ q:[{q:"What makes the sea water rise?",a:"Heat from the sun",d:["Wind","Rivers","The clouds"]},
+    {q:"What happens when the droplets get heavy?",a:"They fall as rain",d:["They freeze solid","They disappear","They rise higher"]}]},
+{t:1,p:"Deep under the ground, rock gets so hot that it melts into a thick liquid called magma. Pressure builds until the magma forces its way upwards. Once it escapes at the surface it is given a new name: lava. As it cools, it hardens into solid rock again.",
+ q:[{q:"What is melted rock called while it is underground?",a:"Magma",d:["Lava","Ash","Crust"]},
+    {q:"When does magma become lava?",a:"Once it reaches the surface",d:["When it cools down","When it first melts","When it hardens"]}]},
+{t:1,p:"The club were fourth after the beam and some parents had started packing up. Then two of the girls scored their best ever on the bars. By the last rotation they had climbed to second, and the hall was full of noise again.",
+ q:[{q:"Where were the club after the beam?",a:"Fourth",d:["First","Second","Last"]},
+    {q:"Why did the noise come back?",a:"They had climbed up to second place",d:["The competition ended","It started raining","The crowd had left"]}]},
+{t:1,p:"The floor routine ran twice around the mat and finished with the hardest tumble of all. Niamh had held something back all the way through on purpose. She landed the last pass perfectly and moved from fourth place to first.",
+ q:[{q:"Where did Niamh finish?",a:"First",d:["Second","Third","Fourth"]},
+    {q:"Why had she held something back?",a:"For the hardest tumble at the end",d:["Because she was tired","To talk to a friend","To warm up properly"]}]},
+{t:2,p:"Atlantic salmon are born in freshwater rivers, then swim out to spend years feeding in the ocean. When they are ready to breed they return to the very river where they hatched, fighting upstream against the current and leaping waterfalls to get there.",
+ q:[{q:"Where are salmon born?",a:"In freshwater rivers",d:["In the open ocean","In lakes","At the seashore"]},
+    {q:"What is remarkable about where they return to?",a:"It is the same river they hatched in",d:["It is always warm","It is downstream","It has no water"]}]},
+{t:2,p:"The Great Wall of China was not built all at once. Different rulers added sections over many centuries, joining older walls together. It was meant to slow attackers down rather than stop them completely, giving soldiers time to gather and to signal for help.",
+ q:[{q:"How was the wall built?",a:"In sections over many centuries",d:["All in a single year","By one ruler alone","By machines"]},
+    {q:"What was the wall meant to do?",a:"Slow attackers down",d:["Stop everyone completely","Mark out a road","Hold back water"]}]},
+{t:2,p:"Antarctica is the coldest, windiest and driest continent on Earth. Although it is covered in thick ice, it counts as a desert, because almost no rain or snow falls there. The ice has simply built up over hundreds of thousands of years without melting away.",
+ q:[{q:"Why does Antarctica count as a desert?",a:"Almost no rain or snow falls there",d:["It is sandy","It is hot","It has no ice"]},
+    {q:"How did the ice build up?",a:"Slowly over hundreds of thousands of years",d:["In a single winter","From rivers","From the sea freezing"]}]},
+{t:2,p:"Every lighthouse flashes its own pattern, so that a sailor can tell one from another in the dark. Some flash twice quickly and then pause; others turn slowly all night long. Long before satellites, that pattern was often the only way to know exactly where you were.",
+ q:[{q:"Why does each lighthouse flash differently?",a:"So sailors can tell them apart",d:["To look attractive","To save electricity","To warn of storms"]},
+    {q:"What did sailors rely on before satellites?",a:"The flashing patterns",d:["Maps only","The stars only","Radio messages"]}]},
+{t:2,p:"Red squirrels were once common all over Ireland, but grey squirrels, brought over from North America, took over much of their woodland. In places where pine martens have returned, the greys have declined and the reds have started to come back.",
+ q:[{q:"Where did grey squirrels come from?",a:"North America",d:["Ireland","Britain","Asia"]},
+    {q:"What has helped the red squirrels?",a:"The return of pine martens",d:["More grey squirrels","Warmer weather","Fewer trees"]}]},
+{t:2,p:"The Great Pyramid at Giza was built more than four thousand years ago from over two million blocks of stone. For most of human history since then it was the tallest building on Earth. It is lined up with the points of the compass almost exactly.",
+ q:[{q:"How long was it the tallest building on Earth?",a:"For most of human history since it was built",d:["For about four years","For one century","It never was"]},
+    {q:"What is remarkable about how it is positioned?",a:"It lines up with the compass points",d:["It faces the sea","It leans to one side","It is perfectly round"]}]},
+{t:3,p:"In July 1969, two astronauts became the first people to walk on the Moon. Their spacecraft carried less computing power than an ordinary mobile phone has today. They left footprints in the dust which, with no wind or rain to disturb them, are still there.",
+ q:[{q:"Why are the footprints still there?",a:"There is no wind or rain to disturb them",d:["They are very deep","Nobody has visited since","The dust is sticky"]},
+    {q:"What is said about the spacecraft computer?",a:"It was weaker than a mobile phone today",d:["It was enormous","It broke down","It was the fastest ever built"]}]},
+{t:3,p:"Most liquids get denser as they freeze, but water does the opposite. As it turns to ice, the molecules lock into a structure that takes up more room, so ice is lighter than the water around it. That is why a frozen lake has ice on top and living fish beneath.",
+ q:[{q:"Why does ice float?",a:"It takes up more room than the same water",d:["It is warmer","It is heavier","It is salty"]},
+    {q:"What does this mean for the fish?",a:"They can go on living under the ice",d:["They freeze solid","They have to leave the lake","They swim on top of the ice"]}]},
+{t:3,p:"Bats hunt in complete darkness by shouting and listening. They send out high squeaks, far too high for human ears, and work out where an insect is from the echo that bounces back. Some can find a moth the size of your thumbnail on the darkest night.",
+ q:[{q:"How do bats find insects?",a:"From the echoes that bounce back",d:["By smell","By seeing in the dark","By touch"]},
+    {q:"Why can people not hear the squeaks?",a:"They are too high for human ears",d:["They are too quiet","The bats are too far away","They happen underwater"]}]},
+{t:3,p:"An octopus has no bones at all, so it can squeeze through any gap bigger than its beak. It can change the colour and even the texture of its skin in less than a second, and it can taste what it touches through the suckers along its arms.",
+ q:[{q:"What decides the smallest gap an octopus can fit through?",a:"The size of its beak",d:["The length of its arms","The size of its eyes","Its weight"]},
+    {q:"What can the suckers do?",a:"Taste whatever they touch",d:["See","Hear","Breathe"]}]},
+{t:3,p:"The Titanic was built in Belfast and launched in 1911. On her first voyage across the Atlantic she struck an iceberg late at night and sank in under three hours. There were not enough lifeboats on board for everyone who was travelling.",
+ q:[{q:"Where was the Titanic built?",a:"Belfast",d:["Liverpool","Dublin","Cork"]},
+    {q:"What was the problem with the lifeboats?",a:"There were not enough for everyone aboard",d:["They were too heavy","They leaked","There were none at all"]}]},
+{t:3,p:"Viking raiders first reached Ireland in the late seven hundreds. Over time many settled instead of returning home, and the towns they founded include Dublin, Waterford and Limerick. Their longships were light enough to be carried overland between one river and the next.",
+ q:[{q:"What did the Vikings found in Ireland?",a:"Towns including Dublin and Waterford",d:["Stone castles","Cathedrals only","The first roads"]},
+    {q:"Why did it matter that the longships were light?",a:"They could be carried overland between rivers",d:["They sailed faster","They cost less to build","They floated higher"]}]},
+{t:1,p:"The chalk bowl was almost empty by the end of the session. Every time she gripped the bar her hands slipped a little more. In the end she stopped and waited for the coach to fill it before trying the routine again.",
+ q:[{q:"Why were her hands slipping?",a:"The chalk had almost run out",d:["The bar was too high","She was wearing gloves","Her hands were cold"]},
+    {q:"What did she do about it?",a:"She waited for the coach to fill the bowl",d:["She kept going anyway","She went home","She moved to the beam"]}]},
+{t:1,p:"Otters live along Irish rivers and around the coast. They have no thick layer of fat to keep them warm, so instead they have the densest fur of almost any animal. Trapped air in that fur keeps the cold water off their skin.",
+ q:[{q:"How do otters keep warm?",a:"With very dense fur that traps air",d:["With a thick layer of fat","By staying out of the water","By shivering"]},
+    {q:"Where do Irish otters live?",a:"Along rivers and around the coast",d:["Only in the sea","Only in lakes","In woodland only"]}]},
+{t:1,p:"A rainbow appears when sunlight shines through raindrops. Each drop bends the light and splits it into colours. The rainbow always sits in the part of the sky opposite the sun, which is why you have to turn your back on the sun to see one.",
+ q:[{q:"What splits the light into colours?",a:"The raindrops",d:["The clouds","The sun itself","The wind"]},
+    {q:"Where in the sky is a rainbow?",a:"Opposite the sun",d:["Right beside the sun","Directly overhead","Below the horizon"]}]},
+{t:1,p:"Halfway through the display the youngest girl in the club was called out to tumble. She ran the length of the floor, turned twice in the air, and landed facing the judges. The applause started before she had even lowered her arms.",
+ q:[{q:"How many turns did she make in the air?",a:"Two",d:["One","Three","None"]},
+    {q:"How do you know the crowd were impressed?",a:"They clapped before she lowered her arms",d:["They left early","They stayed silent","They waited for the judges"]}]},
+{t:2,p:"The Shannon is the longest river in Ireland. It rises in County Cavan and runs for about three hundred and sixty kilometres before reaching the Atlantic. On its way it widens into several big lakes, so parts of it look more like a lake than a river.",
+ q:[{q:"Where does the Shannon begin?",a:"In County Cavan",d:["In County Sligo","At the Atlantic","In Dublin"]},
+    {q:"Why do parts of it not look like a river?",a:"It widens out into big lakes",d:["It runs underground","It dries up","It freezes over"]}]},
+{t:2,p:"An owl can fly almost silently. The front edges of its wing feathers are fringed like a comb, which breaks up the rush of air instead of letting it whistle. That silence means the owl can still hear the mouse below it while it is flying.",
+ q:[{q:"What makes an owl's flight silent?",a:"Fringed edges on its wing feathers",d:["Very small wings","Flying slowly","Hollow bones"]},
+    {q:"Why does the silence help it hunt?",a:"It can still hear the mouse while flying",d:["It flies faster","It stays warmer","It sees better"]}]},
+{t:2,p:"Hedgehogs hibernate through the Irish winter. Their heartbeat slows to a fraction of its normal speed and their body cools until they are barely warmer than the air around them. Waking early wastes so much energy that it can be dangerous.",
+ q:[{q:"What happens to a hibernating hedgehog's heartbeat?",a:"It slows right down",d:["It speeds up","It stops completely","It stays the same"]},
+    {q:"Why is waking early a problem?",a:"It uses up too much energy",d:["It is too noisy","They forget where they are","They get too warm"]}]},
+{t:2,p:"The moon's gravity pulls on the sea as it passes overhead, dragging the water into a bulge. The Earth spins through that bulge twice a day, which is why most coasts get two high tides and two low tides in every twenty-four hours.",
+ q:[{q:"What pulls the sea into a bulge?",a:"The moon's gravity",d:["The wind","The sun's heat","Waves from storms"]},
+    {q:"How many high tides does a coast usually get in a day?",a:"Two",d:["One","Four","It varies wildly"]}]},
+{t:2,p:"A rip current is a narrow channel of water flowing back out to sea. Swimming straight against it will exhaust anybody, because it is faster than a person. Lifeguards teach you to swim across it, parallel to the beach, until you are out of the flow.",
+ q:[{q:"Why should you not swim straight back to shore?",a:"The current is faster than a person",d:["Sharks follow the current","It is too cold","You cannot see the beach"]},
+    {q:"What are you told to do instead?",a:"Swim across it, parallel to the beach",d:["Float and wait","Dive underneath it","Swim further out"]}]},
+{t:2,p:"On a bicycle, a low gear turns the pedals many times for each turn of the wheel. That feels easy but moves you slowly, which is exactly what you want on a steep hill. A high gear does the opposite and is only useful once you already have speed.",
+ q:[{q:"When is a low gear useful?",a:"Going up a steep hill",d:["Going fast downhill","On a flat road","When braking"]},
+    {q:"What does a low gear do?",a:"Turns the pedals many times per wheel turn",d:["Turns the wheel many times per pedal","Stops the wheel","Locks the chain"]}]},
+{t:2,p:"Camels store fat in their humps, not water, as most people think. The fat can be broken down for energy when there is nothing to eat. They can also shut their nostrils completely, which keeps blown sand out during a storm.",
+ q:[{q:"What is actually in a camel's hump?",a:"Fat",d:["Water","Air","Food it has swallowed"]},
+    {q:"Why can a camel close its nostrils?",a:"To keep blown sand out",d:["To swim underwater","To sleep better","To stay warm"]}]},
+{t:3,p:"The Great Barrier Reef off the coast of Australia is the largest structure on Earth built by living things. It was made, very slowly, by coral polyps barely bigger than a pinhead, each one leaving behind a hard skeleton when it dies.",
+ q:[{q:"What built the reef?",a:"Tiny coral polyps",d:["Volcanoes","Sand carried by the tide","Whales"]},
+    {q:"What is left behind when a polyp dies?",a:"Its hard skeleton",d:["Nothing at all","An empty shell","A seed"]}]},
+{t:3,p:"Mount Everest is the highest point above sea level anywhere on Earth, at just under nine thousand metres. It is still growing, very slightly, because the plates of rock beneath it are pushing together and forcing the whole range upwards.",
+ q:[{q:"Why is Everest still getting taller?",a:"The plates beneath it are pushing together",d:["Snow is building up","Ice is freezing on top","Nobody knows"]},
+    {q:"What does the passage say it is highest above?",a:"Sea level",d:["The nearest valley","The centre of the Earth","The clouds"]}]},
+{t:3,p:"In 1928 Alexander Fleming came back from holiday to find mould growing on a dish he had left out. Around the mould, the bacteria had died. That accident became penicillin, and it has since saved more lives than almost any other medicine.",
+ q:[{q:"What had happened to the bacteria near the mould?",a:"They had died",d:["They had multiplied","They had turned green","Nothing at all"]},
+    {q:"Why does the passage call it an accident?",a:"He had not meant to leave the dish out",d:["He dropped the dish","He was not a scientist","The mould was rare"]}]},
+{t:3,p:"The Book of Kells was made by monks about twelve hundred years ago, on pages of stretched calfskin rather than paper. Every letter was drawn by hand, and some single pages took months. It is kept in Trinity College in Dublin today.",
+ q:[{q:"What were the pages made of?",a:"Stretched calfskin",d:["Paper","Wood","Cloth"]},
+    {q:"What does the passage say about a single page?",a:"Some took months to finish",d:["They were printed quickly","They were copied by machine","They were left blank"]}]},
+{t:3,p:"An earthquake happens when two great slabs of rock, which have been locked together under enormous strain, finally slip past each other. The energy stored up over years is released in seconds and travels outwards through the ground as waves.",
+ q:[{q:"What causes the shaking?",a:"Two slabs of rock slipping past each other",d:["Heavy rain","Wind on the surface","The Earth spinning"]},
+    {q:"How long does the release take?",a:"Seconds, after years of build-up",d:["Several days","A whole year","It never stops"]}]}
+];
+
+
+/* =======================================================================
+   Storage — Safari can block localStorage on file:// so everything is
+   wrapped and falls back to memory for the session.
+   ======================================================================= */
+var STORE_OK = true;
+var MEM = {};
+function sGet(k){ try{ return localStorage.getItem(k); }catch(e){ STORE_OK=false; return MEM[k]||null; } }
+function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; MEM[k]=v; } }
+
+var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
+  pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
+  avatar:0, days:{last:"",streak:0,best:0},
+  opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false,
+        dayStreak:true,oppGoals:true} };
+var S = load();
+function load(){
+  try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
+    return Object.assign({},DEFAULT_STATE,o,{
+      opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
+      pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
+      runs:Object.assign({taken:0,scored:0},o.runs||{}),
+      xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0,
+      days: Object.assign({last:"",streak:0,best:0}, o.days||{})
+    }); } }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+function save(){ sSet("wordattack.v1", JSON.stringify(S)); }
+
+/* =======================================================================
+   Conflict map — two headwords "conflict" if their word families overlap
+   at all. A distractor is never drawn from a conflicting family, so an
+   option can never accidentally be a correct answer.
+   ======================================================================= */
+/* Synonym keys stay bare so progress saved before the other games existed
+   still counts; every other mode is namespaced. */
+function statKey(mode, word){ return mode==="syn" ? word : mode+":"+word; }
+function splitKey(k){
+  var i=k.indexOf(":");
+  return i<0 ? {mode:"syn", word:k} : {mode:k.slice(0,i), word:k.slice(i+1)};
+}
+var norm = function(s){ return s.toLowerCase().replace(/[^a-z]/g,""); };
+var FAM = SQUAD.map(function(e){ var s={}; s[norm(e.w)]=1; e.y.forEach(function(x){s[norm(x)]=1;}); return s; });
+var CONFLICT = SQUAD.map(function(){ return {}; });
+for(var i=0;i<SQUAD.length;i++){
+  for(var j=i+1;j<SQUAD.length;j++){
+    var hit=false;
+    for(var k in FAM[i]){ if(FAM[j][k]){ hit=true; break; } }
+    if(hit){ CONFLICT[i][j]=1; CONFLICT[j][i]=1; }
+  }
+}
+function safeIdx(targetIdx, used){
+  var pool=[];
+  for(var n=0;n<SQUAD.length;n++){
+    if(n===targetIdx) continue;
+    if(CONFLICT[targetIdx][n]) continue;
+    if(used.indexOf(n)>=0) continue;
+    var bad=false;
+    for(var u=0;u<used.length;u++){ if(CONFLICT[used[u]][n]){ bad=true; break; } }
+    if(bad) continue;
+    pool.push(n);
+  }
+  return pool.length ? pool[(Math.random()*pool.length)|0] : -1;
+}
+function pick(a){ return a[(Math.random()*a.length)|0]; }
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+var cap = function(s){ return s.charAt(0).toUpperCase()+s.slice(1); };
+
+/* =======================================================================
+   MODES — every game shares the match loop, streak and penalty.
+   Each mode supplies a pool of items for a level and builds a question.
+   ======================================================================= */
+var MODES = {
+  syn:{
+    name:"Synonyms", sub:"Words that mean the same", icon:"=",
+    pool:function(lv){ var p=[]; SQUAD.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return SQUAD[i].w; },
+    build:function(i,n){ return buildQuestion(i,["single","sentence","double"][n%3]); }
+  },
+  ant:{
+    name:"Opposites", sub:"Words that mean the reverse", icon:"x",
+    pool:function(lv){ var p=[]; OPPOSITES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return OPPOSITES[i].w; },
+    build:function(i,n,lv){ return buildOpposite(i,lv); }
+  },
+  spell:{
+    name:"Sticking Points", sub:"Spellings that trip people up", icon:"S",
+    pool:function(lv){ var p=[]; SPELLS.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return SPELLS[i].w; },
+    build:function(i,n){ return buildSpell(i,n); }
+  },
+  sent:{
+    name:"Build the Routine", sub:"Joining sentences that make sense", icon:"J",
+    pool:function(lv){ var p=[]; JOINS.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return JOINS[i].c+"-"+i; },
+    build:function(i){ return buildJoin(i); }
+  },
+  tricky:{
+    name:"Tricky Words", sub:"Words you cannot sound out", icon:"T",
+    pool:function(lv){ var p=[]; TRICKY.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return TRICKY[i].a; },
+    build:function(i){ return buildTricky(i); }
+  },
+  listen:{
+    name:"Listen In", sub:"Listen, then answer — no reading", icon:"L",
+    pool:function(lv){ var p=[]; PASSAGES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return "p"+i; },
+    build:function(i){ return buildListen(i); }
+  },
+  team:{
+    name:"Group Work", sub:"Which words belong together", icon:"C",
+    pool:function(lv){ var p=[]; CLASSES.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
+    key:function(i){ return CLASSES[i].r; },
+    build:function(i,n){ return buildTeam(i,n); }
+  }
+};
+
+/* Two safeguards so a distractor is never secretly a right answer.
+   1. No word may appear in two groups.
+   2. Groups that overlap in meaning share a tag and are never used against
+      each other — a couch really is furniture, a saw really is a tool, an
+      oak really is found in a forest, so those pairings are barred. */
+var CLASS_OWNER = {};
+CLASSES.forEach(function(e,i){ e.g.forEach(function(w){ CLASS_OWNER[norm(w)]=i; }); });
+function classesClash(a,b){
+  var ka=CLASSES[a].k, kb=CLASSES[b].k;
+  if(!ka || !kb) return false;
+  for(var i=0;i<ka.length;i++) if(kb.indexOf(ka[i])>=0) return true;
+  return false;
+}
+function outsiders(idx, count){
+  var out=[], guard=0, used={};
+  while(out.length<count && guard++<400){
+    var j=(Math.random()*CLASSES.length)|0;
+    if(j===idx) continue;
+    if(classesClash(idx,j)) continue;             // overlapping meaning
+    var w=pick(CLASSES[j].g);
+    if(CLASS_OWNER[norm(w)]===idx) continue;      // belongs to the target group
+    if(used[norm(w)]) continue;
+    used[norm(w)]=1; out.push(w);
+  }
+  return out;
+}
+function buildTeam(i, n){
+  var e=CLASSES[i];
+  if(n%2===1){
+    // Odd one out: three from the group, one from somewhere else
+    var three=shuffle(e.g.slice()).slice(0,3);
+    var odd=outsiders(i,1)[0];
+    return { kind:"single", label:"Odd one out", key:e.r, word:odd, stem:null, plain:true,
+      help:"Three of these belong together. Tap the one that does not.",
+      opts:shuffle(three.concat([odd])), answers:[odd],
+      teach:cap(three.join(", "))+" "+e.r+"." };
+  }
+  var two=shuffle(e.g.slice()).slice(0,2);
+  return { kind:"double", label:"Two of a kind", key:e.r, word:two[0], stem:null, plain:true,
+    help:"Tap the TWO words that belong together, then go.",
+    opts:shuffle(two.concat(outsiders(i,2))), answers:two.slice(),
+    teach:cap(two[0])+" and "+two[1]+" "+e.r+"." };
+}
+
+function buildListen(i){
+  var e=PASSAGES[i], item=pick(e.q);
+  return { kind:"listen", key:"p"+i, word:e.p, passage:e.p, ask:item.q,
+    help:"Listen as many times as you like, then choose.",
+    opts:shuffle([item.a].concat(item.d)), answers:[item.a],
+    teach:"Tap play to hear it again — you can listen as often as you like." };
+}
+
+/* ---- Opposites. At Champions level one distractor is a SYNONYM of the
+   target, because same-versus-opposite is the confusion worth drilling. ---- */
+function buildOpposite(i, lv){
+  var e=OPPOSITES[i], ans=pick(e.a), opts=[ans], used={};
+  used[norm(e.w)]=1; e.a.forEach(function(x){ used[norm(x)]=1; });
+  var sq=null;
+  for(var s=0;s<SQUAD.length;s++) if(SQUAD[s].w===e.w){ sq=SQUAD[s]; break; }
+  if(sq) sq.y.forEach(function(x){ used[norm(x)]=1; });
+  if(lv>=3 && sq){
+    var trap=pick(sq.y);
+    opts.push(trap); used[norm(trap)]=1;
+  }
+  var guard=0;
+  while(opts.length<4 && guard++<200){
+    var o=OPPOSITES[(Math.random()*OPPOSITES.length)|0];
+    if(o.w===e.w) continue;
+    var cand=pick(o.a);
+    if(used[norm(cand)]) continue;
+    // never offer something that is also a real opposite of the target
+    if(e.a.map(norm).indexOf(norm(cand))>=0) continue;
+    used[norm(cand)]=1; opts.push(cand);
+  }
+  return { kind:"single", key:e.w, word:e.w, stem:e.w,
+    help:"Which word means the OPPOSITE of this one?",
+    opts:shuffle(opts), answers:[ans],
+    teach:cap(e.w)+" — opposites: "+e.a.join(", ")+"." };
+}
+
+/* ---- Spelling. Two rounds: choose the right spelling, or find the
+   letter you cannot hear. ---- */
+function buildSpell(i, n){
+  var e=SPELLS[i];
+  var RULE={silent:"The letter you cannot hear", double:"One or two?", end:"Tricky ending",
+            team:"Vowels working together", soft:"Soft c and g", magic:"Magic e"};
+  var rule = RULE[e.r] || "Spelling";
+  if(e.r==="silent" && n%2===1){
+    var letters=e.w.split("");
+    var ansIdx=e.w.indexOf(e.sl);
+    return { kind:"letters", key:e.w, word:e.w, stem:e.w,
+      help:"Tap the letter you cannot hear when you say this word.",
+      opts:letters, answers:[String(ansIdx)], rule:rule,
+      teach:'The "'+e.sl+'" in '+e.w+' is a ghost — it is right there but you never hear it.' };
+  }
+  return { kind:"single", key:e.w, word:e.w, stem:null, spellPrompt:true,
+    help:"Which one is spelled correctly?",
+    opts:shuffle([e.w].concat(e.bad)), answers:[e.w], rule:rule,
+    teach:e.r==="double" ? "Watch the double letters in "+e.w+"."
+        : e.r==="silent" ? 'Remember the silent "'+e.sl+'" in '+e.w+'.'
+        : "Careful with the ending of "+e.w+"." };
+}
+
+function buildJoin(i){
+  var e=JOINS[i];
+  return { kind:"join", key:e.c+"-"+i, word:e.c, stem:e.stem,
+    help:"Finish the sentence so that it makes sense.",
+    opts:shuffle([e.a].concat(e.d)), answers:[e.a],
+    teach:'"'+e.c+'" has to join two halves that actually fit together.' };
+}
+
+function buildTricky(i){
+  var e=TRICKY[i];
+  return { kind:"tricky", key:e.a, word:e.a, sentence:e.s,
+    help:"These all look alike. Which one belongs in the gap?",
+    opts:shuffle([e.a].concat(e.d)), answers:[e.a],
+    teach:"Look closely at the letters — "+e.a+" is the one that fits here." };
+}
+
+/* =======================================================================
+   Synonym question builders
+   ======================================================================= */
+function buildQuestion(idx, kind){
+  var e = SQUAD[idx];
+  var used=[idx];
+  function distractor(){
+    var n = safeIdx(idx, used);
+    if(n<0) return null;
+    used.push(n);
+    // take a synonym from that unrelated family (not its headword, to vary it)
+    return pick(SQUAD[n].y.concat([SQUAD[n].w]));
+  }
+  var teach = cap(e.w)+" also means: "+e.y.join(", ")+".";
+  if(kind==="double"){
+    var correct2 = shuffle(e.y.slice()).slice(0,2);
+    var opts = correct2.slice();
+    for(var d=0; d<4; d++){ var x=distractor(); if(x) opts.push(x); }
+    return { kind:"double", idx:idx, key:e.w, word:e.w, stem:e.w,
+      help:"Tap the TWO words that mean the same as this one, then go.",
+      opts:shuffle(opts), answers:correct2.slice(), teach:teach };
+  }
+  if(kind==="sentence"){
+    var ans = pick(e.y);
+    var o2=[ans];
+    for(var d2=0; d2<3; d2++){ var y=distractor(); if(y) o2.push(y); }
+    return { kind:"sentence", idx:idx, key:e.w, word:e.w, sentence:e.s,
+      help:"Which word could take the place of the highlighted word?",
+      opts:shuffle(o2), answers:[ans], teach:teach };
+  }
+  var ans3 = pick(e.y);
+  var o3=[ans3];
+  for(var d3=0; d3<3; d3++){ var z=distractor(); if(z) o3.push(z); }
+  return { kind:"single", idx:idx, key:e.w, word:e.w, stem:e.w,
+    help:"Which word means the same as this one?",
+    opts:shuffle(o3), answers:[ans3], teach:teach };
+}
+
+/* =======================================================================
+   Speech
+   ======================================================================= */
+var VOICE=null;
+function englishVoices(){
+  if(!("speechSynthesis" in window)) return [];
+  return (speechSynthesis.getVoices()||[]).filter(function(v){ return /^en/i.test(v.lang); });
+}
+/* The flat, robotic default is usually a "compact" voice. Prefer Irish, then
+   UK, and strongly prefer enhanced/premium/neural ones where installed. */
+function isRichVoice(v){
+  return !!v && /premium|enhanced|neural|siri/i.test(v.name+" "+(v.voiceURI||""));
+}
+function voiceScore(v){
+  var n=(v.name+" "+(v.voiceURI||"")).toLowerCase(), s=0;
+  if(/en[-_]ie/i.test(v.lang)) s+=40;
+  else if(/en[-_]gb/i.test(v.lang)) s+=30;
+  else if(/en[-_](au|nz)/i.test(v.lang)) s+=20;
+  else s+=10;
+  if(/premium|enhanced|neural|siri/.test(n)) s+=30;
+  if(/compact/.test(n)) s-=20;
+  if(v.localService) s+=4;
+  return s;
+}
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return;
+  var v=englishVoices();
+  if(!v.length) return;
+  if(S.opts.voiceURI){
+    var chosen=v.filter(function(x){ return x.voiceURI===S.opts.voiceURI; })[0];
+    if(chosen){ VOICE=chosen; return; }
+  }
+  VOICE = v.slice().sort(function(a,b){ return voiceScore(b)-voiceScore(a); })[0] || null;
+}
+if("speechSynthesis" in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged=function(){ pickVoice(); fillVoiceList(); };
+}
+function say(text, onend){
+  if(!S.opts.voice || !("speechSynthesis" in window)){ if(onend) onend(); return; }
+  try{
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    if(VOICE) u.voice=VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate=0.92; u.pitch=1;
+    if(onend){
+      u.onend=onend;
+      u.onerror=onend;
+      // belt and braces: some browsers drop onend on long utterances
+      var guard=setTimeout(onend, Math.max(4000, text.length*95));
+      var wrapped=onend;
+      u.onend=function(){ clearTimeout(guard); wrapped(); };
+      u.onerror=function(){ clearTimeout(guard); wrapped(); };
+    }
+    speechSynthesis.speak(u);
+  }catch(e){ if(onend) onend(); }
+}
+
+/* Long text one sentence at a time. Engines give a whole paragraph a flat,
+   run-on delivery; fed a sentence at a time they put the stress and the
+   falling tone in the right places, which is most of what "robotic" is. */
+function sayPassage(text, onend){
+  if(!S.opts.voice || !("speechSynthesis" in window)){ if(onend) onend(); return; }
+  var parts=(text.match(/[^.!?]+[.!?]*/g)||[text])
+              .map(function(s){ return s.trim(); }).filter(Boolean);
+  var i=0;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  var next=function(){
+    if(i>=parts.length){ if(onend) onend(); return; }
+    var line=parts[i++], moved=false;
+    var go=function(){ if(moved) return; moved=true; setTimeout(next,180); };
+    try{
+      var u=new SpeechSynthesisUtterance(line);
+      if(VOICE) u.voice=VOICE;
+      u.lang = VOICE ? VOICE.lang : "en-GB";
+      u.rate=0.95; u.pitch=1;
+      var guard=setTimeout(go, Math.max(3000, line.length*100));
+      u.onend=function(){ clearTimeout(guard); go(); };
+      u.onerror=function(){ clearTimeout(guard); go(); };
+      speechSynthesis.speak(u);
+    }catch(e){ go(); }
+  };
+  next();
+}
+
+/* =======================================================================
+   Screens
+   ======================================================================= */
+var $ = function(id){ return document.getElementById(id); };
+function show(id){
+  var all=document.querySelectorAll(".screen");
+  for(var i=0;i<all.length;i++) all[i].classList.remove("on");
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+}
+
+/* =======================================================================
+   Match state
+   ======================================================================= */
+var M=null;
+var ATTACKS=12;
+
+function startMatch(mode, level){
+  // clear any penalty left pending from a match that was restarted or abandoned
+  $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
+  $("runWrap").classList.remove("on"); RUN.live=false; RUN.done=null;
+  if(RUN.raf){ cancelAnimationFrame(RUN.raf); RUN.raf=null; }
+  var MD=MODES[mode];
+  var pool=MD.pool(level);
+
+  // bias towards items he has struggled with
+  var weighted=[];
+  pool.forEach(function(i){
+    var st=S.stats[statKey(mode, MD.key(i))];
+    var reps = 1;
+    if(st && st.seen>0){ var acc=st.right/st.seen; reps = acc<0.5 ? 3 : (acc<0.8 ? 2 : 1); }
+    for(var r=0;r<reps;r++) weighted.push(i);
+  });
+  shuffle(weighted);
+  var chosen=[], seen={};
+  for(var k=0;k<weighted.length && chosen.length<ATTACKS;k++){
+    if(!seen[weighted[k]]){ seen[weighted[k]]=1; chosen.push(weighted[k]); }
+  }
+  while(chosen.length<ATTACKS && chosen.length<pool.length) chosen.push(pick(pool));
+
+  M={ mode:mode, level:level,
+      queue:chosen.map(function(idx,n){ var q=MD.build(idx,n,level); q.pidx=idx; return q; }),
+      pool:chosen.slice(),
+      n:0, us:0, them:0, streak:0, missStreak:0, right:0, wrong:0, pens:0, pensScored:0, rewards:0,
+      missed:[], retried:false, picked:[], locked:false, t0:Date.now(), timer:null };
+
+  $("clockTxt").textContent = "";
+  if(S.opts.clock){
+    var tick=function(){
+      var s=((Date.now()-M.t0)/1000)|0, mm=(s/60)|0, ss=s%60;
+      $("clockTxt").textContent = mm+":"+(ss<10?"0":"")+ss;
+    };
+    tick();                       // draw straight away, not a second later
+    M.timer=setInterval(tick,1000);
+  }
+  show("scMatch");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  var q=M.queue[M.n];
+  M.picked=[]; M.locked=false;
+  $("fbBox").innerHTML="";
+  $("btnNext").classList.add("hidden");
+  $("attackNo").textContent = "Element "+(M.n+1)+" of "+M.queue.length;
+  $("scoreTxt").textContent = M.us+" – "+M.them;
+  var LABEL={ double:"Pick two", sentence:"Swap it in", join:"Build the routine",
+              tricky:"Spot the difference", letters:"The silent one", listen:"Ears only" };
+  var ICON={syn:"ic-syn",ant:"ic-ant",tricky:"ic-tricky",spell:"ic-spell",
+            sent:"ic-sent",listen:"ic-listen",team:"ic-team"};
+  $("qType").innerHTML='<svg class="qtypeic"><use href="#'+(ICON[M.mode]||"ic-ball")+'"/></svg>'+
+    (q.label || LABEL[q.kind] || (q.rule ? q.rule : "Which one"));
+  $("qCard").className = "card g-"+M.mode;
+  $("qHelp").textContent = q.help;
+  updateDots(); updateBall();
+
+  function speaker(txt,big){
+    return ' <button class="iconbtn" style="display:inline-grid;width:'+(big?38:34)+'px;height:'+
+      (big?38:34)+'px;vertical-align:middle" data-say="'+String(txt).replace(/"/g,"&quot;")+'">&#128266;</button>';
+  }
+  var stem="";
+  if(q.kind==="sentence"){
+    var re=new RegExp("\\b("+q.word+")\\b","i");
+    stem='<div class="sentence">'+q.sentence.replace(re,"<mark>$1</mark>")+speaker(q.sentence,1)+'</div>';
+  } else if(q.kind==="tricky"){
+    stem='<div class="sentence">'+q.sentence.replace("___",'<mark>&nbsp;?&nbsp;</mark>')+'</div>';
+  } else if(q.kind==="join"){
+    stem='<div class="sentence">'+q.stem+' <span class="muted">…</span>'+speaker(q.stem,1)+'</div>';
+  } else if(q.kind==="listen"){
+    stem='<div class="listenbox">'+
+      '<button class="btn primary" id="btnPlayPassage" style="margin-bottom:8px">&#9654;&nbsp; Play the commentary</button>'+
+      '<div class="small muted" id="listenStatus">Listen the whole way through. The question comes afterwards.</div>'+
+      '<button class="btn ghost hidden" id="btnShowWords" style="margin:8px 0 0">Show the words</button>'+
+      '<div class="passage hidden" id="passageText">'+q.passage+'</div>'+
+      '</div><div class="sentence hidden" id="listenQ" style="margin-top:.7em"><b>'+q.ask+'</b></div>';
+  } else if(q.plain){
+    stem="";                              // the words themselves are the question
+  } else if(q.spellPrompt){
+    stem='<div class="sentence">Only one of these is a real spelling.'+speaker(q.word,1)+'</div>';
+  } else {
+    stem='<div><span class="target">'+cap(q.word)+'</span>'+speaker(q.word,1)+'</div>';
+  }
+  $("qStem").innerHTML=stem;
+
+  var html="";
+  if(q.kind==="letters"){
+    html='<div class="letterrow">';
+    q.opts.forEach(function(ch,i){ html+='<button class="lettbtn" data-opt="'+i+'">'+ch+'</button>'; });
+    html+='</div>';
+  } else {
+    q.opts.forEach(function(o,i){
+      // spellings and sentence fragments stay exactly as they are written
+      var label = (q.kind==="join"||q.kind==="tricky"||q.spellPrompt) ? o : cap(o);
+      html+='<button class="btn opt" data-opt="'+i+'">'+label+
+            '<span class="say" data-say="'+String(o).replace(/"/g,"&quot;")+'">&#128266;</span></button>';
+    });
+  }
+  $("qOpts").innerHTML=html;
+  $("btnConfirm").classList.toggle("hidden", q.kind!=="double");
+  if(q.kind==="double") $("btnConfirm").textContent="Go! (pick 2)";
+  M.fiftyUsed=false;
+  refreshFifty();
+
+  if(q.kind==="listen"){
+    /* CELF-5 presents the whole paragraph first and only then asks the
+       questions, so the question stays hidden until the passage has finished.
+       Seeing it first would turn listening into scanning for one fact. */
+    $("qOpts").classList.add("hidden");
+    // The passage plays on a short delay, so the question may already have
+    // moved on (he left the pitch, or answered fast). Bail out if so.
+    var stillHere=function(){ return !!($("listenQ") && $("btnPlayPassage") && $("listenStatus")); };
+    var reveal=function(){
+      if(!stillHere()) return;
+      $("listenQ").classList.remove("hidden");
+      $("qOpts").classList.remove("hidden");
+      $("btnShowWords").classList.remove("hidden");
+      $("listenStatus").textContent="Play it again as often as you need.";
+      $("btnPlayPassage").innerHTML="&#9654;&nbsp; Play it again";
+    };
+    var speakIt=function(){
+      if(!stillHere()) return;
+      $("listenStatus").textContent="Playing…";
+      $("btnPlayPassage").disabled=true;
+      var t0=Date.now();
+      sayPassage(q.passage, function(){
+        if($("btnPlayPassage")) $("btnPlayPassage").disabled=false;
+        reveal();
+        // If it "finished" almost instantly the audio never really played
+        // (no voice, muted, or the app in the background). Fall back to text
+        // rather than asking about a passage he never heard.
+        if(Date.now()-t0 < 1500 && stillHere()){
+          $("passageText").classList.remove("hidden");
+          $("btnShowWords").textContent="Hide the words";
+          $("listenStatus").textContent="The sound did not play, so here are the words. Check the volume and the voice in settings.";
+        }
+      });
+    };
+    $("btnShowWords").addEventListener("click", function(){
+      $("passageText").classList.toggle("hidden");
+      this.textContent = $("passageText").classList.contains("hidden") ? "Show the words" : "Hide the words";
+    });
+    if(S.opts.reader || !S.opts.voice || !("speechSynthesis" in window)){
+      // A grown-up reads it aloud (or there is no voice): show the words,
+      // then hide them so the question is still answered from memory.
+      $("passageText").classList.remove("hidden");
+      $("btnPlayPassage").innerHTML="Read it out, then tap here &rsaquo;";
+      $("listenStatus").textContent = S.opts.reader
+        ? "Read this aloud to him once. Tap when you have finished."
+        : "Sound is off, so read it instead. The question comes next.";
+      $("btnPlayPassage").addEventListener("click", function(){
+        $("passageText").classList.add("hidden");
+        $("btnShowWords").textContent="Show the words";
+        reveal();
+        $("listenStatus").textContent="You can show the words again if you need to.";
+        $("btnPlayPassage").classList.add("hidden");
+      });
+      $("qHelp").textContent = S.opts.reader
+        ? "A grown-up reads it aloud, then he answers from memory."
+        : "Turn sound on in settings for the listening version.";
+    } else {
+      $("btnPlayPassage").addEventListener("click", speakIt);
+      setTimeout(speakIt, 250);
+    }
+  }
+}
+
+/* =======================================================================
+   XP and the fifty-fifty card
+   ======================================================================= */
+var XP_PICKUP=1, XP_GOAL=5, FIFTY_COST=20;
+function addXP(n){ S.xp=(S.xp||0)+n; save(); }
+
+function fiftyAvailable(q){
+  if(!q || q.kind==="letters") return false;
+  return (q.opts.length - q.answers.length) >= 2;
+}
+function refreshFifty(){
+  var q=M && M.queue[M.n];
+  var can=fiftyAvailable(q) && !M.fiftyUsed && !M.locked;
+  $("btnFifty").classList.toggle("hidden", !can);
+  $("btnFifty").disabled = S.xp < FIFTY_COST;
+  $("btnFifty").style.opacity = S.xp < FIFTY_COST ? .5 : 1;
+  $("xpLine").innerHTML = '<span class="xppill">'+(S.xp||0)+' XP</span>'+
+    (can ? (S.xp>=FIFTY_COST ? ' &nbsp;a fifty-fifty costs '+FIFTY_COST
+                             : ' &nbsp;'+(FIFTY_COST-S.xp)+' more for a fifty-fifty') : '');
+}
+function useFifty(){
+  var q=M.queue[M.n];
+  if(M.locked || M.fiftyUsed || !fiftyAvailable(q) || S.xp<FIFTY_COST) return;
+  var wrong=[];
+  q.opts.forEach(function(o,i){ if(q.answers.indexOf(o)<0) wrong.push(i); });
+  shuffle(wrong);
+  var nodes=$("qOpts").children;
+  wrong.slice(0,2).forEach(function(i){ if(nodes[i]) nodes[i].classList.add("gone"); });
+  S.xp-=FIFTY_COST; M.fiftyUsed=true; save();
+  refreshFifty();
+}
+$("btnFifty").addEventListener("click", useFifty);
+
+function updateDots(){
+  var d=$("streakDots").querySelectorAll(".sdot");
+  for(var i=0;i<3;i++) d[i].className.baseVal = "sdot" + (i<M.streak ? " lit" : "");
+  var left=3-M.streak;
+  $("streakLabel").textContent = M.streak===0 ? "three in a row wins a vault"
+    : (left===1 ? "one more for a vault" : left+" more for a vault");
+}
+function updateBall(){
+  var x=[36,110,190,262][Math.min(M.streak,3)];
+  $("ball").style.transform="translate("+x+"px,34px)";
+}
+
+$("qOpts").addEventListener("click", function(ev){
+  var sayEl = ev.target.closest("[data-say]");
+  if(sayEl && sayEl.classList.contains("say")){ ev.stopPropagation(); say(sayEl.getAttribute("data-say")); return; }
+  var b = ev.target.closest("[data-opt]");
+  if(!b || M.locked || b.classList.contains("gone")) return;
+  var q=M.queue[M.n];
+  var i=+b.getAttribute("data-opt");
+  if(q.kind==="letters"){ M.picked=[i]; grade(); return; }
+  if(q.kind==="double"){
+    var at=M.picked.indexOf(i);
+    if(at>=0){ M.picked.splice(at,1); b.classList.remove("picked"); }
+    else if(M.picked.length<2){ M.picked.push(i); b.classList.add("picked"); }
+    $("btnConfirm").textContent = M.picked.length===2 ? "Go!" : "Go! (pick "+(2-M.picked.length)+" more)";
+  } else {
+    M.picked=[i]; grade();
+  }
+});
+$("qStem").addEventListener("click", function(ev){
+  var s=ev.target.closest("[data-say]"); if(s) say(s.getAttribute("data-say"));
+});
+$("btnConfirm").addEventListener("click", function(){
+  if(M.picked.length===2 && !M.locked) grade();
+});
+
+function grade(){
+  M.locked=true;
+  $("btnFifty").classList.add("hidden");
+  var q=M.queue[M.n];
+  var ok, i;
+
+  if(q.kind==="letters"){
+    ok = M.picked.length===1 && String(M.picked[0])===q.answers[0];
+    var lb=$("qOpts").querySelectorAll(".lettbtn");
+    for(i=0;i<lb.length;i++){
+      if(String(i)===q.answers[0]) lb[i].classList.add("right");
+      else if(M.picked.indexOf(i)>=0) lb[i].classList.add("wrongpick");
+    }
+  } else {
+    var chosen = M.picked.map(function(k){ return q.opts[k]; });
+    ok = chosen.length===q.answers.length &&
+         chosen.every(function(c){ return q.answers.indexOf(c)>=0; });
+    var nodes=$("qOpts").children;
+    for(i=0;i<nodes.length;i++){
+      var val=q.opts[i];
+      if(q.answers.indexOf(val)>=0) nodes[i].classList.add("right");
+      else if(M.picked.indexOf(i)>=0) nodes[i].classList.add("wrongpick");
+      nodes[i].classList.remove("picked");
+    }
+  }
+
+  var w=q.key;
+  var sk=statKey(M.mode, w);
+  if(!S.stats[sk]) S.stats[sk]={seen:0,right:0};
+  S.stats[sk].seen++; if(ok) S.stats[sk].right++;
+
+  if(ok){
+    M.right++; M.streak++; M.missStreak=0;
+    updateDots(); updateBall();
+    $("fbBox").innerHTML='<div class="feedback ok"><b>'+
+      pick(["Beautiful.","Nailed it.","Clean as anything.","Take a bow.","Perfect form."])+
+      '</b><br><span class="small">'+q.teach+'</span></div>';
+    if(M.streak>=3){
+      M.streak=0; M.pens++;
+      $("btnConfirm").classList.add("hidden");
+      // Alternate the reward: penalty, counter attack, penalty, ...
+      var reward = (M.rewards % 2 === 0) ? takePenalty : takeRun;
+      M.rewards++;
+      setTimeout(function(){
+        reward(function(scored){
+          if(scored){ M.us++; M.pensScored++; }
+          $("scoreTxt").textContent=M.us+" – "+M.them;
+          updateDots(); updateBall();
+          nextAttack();          // straight back into the questions
+        });
+      }, 700);
+      save();
+      return;                       // Next appears only after the penalty
+    }
+  } else {
+    M.wrong++; M.streak=0; M.missStreak++;
+    if(q.pidx!=null && M.missed.indexOf(q.pidx)<0) M.missed.push(q.pidx);
+    updateDots(); updateBall();
+    // Deliberately gentle: three misses in a row to concede, never more than
+    // three against, and extra time is practice only — it can't cost a goal.
+    if(S.opts.oppGoals && M.missStreak>=3 && M.them<3 && !M.retried){ M.them++; M.missStreak=0; goalFlash("They score."); }
+    var shown = q.kind==="letters"
+      ? 'The silent letter is <b>'+q.opts[+q.answers[0]]+'</b>.'
+      : 'The answer was <b>'+q.answers.map(function(x){ return q.kind==="join"||q.kind==="tricky"?x:cap(x); }).join("</b> and <b>")+'</b>.';
+    $("fbBox").innerHTML='<div class="feedback no"><b>Wobble — off the beam.</b><br>'+
+      '<span class="small">'+shown+'<br>'+q.teach+'</span></div>';
+    if(S.opts.autoSay) setTimeout(function(){
+      if(q.kind==="listen") say(q.answers.join(". "));      // not the whole passage again
+      else say(q.kind==="letters" ? q.word : q.word+". "+q.answers.join(". "));
+    }, 350);
+  }
+  $("scoreTxt").textContent=M.us+" – "+M.them;
+  $("btnConfirm").classList.add("hidden");
+  $("btnNext").classList.remove("hidden");
+  save();
+}
+
+/* =======================================================================
+   PENALTY SHOOT-OUT
+   Swipe from the ball towards a corner (or tap a corner). The keeper is
+   tuned so roughly one in three is saved — see PEN_TUNING below.
+   ======================================================================= */
+/* Target positions are spread so that adjacent zones are at least 21 degrees
+   apart as seen from the ball — a sloppy swipe still lands where he meant. */
+var PEN_POS = {                      // SVG user units inside the 400x320 scene
+  TL:{x:118,y:128}, TR:{x:282,y:128}, C:{x:200,y:128}, BL:{x:100,y:190}, BR:{x:300,y:190}
+};
+var PEN_KEEPER_HOME={x:200,y:182}, PEN_BALL_HOME={x:200,y:272};
+/* Tuned by simulation to land on roughly one save in three:
+     mixed shooter 33% saved · same corner every time 42% · top corners only 32%
+   The keeper leans a little on where you've put your past penalties, so
+   hammering the same corner all night starts to get punished — but only mildly. */
+var PEN_TUNING = {
+  reflex:0.10,        // he simply reads the shot
+  readHistory:0.15,   // else: guesses from your past penalties
+  sameZone:{TL:0.74,TR:0.74,C:0.77,BL:0.80,BR:0.80},  // save odds when he guesses right
+  adjacent:0.30,      // got a hand to it (same side, wrong height)
+  wrong:0.07          // freak save
+};
+var PEN_ADJ = { TL:["BL"], BL:["TL","C"], TR:["BR"], BR:["TR","C"], C:["BL","BR"] };
+
+/* Map a swipe onto whichever corner it actually points at on screen.
+   Uses the real pixel geometry of the goal rather than fixed angle bands,
+   so "swipe towards the corner you can see" always does what it looks like. */
+function penZoneFromSwipe(dx,dy){
+  if(Math.sqrt(dx*dx+dy*dy) < 20) return null;      // too short — let him retake
+  // The SVG scales uniformly, so on-screen angles match scene angles exactly.
+  var swipe = Math.atan2(-dy, dx), best=null, bd=1e9;
+  for(var z in PEN_POS){
+    var tx = PEN_POS[z].x - PEN_BALL_HOME.x;
+    var ty = PEN_POS[z].y - PEN_BALL_HOME.y;
+    var d = Math.abs(Math.atan2(-ty, tx) - swipe);
+    if(d > Math.PI) d = 2*Math.PI - d;
+    if(d < bd){ bd = d; best = z; }
+  }
+  return best;
+}
+function penKeeperPick(shot){
+  var zones=["TL","TR","C","BL","BR"];
+  if(Math.random() < PEN_TUNING.reflex) return shot;          // read it
+  if(Math.random() < PEN_TUNING.readHistory){                 // study the taker
+    var hist=S.pens.zones, tot=0, w=zones.map(function(z){ var v=(hist[z]||0)+0.6; tot+=v; return v; });
+    var r=Math.random()*tot, acc=0;
+    for(var i=0;i<zones.length;i++){ acc+=w[i]; if(r<=acc) return zones[i]; }
+  }
+  return zones[(Math.random()*zones.length)|0];
+}
+function penIsSaved(shot,keep,power){
+  var base;
+  if(shot===keep) base = PEN_TUNING.sameZone[shot];
+  else if((PEN_ADJ[shot]||[]).indexOf(keep)>=0) base = PEN_TUNING.adjacent;
+  else base = PEN_TUNING.wrong;
+  base *= powerMult(power==null?0.7:power);
+  return Math.random() < Math.min(base, 0.95);
+}
+
+/* Power bands, FC style. A weak shot is easy to save; the sweet spot beats
+   the keeper more often; belting it is only slightly worse than the sweet
+   spot, but past 100% it clears the bar entirely (handled in shoot). */
+/* Hold the ball and the bar sweeps up, then back down, over and over.
+   Let go in the green and you strike it properly; too soft and the keeper
+   gets there, too hard and it clears the crossbar. The bar keeps sweeping
+   so a missed window is never fatal — you just wait for the next one. */
+var PEN_POWER = { weak:0.45, sweetLo:0.55, sweetHi:1.00, max:1.15, scale:1.30, sweep:1400 };
+function chargePower(ms){
+  var t=(ms % (PEN_POWER.sweep*2)) / (PEN_POWER.sweep*2);
+  var tri = t < 0.5 ? t*2 : (1-t)*2;          // 0 -> 1 -> 0
+  return tri * PEN_POWER.scale;
+}
+function powerMult(p){
+  if(p < PEN_POWER.weak)    return 1.45;
+  if(p < PEN_POWER.sweetLo) return 1.15;
+  if(p <= PEN_POWER.sweetHi) return 0.80;
+  return 0.95;
+}
+function powerBand(p){
+  if(p > PEN_POWER.max)     return "over";
+  if(p < PEN_POWER.weak)    return "weak";
+  if(p >= PEN_POWER.sweetLo && p <= PEN_POWER.sweetHi) return "good";
+  return "";
+}
+var POWER_WORD = { weak:"Too soft", good:"Perfect!", over:"Too much!", "":"OK" };
+
+function startCharge(){
+  PEN.charging=true; PEN.chargeT0=Date.now();
+  var step=function(){
+    if(!PEN.charging) return;
+    PEN.power=chargePower(Date.now()-PEN.chargeT0);
+    showPower(PEN.power);
+    PEN.raf=requestAnimationFrame(step);
+  };
+  step();
+}
+function stopCharge(){
+  PEN.charging=false;
+  if(PEN.raf) cancelAnimationFrame(PEN.raf);
+  PEN.raf=null;
+}
+function showPower(p){
+  var band=powerBand(p);
+  var fill=$("penPowerFill");
+  fill.style.width=Math.min(p/PEN_POWER.scale,1)*100+"%";
+  fill.className=band;
+  $("penPowerTxt").textContent = p<=0.02 ? "Power" : POWER_WORD[band];
+}
+
+var PEN = { live:false, done:null, startPt:null, aim:null, timer:null, result:false };
+
+function placeAt(el,p,scale){ el.style.transform="translate("+p.x+"px,"+p.y+"px)"+(scale?" scale("+scale+")":""); }
+function penReset(){
+  var k=$("penKeeper"), b=$("penBall");
+  k.className="pkeeper"; k.style.transition="none"; b.style.transition="none";
+  placeAt(k,PEN_KEEPER_HOME); placeAt(b,PEN_BALL_HOME);
+  void k.getBoundingClientRect();
+  k.style.transition=""; b.style.transition="";
+  var t=$("penField").querySelectorAll(".ptarget");
+  for(var i=0;i<t.length;i++) t[i].classList.remove("hot");
+  $("penNet").classList.remove("ripple");
+  $("penRes").innerHTML="&nbsp;"; $("penRes").className="penres";
+  b.style.transitionDuration="";
+  stopCharge(); PEN.power=0; showPower(0);
+  PEN.resolvedAt=0;                    // must not carry over from the last penalty
+  $("penPowerTxt").textContent="Hold to run up";
+  $("penMsg").textContent="Hold to build your run-up, drag to pick your landing, then let go.";
+}
+function takePenalty(cb){
+  PEN.done=cb; PEN.live=true;
+  penReset();
+  $("penWrap").classList.add("on");
+}
+function highlight(z){
+  var t=$("penField").querySelectorAll(".ptarget");
+  for(var i=0;i<t.length;i++) t[i].classList.toggle("hot", t[i].getAttribute("data-zone")===z);
+}
+function shoot(zone, power){
+  if(!PEN.live) return;
+  PEN.live=false;
+  if(power==null) power=0.7;            // a plain tap gets a safe, solid strike
+  highlight(zone); showPower(power);
+  S.pens.taken++; S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;
+
+  var over = power > PEN_POWER.max;
+  var keep=penKeeperPick(zone);
+  var saved = over ? false : penIsSaved(zone,keep,power);
+  var k=$("penKeeper"), b=$("penBall");
+
+  placeAt(k, PEN_POS[keep]);
+  if(PEN_POS[keep].x < 190) k.classList.add("dive-l");
+  else if(PEN_POS[keep].x > 210) k.classList.add("dive-r");
+  else k.classList.add("dive-u");
+  // harder strikes travel faster
+  b.style.transitionDuration = (0.46 - Math.min(power,1)*0.20)+"s";
+  if(over) placeAt(b, {x:PEN_POS[zone].x, y:-30}, 0.7);
+  else placeAt(b, PEN_POS[zone], 0.85);
+
+  setTimeout(function(){
+    if(over){
+      $("penRes").textContent="OVER-ROTATED!"; $("penRes").className="penres saved";
+      $("penMsg").textContent="Too much run-up — ease off a little next time.";
+      save(); PEN.result=false;
+      PEN.resolvedAt=Date.now();
+      PEN.timer=setTimeout(penDismiss, 2600);
+      return;
+    }
+    if(saved){
+      placeAt(b, {x:(PEN_POS[keep].x<200?30:370), y:250}, 0.7);
+      $("penRes").textContent="STEPPED OFF"; $("penRes").className="penres saved";
+      $("penMsg").textContent="A step on the landing — so close.";
+    } else {
+      S.pens.scored++; addXP(XP_GOAL);
+      placeAt(b, {x:PEN_POS[zone].x, y:PEN_POS[zone].y+6}, 0.62);
+      $("penNet").classList.add("ripple");
+      $("penRes").textContent="STUCK IT!"; $("penRes").className="penres scored";
+      $("penMsg").textContent=pick(["Stuck it.","Arms up, no wobble.","Textbook landing.","Judges love that."])+
+        "  +"+XP_GOAL+" XP";
+    }
+    save();
+    PEN.result = !saved;
+    // hold the result on screen, then straight back to the questions
+    PEN.resolvedAt=Date.now();
+    PEN.timer=setTimeout(penDismiss, saved?2600:2800);
+  }, 430);
+}
+function penDismiss(){
+  if(PEN.timer){ clearTimeout(PEN.timer); PEN.timer=null; }
+  if(!PEN.done) return;
+  $("penWrap").classList.remove("on");
+  var cb=PEN.done; PEN.done=null;
+  cb(PEN.result);
+}
+
+(function bindPenalty(){
+  var f=$("penField");
+  function localPt(ev){
+    var r=f.getBoundingClientRect();
+    return { x:ev.clientX-r.left, y:ev.clientY-r.top, w:r.width, h:r.height };
+  }
+  f.addEventListener("pointerdown", function(ev){
+    if(!PEN.live) return;
+    try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
+    PEN.startPt=localPt(ev); PEN.downAt=Date.now();
+    PEN.aim="C"; highlight("C");         // show the default so it is never a surprise
+    startCharge();                       // bar starts sweeping the moment he holds
+    $("penMsg").textContent="Drag to pick your landing. Let go when the bar is in the green.";
+    ev.preventDefault();
+  });
+  f.addEventListener("pointermove", function(ev){
+    if(!PEN.live || !PEN.startPt) return;
+    var p=localPt(ev);
+    var z=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
+    if(z){ PEN.aim=z; highlight(z); }    // keep the last good aim if he wobbles
+    ev.preventDefault();
+  });
+  f.addEventListener("pointerup", function(ev){
+    if(!PEN.live || !PEN.startPt) return;
+    var held=Date.now()-PEN.downAt;
+    // Power comes from how long he held, not from the animation frames — the
+    // bar is only the picture of it, and browsers throttle frames when a tab
+    // is not in front. Read it before stopping the loop.
+    var pw=chargePower(Date.now()-PEN.chargeT0);
+    stopCharge(); PEN.power=pw; showPower(pw);
+    var p=localPt(ev);
+    var swiped=penZoneFromSwipe(p.x-PEN.startPt.x, p.y-PEN.startPt.y);
+    var z=swiped, straight=false;
+    if(!z){
+      // a quick tap on a corner: aim there and give it a safe, solid strike
+      var sx=p.x/p.w*400, sy=p.y/p.h*320, best=null, bd=1e9;
+      for(var key in PEN_POS){
+        var d=Math.pow(PEN_POS[key].x-sx,2)+Math.pow(PEN_POS[key].y-sy,2);
+        if(d<bd){ bd=d; best=key; }
+      }
+      if(best && bd < 70*70){ z=best; if(held<260) pw=null; }
+    }
+    // Held it long enough to build power but never picked a corner — take the
+    // shot anyway rather than throwing the charge away. Straight down the middle.
+    if(!z && held>=260){ z = PEN.aim || "C"; straight=!swiped; }
+    PEN.startPt=null;
+    if(z){
+      if(straight) $("penMsg").textContent="No landing picked — straight down the middle.";
+      shoot(z, pw);
+    } else {
+      highlight(null); showPower(0);
+      $("penMsg").textContent="Hold, drag towards a landing spot, then let go.";
+    }
+    ev.preventDefault();
+  });
+  f.addEventListener("pointercancel", function(){
+    // iOS can take the touch away mid-hold; say so rather than failing silently
+    stopCharge(); PEN.startPt=null; highlight(null); showPower(0);
+    if(PEN.live) $("penMsg").textContent="Lost it — hold again to restart your run-up.";
+  });
+
+  // tap to skip the celebration — but not for the first moment, so the tap
+  // that took the penalty cannot bounce straight through and skip it
+  $("penWrap").addEventListener("click", function(){
+    if(!PEN.live && PEN.done && PEN.resolvedAt && Date.now()-PEN.resolvedAt > 900) penDismiss();
+  });
+})();
+
+/* =======================================================================
+   COUNTER ATTACK — the running game, alternating with the penalty.
+   Three channels. Swipe sideways to switch, up to hurdle a sliding tackle,
+   down to slide under a high challenge. Reach the box and you score.
+   ======================================================================= */
+var RUN = { live:false, done:null, raf:null, timer:null, result:false, resolvedAt:0 };
+var RUN_W=360, RUN_H=520, RUN_GROUND=402, RUN_LANES=[86,180,274];
+/* =======================================================================
+   AVATARS — pick your player. Kits, skin tones and hair are varied on
+   purpose so he can find one that looks like him.
+   ======================================================================= */
+var AVATARS = [
+ {n:"Violet",     no:1, kit:"#7A3FA8", trim:"#F2C300", shorts:"#7A3FA8", socks:"#7A3FA8", skin:"#E9C39C", hair:"#3A2418", style:"plain"},
+ {n:"Teal",       no:2, kit:"#0E8C8C", trim:"#FFFFFF", shorts:"#0E8C8C", socks:"#0E8C8C", skin:"#F1D2B0", hair:"#8A4B1E", style:"plain"},
+ {n:"Rose",       no:3, kit:"#C2506E", trim:"#FFD34D", shorts:"#C2506E", socks:"#C2506E", skin:"#8D5524", hair:"#1B1310", style:"plain"},
+ {n:"Sunburst",   no:4, kit:"#E8712A", trim:"#FFFFFF", shorts:"#E8712A", socks:"#E8712A", skin:"#C68642", hair:"#241A12", style:"plain"},
+ {n:"Emerald",    no:5, kit:"#2E7D4F", trim:"#FFD34D", shorts:"#2E7D4F", socks:"#2E7D4F", skin:"#5C3317", hair:"#120C08", style:"hoops"},
+ {n:"Midnight",   no:6, kit:"#23306B", trim:"#8FD3F4", shorts:"#23306B", socks:"#23306B", skin:"#F1D2B0", hair:"#D9B26A", style:"plain"},
+ {n:"Silver",     no:7, kit:"#8C8C92", trim:"#23262B", shorts:"#8C8C92", socks:"#8C8C92", skin:"#E9C39C", hair:"#4A3722", style:"stripes"},
+ {n:"Sky",        no:8, kit:"#4EA3E0", trim:"#FFFFFF", shorts:"#4EA3E0", socks:"#4EA3E0", skin:"#C68642", hair:"#B5651D", style:"plain"}
+];
+function myAvatar(){ return AVATARS[Math.min(S.avatar||0, AVATARS.length-1)]; }
+
+/* Defenders wear whichever colour contrasts with the chosen kit, so the
+   player is never the same colour as the people tackling him. */
+var RUN_KIT = "#C8102E";
+function defenderKit(){
+  var k=myAvatar().kit.toUpperCase();
+  var r=parseInt(k.substr(1,2),16), g=parseInt(k.substr(3,2),16), b=parseInt(k.substr(5,2),16);
+  return (r>140 && r>b+40) ? "#1F5FA8" : "#C8102E";   // reddish kit -> blue defenders
+}
+var RUN_CFG = {
+  rows:8, gap:250, gapVar:70, lead:430, runIn:260, goalAhead:200,
+  speed:250, speedEnd:300,
+  jumpMs:660, slideMs:640, jumpH:56, laneMs:150,
+  shootMs:900, aimMs:6000
+};
+
+/* Every row has the same shape: one defender sliding in on the ground that
+   can be hurdled, one standing defender who has to be gone round, and one
+   clear channel. So there are always two ways through. */
+function makeCourse(){
+  var rows=[], z=RUN_CFG.lead;
+  for(var i=0;i<RUN_CFG.rows;i++){
+    var p=shuffle([0,1,2]);
+    rows.push({ z:z, slide:p[0], block:p[1], free:p[2], done:false });
+    z += RUN_CFG.gap + Math.random()*RUN_CFG.gapVar;
+  }
+  /* Bonus balls sit between the rows, in any channel. Going for one often
+     means not sitting in the easy channel, which is the whole point. */
+  var pick_=[];
+  for(var j=0;j<rows.length;j++){
+    if(Math.random()>0.78) continue;
+    var mid = j===0 ? rows[0].z-RUN_CFG.gap*0.55 : (rows[j].z+rows[j-1].z)/2;
+    pick_.push({ z:mid, lane:(Math.random()*3)|0, got:false });
+  }
+  return { rows:rows, picks:pick_, end:z+RUN_CFG.runIn };
+}
+
+function takeRun(cb){
+  RUN.done=cb; RUN.result=false; RUN.resolvedAt=0;
+  RUN.course=makeCourse();
+  RUN.dist=0; RUN.lane=1; RUN.laneFrom=1; RUN.laneT=1;
+  RUN.state="run"; RUN.stateT=0; RUN.hit=false; RUN.last=0;
+  RUN.startPt=null; RUN.phase="run"; RUN.shootT=0; RUN.aimT=0;
+  RUN.gained=0; RUN.picked=0; RUN.tapAt=0; RUN.tapPt=null;
+  RUN.shotZone="C"; RUN.keepZone="C"; RUN.saved=false;
+  $("runRes").innerHTML="&nbsp;"; $("runRes").className="penres";
+  $("runMsg").textContent="Swipe for the clear lane, up to leap the beam. Collect the stars on the way.";
+  $("runWrap").classList.add("on");
+
+  var cv=$("runCanvas");
+  var ctx = cv && cv.getContext ? cv.getContext("2d") : null;
+  if(!ctx){                       // no canvas (very old browser, or a test)
+    RUN.result=true; runFinish(true, "GOAL!", "Clear run at the mat.");
+    return;
+  }
+  RUN.ctx=ctx; RUN.live=true;
+  RUN.last=0;
+  RUN.raf=requestAnimationFrame(runStep);
+}
+
+function runStep(ts){
+  if(!RUN.live) return;
+  if(!RUN.last) RUN.last=ts;
+  var dt=Math.min(50, ts-RUN.last)/1000;   // clamp so a stall cannot teleport him
+  RUN.last=ts;
+
+  var p = RUN.dist / RUN.course.end;
+  var speed = RUN_CFG.speed + (RUN_CFG.speedEnd-RUN_CFG.speed)*Math.min(1,p);
+  RUN.dist += speed*dt;
+
+  if(RUN.laneT<1){ RUN.laneT=Math.min(1, RUN.laneT + (dt*1000)/RUN_CFG.laneMs); }
+  if(RUN.state!=="run"){
+    RUN.stateT += dt*1000;
+    var dur = RUN.state==="jump" ? RUN_CFG.jumpMs : RUN_CFG.slideMs;
+    if(RUN.stateT>=dur){ RUN.state="run"; RUN.stateT=0; }
+  }
+
+  // bonus balls he has just run over
+  for(var b=0;b<RUN.course.picks.length;b++){
+    var pk=RUN.course.picks[b];
+    if(!pk.got && pk.z-RUN.dist <= 0){
+      pk.got=true;
+      if(RUN.lane===pk.lane){ pk.taken=true; RUN.gained+=XP_PICKUP; RUN.picked++; }
+    }
+  }
+  // defenders he has just reached
+  for(var i=0;i<RUN.course.rows.length;i++){
+    var r=RUN.course.rows[i];
+    if(!r.done && r.z-RUN.dist <= 0){
+      r.done=true;
+      if(RUN.lane===r.block){
+        RUN.hit=true; RUN.live=false; runDraw();
+        runFinish(false, "TACKLED", "Blocked by the mats — take the clear lane.");
+        return;
+      }
+      if(RUN.lane===r.slide && RUN.state!=="jump"){
+        RUN.hit=true; RUN.live=false; runDraw();
+        runFinish(false, "TACKLED", "That is a beam. Swipe up to leap it, or go round.");
+        return;
+      }
+    }
+  }
+
+  if(RUN.dist >= RUN.course.end){
+    // he has reached the spot — now there is a keeper to beat
+    RUN.dist=RUN.course.end;
+    RUN.phase="aim"; RUN.state="run"; RUN.aimT=0;
+    $("runMsg").textContent="Double tap where on the mat you want to land.";
+    runDraw();
+    RUN.raf=requestAnimationFrame(runAimStep);
+    return;
+  }
+  runDraw();
+  RUN.raf=requestAnimationFrame(runStep);
+}
+
+/* Waiting for him to pick his spot. If he dithers too long the keeper wins
+   the staring contest and it goes down the middle. */
+function runAimStep(ts){
+  if(RUN.phase!=="aim") return;
+  if(!RUN.last) RUN.last=ts;
+  var dt=Math.min(50, ts-RUN.last); RUN.last=ts;
+  RUN.aimT += dt;
+  runDraw();
+  if(RUN.aimT >= RUN_CFG.aimMs){ runTakeShot("C", true); return; }
+  RUN.raf=requestAnimationFrame(runAimStep);
+}
+
+function runTakeShot(zone, rushed){
+  if(RUN.phase!=="aim") return;
+  RUN.phase="shoot"; RUN.shootT=0; RUN.last=0;
+  RUN.shotZone=zone;
+  RUN.keepZone=penKeeperPick(zone);
+  RUN.saved=penIsSaved(zone, RUN.keepZone, rushed?0.45:0.75);
+  S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;   // the keeper remembers your habits
+  if(rushed) $("runMsg").textContent="Too slow — she had to rush the landing.";
+  RUN.raf=requestAnimationFrame(runShoot);
+}
+
+/* On the spot: he strikes it, the ball flies past the post-height into the
+   corner of the net, and the net bulges. */
+function runShoot(ts){
+  if(RUN.phase!=="shoot") return;   // a stray frame after the shot resolved
+  if(!RUN.last) RUN.last=ts;
+  var dt=Math.min(50, ts-RUN.last); RUN.last=ts;
+  RUN.shootT += dt;
+  runDraw();
+  if(RUN.shootT >= RUN_CFG.shootMs){
+    if(RUN.saved){
+      runFinish(false, "SAVED!", "A step on the landing. You still keep your stars.");
+    } else {
+      RUN.gained += XP_GOAL;
+      runFinish(true, "GOAL!", "The whole length, and she sticks it.");
+    }
+    return;
+  }
+  RUN.raf=requestAnimationFrame(runShoot);
+}
+
+/* Which part of the goal he tapped. */
+function runGoalRect(){
+  var gy1=RUN_GROUND-RUN_CFG.goalAhead;
+  return { x0:58, x1:RUN_W-58, y0:gy1-78, y1:gy1 };
+}
+function runZoneFromTap(x,y){
+  var g=runGoalRect(), pad=34;
+  if(x<g.x0-pad || x>g.x1+pad || y<g.y0-pad || y>g.y1+pad) return null;
+  var w=(g.x1-g.x0)/3;
+  if(x < g.x0+w) return y < (g.y0+g.y1)/2 ? "TL" : "BL";
+  if(x > g.x1-w) return y < (g.y0+g.y1)/2 ? "TR" : "BR";
+  return "C";
+}
+function runZonePoint(z){
+  var g=runGoalRect();
+  var xs={TL:g.x0+36, BL:g.x0+36, C:(g.x0+g.x1)/2, TR:g.x1-36, BR:g.x1-36};
+  var ys={TL:g.y0+22, TR:g.y0+22, C:g.y0+40, BL:g.y1-18, BR:g.y1-18};
+  return { x:xs[z], y:ys[z] };
+}
+
+function runFinish(scored, title, msg){
+  if(RUN.phase==="done") return;    // only ever score a run once
+  if(RUN.raf) cancelAnimationFrame(RUN.raf);
+  RUN.raf=null; RUN.live=false; RUN.phase="done";
+  RUN.result=scored;
+  S.runs.taken++; if(scored) S.runs.scored++;
+  if(RUN.gained>0) addXP(RUN.gained);
+  save();
+  $("runRes").textContent=title;
+  $("runRes").className="penres "+(scored?"scored":"saved");
+  $("runMsg").textContent=msg+(RUN.gained>0
+    ? "  +"+RUN.gained+" XP"+(RUN.picked? " ("+RUN.picked+" star"+(RUN.picked>1?"s":"")+")":"")
+    : "");
+  RUN.resolvedAt=Date.now();
+  RUN.timer=setTimeout(runDismiss, 2400);
+}
+function runDismiss(){
+  if(RUN.timer){ clearTimeout(RUN.timer); RUN.timer=null; }
+  if(!RUN.done) return;
+  $("runWrap").classList.remove("on");
+  var cb=RUN.done; RUN.done=null;
+  cb(RUN.result);
+}
+
+function runLaneX(){
+  var a=RUN_LANES[RUN.laneFrom], b=RUN_LANES[RUN.lane];
+  var t=RUN.laneT, e=t<0.5 ? 2*t*t : -1+(4-2*t)*t;   // ease in-out
+  return a+(b-a)*e;
+}
+function runMove(d){
+  if(!RUN.live) return;
+  var next=Math.max(0, Math.min(2, RUN.lane+d));
+  if(next===RUN.lane) return;
+  RUN.laneFrom=RUN.lane; RUN.lane=next; RUN.laneT=0;
+}
+function runAct(s){
+  if(!RUN.live || RUN.state!=="run") return;
+  RUN.state=s; RUN.stateT=0;
+}
+
+function runDraw(){
+  var c=RUN.ctx; if(!c) return;
+  var d=RUN.dist;
+  c.clearRect(0,0,RUN_W,RUN_H);
+  // grass with mown bands scrolling towards the viewer
+  c.fillStyle="#2F6FA8"; c.fillRect(0,0,RUN_W,RUN_H);
+  var band=64, off=d%(band*2);
+  c.fillStyle="#3A7FBC";
+  for(var y=-band*2+off; y<RUN_H+band; y+=band*2) c.fillRect(0,y,RUN_W,band);
+  // touchlines and channel guides
+  c.strokeStyle="rgba(255,255,255,.55)"; c.lineWidth=3;
+  c.beginPath(); c.moveTo(14,0); c.lineTo(14,RUN_H); c.moveTo(RUN_W-14,0); c.lineTo(RUN_W-14,RUN_H); c.stroke();
+  c.strokeStyle="rgba(255,255,255,.30)"; c.lineWidth=2; c.setLineDash([16,16]);
+  c.lineDashOffset=-(d%32);
+  [133,227].forEach(function(x){ c.beginPath(); c.moveTo(x,0); c.lineTo(x,RUN_H); c.stroke(); });
+  c.setLineDash([]);
+
+  var spotY = RUN_GROUND - (RUN.course.end - d);
+  var goalY = RUN_GROUND - ((RUN.course.end + RUN_CFG.goalAhead) - d);
+  // penalty area, D and spot
+  if(spotY > -260){
+    c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=3;
+    var boxTop=goalY, boxBot=spotY+96;
+    c.beginPath(); c.moveTo(30,boxBot); c.lineTo(30,boxTop); c.moveTo(RUN_W-30,boxBot); c.lineTo(RUN_W-30,boxTop);
+    c.moveTo(30,boxBot); c.lineTo(RUN_W-30,boxBot); c.stroke();
+    c.beginPath(); c.arc(RUN_W/2, spotY, 56, 0.15*Math.PI, 0.85*Math.PI); c.stroke();
+    c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(RUN_W/2, spotY, 4, 0, 6.3); c.fill();
+  }
+  // the landing mat at the end of the tumbling run
+  if(goalY > -140){
+    var gh=78, gx0=58, gx1=RUN_W-58;
+    c.fillStyle="#D8A93F"; c.fillRect(gx0,goalY-gh,gx1-gx0,gh);
+    c.fillStyle="rgba(255,255,255,.22)"; c.fillRect(gx0,goalY-gh,gx1-gx0,7);
+    c.fillStyle="rgba(0,0,0,.12)"; c.fillRect(gx0,goalY-8,gx1-gx0,8);
+    c.strokeStyle="#B78B23"; c.lineWidth=4; c.strokeRect(gx0,goalY-gh,gx1-gx0,gh);
+  }
+  // bonus balls
+  RUN.course.picks.forEach(function(p){
+    if(p.got) return;
+    var sy = RUN_GROUND - (p.z-d);
+    if(sy < -30 || sy > RUN_H+30) return;
+    runDrawPickup(c, RUN_LANES[p.lane], sy);
+  });
+  // defenders
+  var kit=defenderKit();
+  RUN.course.rows.forEach(function(r){
+    var sy = RUN_GROUND - (r.z-d);
+    if(sy < -70 || sy > RUN_H+50) return;
+    runDrawSlider(c, RUN_LANES[r.slide], sy, kit);
+    runDrawStander(c, RUN_LANES[r.block], sy, kit);
+  });
+
+  if(RUN.phase==="aim" || RUN.phase==="shoot"){
+    runDrawKeeper(c);
+    if(RUN.phase==="aim") runDrawAimHelp(c);
+  }
+  if(RUN.phase==="shoot") runDrawShot(c, spotY, goalY);
+  else runDrawPlayer(c);
+
+  // bonus tally
+  if(RUN.gained>0){
+    c.fillStyle="rgba(0,0,0,.35)"; c.beginPath();
+    c.roundRect ? c.roundRect(10,10,86,26,13) : c.rect(10,10,86,26); c.fill();
+    c.fillStyle="#FFD34D"; c.beginPath(); c.arc(26,23,8,0,6.3); c.fill();
+    c.fillStyle="#3A2A00"; c.font="bold 11px -apple-system,sans-serif"; c.textAlign="center";
+    c.fillText("XP",26,27);
+    c.fillStyle="#FFFFFF"; c.font="bold 14px -apple-system,sans-serif"; c.textAlign="left";
+    c.fillText("+"+RUN.gained, 40, 28);
+    c.textAlign="start";
+  }
+}
+
+function runDrawPickup(c,x,y){
+  var bob=Math.sin(RUN.dist/24)*3, cy=y-16+bob;
+  c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+6,13,4,0,0,6.3); c.fill();
+  c.fillStyle="#FFD34D"; c.beginPath();
+  for(var i=0;i<10;i++){
+    var r=(i%2?5.5:13), a=-Math.PI/2+i*Math.PI/5;
+    c[i?"lineTo":"moveTo"](x+Math.cos(a)*r, cy+Math.sin(a)*r);
+  }
+  c.closePath(); c.fill();
+  c.strokeStyle="#C99000"; c.lineWidth=2; c.stroke();
+}
+
+/* The opposing keeper, on his line. */
+function runDrawKeeper(c){
+  var g=runGoalRect(), home={x:(g.x0+g.x1)/2, y:g.y1-4}, pos=home, dive=0;
+  if(RUN.phase==="shoot"){
+    var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs), p=runZonePoint(RUN.keepZone);
+    pos={ x:home.x+(p.x-home.x)*Math.min(1,t*1.5), y:home.y+(p.y-home.y)*Math.min(1,t*1.5) };
+    dive = (p.x<home.x?-1:(p.x>home.x?1:0)) * Math.min(1,t*1.5) * 0.7;
+  }
+  c.save();
+  c.translate(pos.x,pos.y); c.rotate(dive);
+  c.fillStyle="#B8E31E"; c.fillRect(-30,-26,60,9);                 // arms
+  c.fillStyle="#F7F7F5"; c.beginPath(); c.arc(-32,-21,6,0,6.3); c.fill();
+  c.beginPath(); c.arc(32,-21,6,0,6.3); c.fill();
+  c.fillStyle="#B8E31E"; c.fillRect(-13,-28,26,26);                // shirt
+  c.fillStyle="#14151A"; c.fillRect(-12,-4,10,12); c.fillRect(2,-4,10,12);
+  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(0,-36,8,0,6.3); c.fill();
+  c.fillStyle="#2B2118"; c.beginPath(); c.arc(0,-38,8,3.35,6.07); c.fill();
+  c.restore();
+}
+
+/* Faint targets so it is obvious the goal is tappable. */
+function runDrawAimHelp(c){
+  var pulse=0.35+0.25*Math.sin(RUN.aimT/220);
+  ["TL","C","TR","BL","BR"].forEach(function(z){
+    var p=runZonePoint(z);
+    c.strokeStyle="rgba(255,255,255,"+pulse+")"; c.lineWidth=3;
+    c.setLineDash([5,5]); c.beginPath(); c.arc(p.x,p.y,17,0,6.3); c.stroke(); c.setLineDash([]);
+  });
+  var left=Math.max(0,(RUN_CFG.aimMs-RUN.aimT)/1000);
+  c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 15px -apple-system,sans-serif"; c.textAlign="center";
+  c.fillText("double tap the mat — "+left.toFixed(1)+"s", RUN_W/2, RUN_GROUND-96);
+  c.textAlign="start";
+}
+
+function runShadow(c,x,y,rx,a){
+  c.fillStyle="rgba(0,0,0,"+a+")"; c.beginPath(); c.ellipse(x,y,rx,6,0,0,6.3); c.fill();
+}
+function runHead(c,x,y,r){
+  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
+  c.fillStyle="#2B2118"; c.beginPath(); c.arc(x,y-r*0.28,r,3.35,6.07); c.fill();
+}
+
+/* Standing defender — arms out, blocking the channel. */
+/* A stack of crash mats blocking the lane — you have to go round. */
+function runDrawStander(c,x,y,kit){
+  runShadow(c,x,y+5,32,.20);
+  var cols=["#C9532F","#D8A93F","#7A3FA8"];
+  for(var i=0;i<3;i++){
+    c.fillStyle=cols[i];
+    c.fillRect(x-32, y-14-(i*16), 64, 15);
+    c.fillStyle="rgba(255,255,255,.20)"; c.fillRect(x-32, y-14-(i*16), 64, 4);
+    c.fillStyle="rgba(0,0,0,.14)";      c.fillRect(x-32, y-3-(i*16), 64, 3);
+  }
+  c.strokeStyle="rgba(0,0,0,.18)"; c.lineWidth=2; c.strokeRect(x-32,y-62,64,63);
+}
+
+/* Sliding defender — low along the ground, hurdle him. */
+/* A low balance beam lying across the lane — leap it. */
+function runDrawSlider(c,x,y,kit){
+  c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+5,36,7,0,0,6.3); c.fill();
+  c.fillStyle="#8A5A2B"; c.fillRect(x-36,y-16,72,14);
+  c.fillStyle="#A87139"; c.fillRect(x-36,y-16,72,5);
+  c.fillStyle="#6B4420"; c.fillRect(x-36,y-4,72,4);
+  c.fillStyle="#5C5C62"; c.fillRect(x-26,y-2,9,7); c.fillRect(x+17,y-2,9,7);
+  runArrow(c,x,y-40,"up");
+}
+function runArrow(c,x,y,dir){
+  c.fillStyle="rgba(255,255,255,.95)";
+  c.beginPath();
+  if(dir==="up"){ c.moveTo(x,y-10); c.lineTo(x+9,y+4); c.lineTo(x-9,y+4); }
+  else          { c.moveTo(x,y+10); c.lineTo(x+9,y-4); c.lineTo(x-9,y-4); }
+  c.closePath(); c.fill();
+}
+
+function runBall(c,x,y,r){
+  c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
+  c.strokeStyle="#1B2430"; c.lineWidth=2; c.stroke();
+  c.fillStyle="#1B2430"; c.beginPath();
+  for(var i=0;i<5;i++){ var a=-Math.PI/2+i*2*Math.PI/5;
+    c[i?"lineTo":"moveTo"](x+Math.cos(a)*r*0.52, y+Math.sin(a)*r*0.52); }
+  c.closePath(); c.fill();
+}
+
+/* One figure used by the runner, the finishing strike and the avatar picker,
+   so what he picks is exactly what he sees on the pitch.
+   pose: 'run' | 'jump' | 'slide' | 'stand' | 'kick'  */
+function drawFooballer(c, x, y, a, pose, phase, scale){
+  scale=scale||1; phase=phase||0;
+  c.save(); c.translate(x,y); c.scale(scale,scale);
+  var dark="rgba(0,0,0,.16)", light="rgba(255,255,255,.22)";
+
+  function head(hx,hy){
+    c.fillStyle=a.skin; c.beginPath(); c.arc(hx,hy,10,0,6.3); c.fill();
+    c.fillStyle="rgba(0,0,0,.10)"; c.beginPath(); c.arc(hx+3,hy+1,10,-0.5,1.6); c.fill();
+    c.fillStyle=a.hair;                                        // hair over the crown
+    c.beginPath(); c.arc(hx,hy-2.5,10,Math.PI*1.02,Math.PI*1.98); c.fill();
+    c.fillRect(hx-10,hy-4,3.5,4); c.fillRect(hx+6.5,hy-4,3.5,4); // sideburns
+  }
+  function shirt(sx,sy,w,h){
+    c.fillStyle=a.kit; c.beginPath();
+    (c.roundRect? c.roundRect(sx,sy,w,h,5) : c.rect(sx,sy,w,h)); c.fill();
+    if(a.style==="stripes"){
+      c.fillStyle=a.trim;
+      for(var i=1;i<w-4;i+=11) c.fillRect(sx+i,sy+1,5,h-2);
+    } else if(a.style==="hoops"){
+      c.fillStyle=a.trim;
+      for(var j=6;j<h-4;j+=11) c.fillRect(sx+1,sy+j,w-2,5);
+    }
+    c.fillStyle=a.trim; c.fillRect(sx+w/2-7,sy,14,5);            // collar
+    c.fillStyle=light; c.fillRect(sx,sy,w,4);                    // top light
+    c.fillStyle=dark;  c.fillRect(sx,sy+h-4,w,4);                // bottom shade
+  }
+  function sleeve(sx,sy,w,h){
+    c.fillStyle=a.kit; c.beginPath();
+    (c.roundRect? c.roundRect(sx,sy,w,h,4) : c.rect(sx,sy,w,h)); c.fill();
+    c.fillStyle=a.trim; c.fillRect(sx<0?sx:sx+w-4, sy, 4, h);    // cuff
+  }
+  function leg(lx,ly,len){
+    c.fillStyle=a.shorts; c.fillRect(lx,ly,12,Math.max(6,len*0.42));
+    c.fillStyle=a.skin;   c.fillRect(lx+1,ly+len*0.42,10,len*0.3);
+    c.fillStyle=a.socks;  c.fillRect(lx+1,ly+len*0.72,10,len*0.28);
+    c.fillStyle=a.trim;   c.fillRect(lx+1,ly+len*0.72,10,3);
+    c.fillStyle="#14151A"; c.fillRect(lx-2,ly+len,15,5);         // boot
+  }
+
+  if(pose==="slide"){
+    c.fillStyle=a.shorts; c.fillRect(4,-19,20,18);
+    shirt(-22,-21,30,20);
+    sleeve(-26,-18,12,8);
+    c.fillStyle=a.socks; c.fillRect(20,-16,12,10);
+    c.fillStyle="#14151A"; c.fillRect(30,-18,14,6);
+    head(-30,-12);
+  } else if(pose==="kick"){
+    leg(-20,-20,20);
+    c.save(); c.translate(-2,-22); c.rotate(-0.55);
+    c.fillStyle=a.shorts; c.fillRect(0,-6,12,12);
+    c.fillStyle=a.socks;  c.fillRect(12,-6,13,12);
+    c.fillStyle="#14151A"; c.fillRect(25,-5,10,10);
+    c.restore();
+    shirt(-18,-54,34,34);
+    sleeve(-31,-50,14,10); sleeve(15,-58,14,10);
+    head(-1,-64);
+  } else {
+    var air=(pose==="jump");
+    var stride=air?0:Math.sin(phase)*6;
+    leg(-15,-18,air?12:16+stride);
+    leg(3,-18,air?12:16-stride);
+    shirt(-18,-52,36,34);
+    sleeve(-31,-48,14,10); sleeve(17,-48,14,10);
+    head(0,-62);
+  }
+  // squad number on the chest
+  if(pose!=="slide"){
+    c.fillStyle=a.trim; c.font="bold 13px -apple-system,BlinkMacSystemFont,sans-serif";
+    c.textAlign="center"; c.fillText(String(a.no), pose==="kick"?-1:0, pose==="kick"?-30:-28);
+    c.textAlign="start";
+  }
+  c.restore();
+}
+
+function runDrawPlayer(c){
+  var x=runLaneX(), y=RUN_GROUND, lift=0, sliding=(RUN.state==="slide");
+  if(RUN.state==="jump"){
+    var t=Math.min(1, RUN.stateT/RUN_CFG.jumpMs);
+    lift = RUN_CFG.jumpH * Math.sin(Math.PI*t);
+  }
+  runShadow(c,x,y+4,Math.max(10,22-lift/6),Math.max(0.06,0.20-lift/380));
+  var by=y-lift;
+  drawFooballer(c, x, by, myAvatar(), sliding?"slide":(lift>4?"jump":"run"), RUN.dist/13);
+  runBall(c, x+(sliding?28:21), by-(sliding?7:5), 9);
+}
+
+/* The finish: he strikes it from the spot and it flies into the top corner. */
+function runDrawShot(c, spotY, goalY){
+  var t=Math.min(1, RUN.shootT/RUN_CFG.shootMs);
+  var x=RUN_W/2, g=RUN_GROUND;
+  runShadow(c,x-10,g+4,22,.20);
+  drawFooballer(c, x-8, g, myAvatar(), "kick");
+  // ball from the spot to wherever he aimed, rising then dipping
+  var target=runZonePoint(RUN.shotZone);
+  var bx0=x+16, by0=g-16, bx1=target.x, by1=target.y;
+  var bx=bx0+(bx1-bx0)*t, by=by0+(by1-by0)*t - Math.sin(Math.PI*t)*26;
+  runBall(c,bx,by,9-t*1.5);
+  if(t>0.82 && !RUN.saved){                       // net takes the pace out of it
+    c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=2;
+    var rr=(t-0.82)*90;
+    c.beginPath(); c.arc(bx1,by1,rr,0,6.3); c.stroke();
+  }
+}
+
+(function bindRun(){
+  var f=$("runCanvas"); if(!f) return;
+  function pt(e){ var r=f.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+  function canvasPt(e){
+    var r=f.getBoundingClientRect();
+    return { x:(e.clientX-r.left)/r.width*RUN_W, y:(e.clientY-r.top)/r.height*RUN_H };
+  }
+  f.addEventListener("pointerdown", function(ev){
+    if(RUN.phase==="aim"){ ev.preventDefault(); return; }
+    if(!RUN.live) return;
+    RUN.startPt=pt(ev);
+    try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
+    ev.preventDefault();
+  });
+  f.addEventListener("pointerup", function(ev){
+    if(RUN.phase==="aim"){
+      // double tap on the goal picks the corner
+      var cp=canvasPt(ev), now=Date.now();
+      var near = RUN.tapPt && Math.abs(cp.x-RUN.tapPt.x)<60 && Math.abs(cp.y-RUN.tapPt.y)<60;
+      if(RUN.tapAt && now-RUN.tapAt<450 && near){
+        var z=runZoneFromTap(cp.x,cp.y);
+        RUN.tapAt=0; RUN.tapPt=null;
+        if(z) runTakeShot(z,false);
+        else $("runMsg").textContent="Double tap on the mat.";
+      } else {
+        RUN.tapAt=now; RUN.tapPt=cp;
+        $("runMsg").textContent="Once more to shoot there.";
+      }
+      ev.preventDefault(); return;
+    }
+    if(!RUN.live || !RUN.startPt) return;
+    var p=pt(ev), dx=p.x-RUN.startPt.x, dy=p.y-RUN.startPt.y;
+    RUN.startPt=null;
+    if(Math.abs(dx)<20 && Math.abs(dy)<20) return;          // a tap, not a swipe
+    if(Math.abs(dx) > Math.abs(dy)) runMove(dx>0?1:-1);
+    else if(dy<0) runAct("jump"); else runAct("slide");
+    ev.preventDefault();
+  });
+  f.addEventListener("pointercancel", function(){ RUN.startPt=null; });
+  document.addEventListener("keydown", function(ev){
+    if(!RUN.live) return;
+    if(ev.key==="ArrowLeft") runMove(-1);
+    else if(ev.key==="ArrowRight") runMove(1);
+    else if(ev.key==="ArrowUp") runAct("jump");
+    else if(ev.key==="ArrowDown") runAct("slide");
+    else return;
+    ev.preventDefault();
+  });
+  $("runWrap").addEventListener("click", function(){
+    if(!RUN.live && RUN.done && RUN.resolvedAt && Date.now()-RUN.resolvedAt > 900) runDismiss();
+  });
+})();
+
+function goalFlash(txt){
+  var d=document.createElement("div");
+  d.className="goalflash";
+  d.innerHTML='<svg class="burst" viewBox="0 0 100 100"><use href="#ic-burst"/></svg>'+
+              '<svg class="fball" viewBox="0 0 24 24"><use href="#ic-ball"/></svg>'+
+              '<span>'+txt+'</span>';
+  document.body.appendChild(d);
+  setTimeout(function(){ d.remove(); }, 900);
+}
+
+$("btnNext").addEventListener("click", nextAttack);
+function nextAttack(){
+  M.n++;
+  if(M.n>=M.queue.length){
+    // one spaced-retrieval pass over anything missed
+    if(!M.retried && M.missed.length){
+      M.retried=true;
+      // cap the second look at 6 so a bad day never turns into a marathon
+      M.missed.slice(0,6).forEach(function(idx,i){
+        M.queue.push(MODES[M.mode].build(idx, i%2===0?0:1, M.level));
+      });
+      renderQuestion();
+      $("fbBox").innerHTML='<div class="feedback ok"><b>Extra time.</b><br><span class="small">Second look at the ones that got away.</span></div>';
+      return;
+    }
+    endMatch();
+    return;
+  }
+  renderQuestion();
+}
+
+function reviewLine(mode, idx){
+  if(mode==="syn"){ var e=SQUAD[idx]; return {title:cap(e.w), say:e.w, detail:e.y.join(", ")}; }
+  if(mode==="ant"){ var o=OPPOSITES[idx]; return {title:cap(o.w), say:o.w, detail:"Opposites: "+o.a.join(", ")}; }
+  if(mode==="spell"){ var s=SPELLS[idx];
+    return {title:s.w, say:s.w, detail:s.r==="silent" ? 'Silent "'+s.sl+'"'
+      : (s.r==="double" ? "Watch the double letters" : "Watch the ending")}; }
+  if(mode==="sent"){ var j=JOINS[idx]; return {title:j.stem, say:j.stem+" "+j.a, detail:j.a}; }
+  if(mode==="team"){ var c=CLASSES[idx];
+    return {title:cap(c.g.slice(0,2).join(", ")), say:c.g.join(", "), detail:"They "+c.r}; }
+  if(mode==="listen"){ var g=PASSAGES[idx];
+    return {title:g.p.split(" ").slice(0,5).join(" ")+"…", say:g.p, detail:"Listen to it again"}; }
+  var t=TRICKY[idx];
+  return {title:t.a, say:t.a, detail:t.s.replace("___", t.a)};
+}
+
+function dayKey(d){ return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+/* A day counts once he finishes a match, not merely for opening the app. */
+function markDayPlayed(){
+  var today=dayKey(new Date());
+  if(S.days.last===today) return;
+  var yesterday=dayKey(new Date(Date.now()-864e5));
+  S.days.streak = (S.days.last===yesterday) ? S.days.streak+1 : 1;
+  S.days.last=today;
+  if(S.days.streak>S.days.best) S.days.best=S.days.streak;
+  save();
+}
+
+function endMatch(){
+  if(M.timer) clearInterval(M.timer);
+  markDayPlayed();
+  var res = M.us>M.them ? "w" : (M.us===M.them ? "d" : "l");
+  S.season.p++; S.season[res]++;
+  S.season.gf+=M.us; S.season.ga+=M.them;
+  S.season.pts += res==="w"?3:(res==="d"?1:0);
+  var total=M.right+M.wrong;
+  S.history.unshift({ d:new Date().toISOString().slice(0,10), us:M.us, them:M.them,
+    right:M.right, total:total, lvl:M.level });
+  S.history=S.history.slice(0,12);
+  save();
+
+  $("ftHead").textContent = res==="w" ? "You won." : (res==="d" ? "Honours even." : "Not this time.");
+  $("ftScore").textContent = M.us+" – "+M.them;
+  $("ftOpp").textContent = ["Sligo Gymnastics","Western Stars","Atlantic Club","Mayo Tumblers","City Academy"][S.season.p % 5];
+  var pc = total ? Math.round(M.right/total*100) : 0;
+  $("ftLine").textContent = M.right+" of "+total+" correct ("+pc+"%). "+
+    (res==="w" ? "Three points." : res==="d" ? "One point." : "No points — but every miss is a word learned.");
+  $("ftStats").innerHTML='<div class="bar'+(pc<60?" warn":"")+'"><i style="width:'+pc+'%"></i></div>'+
+    (M.pens ? '<p class="small" style="margin-top:.7em">Vaults won: <b>'+M.pens+
+              '</b> · scored: <b>'+M.pensScored+'</b>'+
+              (M.pens-M.pensScored ? ' · saved: <b>'+(M.pens-M.pensScored)+'</b>' : '')+'</p>'
+            : '<p class="small muted" style="margin-top:.7em">No vaults this round — three in a row wins you one.</p>');
+
+  if(M.missed.length){
+    $("ftReviewCard").classList.remove("hidden");
+    var h='';
+    M.missed.forEach(function(idx){
+      var line=reviewLine(M.mode, idx);
+      h+='<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+line.title+
+         '</b> <button class="iconbtn" style="display:inline-grid;width:32px;height:32px;vertical-align:middle;font-size:.8em" data-say="'+
+         line.say.replace(/"/g,"&quot;")+'">&#128266;</button><br><span class="small muted">'+line.detail+'</span></div>';
+    });
+    $("ftReview").innerHTML=h;
+  } else {
+    $("ftReviewCard").classList.add("hidden");
+    $("ftReview").innerHTML="";          // don't keep last match's words around
+  }
+  show("scFT");
+}
+$("ftReview").addEventListener("click",function(ev){ var s=ev.target.closest("[data-say]"); if(s) say(s.getAttribute("data-say")); });
+
+$("btnQuit").addEventListener("click", function(){
+  if(M && M.timer) clearInterval(M.timer);
+  $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
+  $("runWrap").classList.remove("on"); RUN.live=false; RUN.done=null;
+  if(RUN.raf){ cancelAnimationFrame(RUN.raf); RUN.raf=null; }
+  renderHome(); show("scHome");
+});
+
+/* =======================================================================
+   Home / season
+   ======================================================================= */
+function renderHome(){
+  var s=S.season;
+  var d=S.opts.dayStreak ? (S.days.streak||0) : 0;
+  var dayBit = d>0 ? '<span class="daystreak"><span class="fl">&#9679;</span>'+
+      d+' day'+(d===1?'':'s')+' in a row</span> ' : '';
+  var xpBit='<p style="margin:.2em 0 .6em">'+dayBit+'<span class="xppill">'+(S.xp||0)+' XP</span>'+
+    ' <span class="small muted">'+(S.xp>=FIFTY_COST
+      ? 'enough for a fifty-fifty on a question'
+      : (FIFTY_COST-(S.xp||0))+' more earns a fifty-fifty')+'</span></p>';
+  if(!s.p){
+    $("seasonBody").innerHTML=xpBit+'<p class="muted">No routines yet. Your season will build up here.</p>';
+  } else {
+    $("seasonBody").innerHTML= xpBit +
+      '<table><tr><th>Played</th><th class="num">W</th><th class="num">D</th><th class="num">L</th>'+
+      '<th class="num">Goals</th><th class="num">Points</th></tr><tr>'+
+      '<td>'+s.p+'</td><td class="num">'+s.w+'</td><td class="num">'+s.d+'</td><td class="num">'+s.l+
+      '</td><td class="num">'+s.gf+':'+s.ga+'</td><td class="num"><b>'+s.pts+'</b></td></tr></table>';
+  }
+}
+
+/* =======================================================================
+   Avatar picker — each tile is the real figure, drawn by the same code
+   that draws him on the pitch.
+   ======================================================================= */
+function renderAvatars(){
+  var g=$("avGrid");
+  g.innerHTML=AVATARS.map(function(a,i){
+    return '<button class="avcard'+(i===(S.avatar||0)?" on":"")+'" data-av="'+i+'">'+
+      '<canvas width="150" height="190"></canvas><b>'+a.n+'</b></button>';
+  }).join("");
+  var cards=g.querySelectorAll(".avcard");
+  for(var i=0;i<cards.length;i++){
+    var cv=cards[i].querySelector("canvas"), ctx=cv.getContext&&cv.getContext("2d");
+    if(!ctx) continue;
+    ctx.clearRect(0,0,150,190);
+    ctx.fillStyle="rgba(0,0,0,.10)";
+    ctx.beginPath(); ctx.ellipse(75,172,30,7,0,0,6.3); ctx.fill();
+    drawFooballer(ctx, 75, 168, AVATARS[i], "stand", 0, 1.55);
+  }
+}
+$("avGrid").addEventListener("click", function(ev){
+  var b=ev.target.closest("[data-av]"); if(!b) return;
+  S.avatar=+b.getAttribute("data-av"); save(); renderAvatars();
+});
+
+/* =======================================================================
+   Squad screen
+   ======================================================================= */
+function renderSquad(){
+  var h="";
+  SQUAD.forEach(function(e,i){
+    var st=S.stats[e.w], cls="";
+    if(st && st.seen){ var a=st.right/st.seen; cls = a>=0.8?"s2":(a>=0.5?"s1":"s0"); }
+    h+='<span data-sq="'+i+'">'+cap(e.w)+'</span>';
+  });
+  $("squadGrid").innerHTML=h;
+  $("squadDetail").classList.add("hidden");
+}
+$("squadGrid").addEventListener("click",function(ev){
+  var t=ev.target.closest("[data-sq]"); if(!t) return;
+  var e=SQUAD[+t.getAttribute("data-sq")];
+  var st=S.stats[e.w];
+  $("squadDetail").innerHTML='<h2>'+cap(e.w)+' <button class="iconbtn" style="display:inline-grid;width:38px;height:38px;vertical-align:middle" data-say="'+
+    e.w+'">&#128266;</button></h2><p>'+e.y.map(cap).join(" · ")+'</p><p class="muted small">Example: '+e.s+'</p>'+
+    (st&&st.seen?'<p class="small">Seen '+st.seen+' times · '+Math.round(st.right/st.seen*100)+'% correct</p>':'<p class="small muted">Not tested yet.</p>');
+  $("squadDetail").classList.remove("hidden");
+  if($("squadDetail").scrollIntoView) $("squadDetail").scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+$("squadDetail").addEventListener("click",function(ev){ var s=ev.target.closest("[data-say]"); if(s) say(s.getAttribute("data-say")); });
+
+/* =======================================================================
+   Parent zone
+   ======================================================================= */
+function renderParent(){
+  var seen=0, right=0, tried=0;
+  for(var w in S.stats){ tried++; seen+=S.stats[w].seen; right+=S.stats[w].right; }
+  var pc = seen?Math.round(right/seen*100):0;
+  $("parentSummary").innerHTML=
+    '<table>'+
+    '<tr><th>Items met</th><td class="num"><b>'+tried+'</b></td></tr>'+
+    '<tr><th>Questions answered</th><td class="num"><b>'+seen+'</b></td></tr>'+
+    '<tr><th>Overall accuracy</th><td class="num"><b>'+pc+'%</b></td></tr>'+
+    '<tr><th>Matches played</th><td class="num"><b>'+S.season.p+'</b></td></tr>'+
+    (S.opts.dayStreak ? '<tr><th>Days in a row</th><td class="num"><b>'+(S.days.streak||0)+'</b>'+
+      (S.days.best>S.days.streak?' (best '+S.days.best+')':'')+'</td></tr>' : '')+
+    (S.pens.taken?'<tr><th>Vaults stuck</th><td class="num"><b>'+S.pens.scored+' of '+S.pens.taken+
+      '</b> ('+Math.round(S.pens.scored/S.pens.taken*100)+'%)</td></tr>':'')+
+    (S.runs.taken?'<tr><th>Floor runs</th><td class="num"><b>'+S.runs.scored+' of '+S.runs.taken+
+      '</b> ('+Math.round(S.runs.scored/S.runs.taken*100)+'%)</td></tr>':'')+
+    '</table>';
+
+  var rows=[], perMode={};
+  for(var k in S.stats){
+    var st=S.stats[k], sp=splitKey(k);
+    if(!perMode[sp.mode]) perMode[sp.mode]={seen:0,right:0,items:0};
+    perMode[sp.mode].seen+=st.seen; perMode[sp.mode].right+=st.right; perMode[sp.mode].items++;
+    if(st.seen>=2) rows.push({w:sp.word,m:sp.mode,a:st.right/st.seen,s:st.seen});
+  }
+  var mh='<table><tr><th>Game</th><th class="num">Answered</th><th class="num">Accuracy</th></tr>';
+  var any=false;
+  for(var mk in MODES){ var pm=perMode[mk]; if(!pm) continue; any=true;
+    mh+='<tr><td>'+MODES[mk].name+'</td><td class="num">'+pm.seen+'</td><td class="num"><b>'+
+        Math.round(pm.right/pm.seen*100)+'%</b></td></tr>'; }
+  $("parentByMode").innerHTML = any ? mh+'</table>'
+    : '<p class="muted">Nothing played yet.</p>';
+
+  rows.sort(function(a,b){ return a.a-b.a; });
+  if(!rows.length){
+    $("parentWeak").innerHTML='<p class="muted">Not enough data yet — play a couple of matches.</p>';
+  } else {
+    var h='<table><tr><th>Item</th><th>Game</th><th>Accuracy</th><th class="num">Seen</th></tr>';
+    rows.slice(0,18).forEach(function(r){
+      var p=Math.round(r.a*100);
+      var label = r.m==="sent" ? r.w.split("-")[0] : r.w;
+      h+='<tr><td>'+cap(label)+'</td><td class="small muted">'+(MODES[r.m]?MODES[r.m].name:r.m)+
+         '</td><td><div class="bar'+(p<60?" warn":"")+'"><i style="width:'+p+'%"></i></div></td>'+
+         '<td class="num">'+r.s+'</td></tr>';
+    });
+    $("parentWeak").innerHTML=h+'</table>';
+  }
+
+  if(!S.history.length){ $("parentHistory").innerHTML='<p class="muted">No matches yet.</p>'; }
+  else {
+    var lv={1:"Beginner",2:"Club",3:"Elite"};
+    var t='<table><tr><th>Date</th><th>Level</th><th>Score</th><th class="num">Correct</th></tr>';
+    S.history.forEach(function(m){
+      t+='<tr><td>'+m.d+'</td><td>'+(lv[m.lvl]||"")+'</td><td>'+m.us+'–'+m.them+'</td>'+
+         '<td class="num">'+m.right+'/'+m.total+'</td></tr>';
+    });
+    $("parentHistory").innerHTML=t+'</table>';
+  }
+  $("storageNote").textContent = STORE_OK
+    ? "Progress is saved on this device in this browser."
+    : "Heads up: this browser is blocking saved data (common when opening a file directly). Progress will only last for this session — use Export below, or add the app to your Home Screen.";
+}
+$("btnExport").addEventListener("click",function(){
+  var lines=["Word Attack FC — progress export","Date: "+new Date().toLocaleString(),"",
+    "Season: P"+S.season.p+" W"+S.season.w+" D"+S.season.d+" L"+S.season.l+" Pts"+S.season.pts,"","Word,Seen,Correct,Accuracy%"];
+  for(var k in S.stats){ var st=S.stats[k]; lines.push(k+","+st.seen+","+st.right+","+Math.round(st.right/st.seen*100)); }
+  var txt=lines.join("\n");
+  try{
+    var b=new Blob([txt],{type:"text/plain"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(b);
+    a.download="word-attack-progress.txt"; a.click();
+  }catch(e){ alert(txt); }
+});
+$("btnReset").addEventListener("click",function(){
+  if(confirm("Erase all progress and start the season again?")){
+    S=JSON.parse(JSON.stringify(DEFAULT_STATE)); save(); applyOpts(); renderParent(); renderHome();
+  }
+});
+
+/* =======================================================================
+   Settings
+   ======================================================================= */
+function applyOpts(){
+  var o=S.opts;
+  document.documentElement.style.setProperty("--fs", (o.size/100));
+  document.documentElement.style.setProperty("--ls", o.space?"0.055em":"0.005em");
+  document.documentElement.style.setProperty("--ws", o.space?"0.20em":"0.04em");
+  document.documentElement.style.setProperty("--lh", o.space?"1.75":"1.5");
+  document.body.className = o.theme||"";
+  $("setVoice").checked=o.voice; $("setAutoSay").checked=o.autoSay;
+  $("setClock").checked=o.clock; $("setSpace").checked=o.space; $("setSize").value=o.size;
+  $("setReader").checked=o.reader;
+  $("setDayStreak").checked=o.dayStreak; $("setOppGoals").checked=o.oppGoals;
+  $("btnSound").innerHTML = o.voice ? "&#128266;" : "&#128263;";
+  var sw=$("swatches").children;
+  for(var i=0;i<sw.length;i++) sw[i].setAttribute("aria-pressed", String((sw[i].getAttribute("data-theme")||"")===(o.theme||"")));
+}
+function fillVoiceList(){
+  var box=$("voiceList"); if(!box) return;
+  var v=englishVoices().slice().sort(function(a,b){ return voiceScore(b)-voiceScore(a); });
+  if(!v.length){
+    box.innerHTML='<p class="small muted">This device is not offering the browser any speech voices. '+
+      'Turn on "A grown-up reads the passage" above instead.</p>';
+    $("voiceHint").textContent="No voices available";
+    return;
+  }
+  box.innerHTML=v.map(function(x){
+    var on=(VOICE && VOICE.voiceURI===x.voiceURI);
+    return '<button class="btn voicebtn'+(on?" on":"")+'" data-voice="'+
+      x.voiceURI.replace(/"/g,"&quot;")+'">&#9654;&nbsp; '+x.name+
+      ' <span class="small muted">'+x.lang+(isRichVoice(x)?" · clearer":"")+'</span></button>';
+  }).join("");
+  $("voiceHint").innerHTML = 'This iPad is offering the browser <b>'+v.length+'</b> voice'+
+    (v.length===1?'':'s')+'. Tap one to hear it. '+
+    (v.some(isRichVoice) ? 'The ones marked "clearer" are the better ones.'
+      : 'Apple does not share its best voices with web pages, so these are the basic set — '+
+        'if none of them sound right, use the grown-up option above.');
+}
+$("voiceList").addEventListener("click", function(ev){
+  var b=ev.target.closest("[data-voice]"); if(!b) return;
+  S.opts.voiceURI=b.getAttribute("data-voice"); save(); pickVoice(); fillVoiceList();
+  say("Puffins spend most of the year far out at sea.");
+});
+
+function bindOpt(id,key){
+  $(id).addEventListener("change",function(){ S.opts[key]=$(id).checked; save(); applyOpts(); });
+}
+bindOpt("setVoice","voice"); bindOpt("setAutoSay","autoSay");
+bindOpt("setClock","clock"); bindOpt("setSpace","space"); bindOpt("setReader","reader");
+$("setDayStreak").addEventListener("change",function(){ S.opts.dayStreak=this.checked; save(); renderParent(); });
+$("setOppGoals").addEventListener("change",function(){ S.opts.oppGoals=this.checked; save(); });
+$("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(); applyOpts(); });
+$("swatches").addEventListener("click",function(ev){
+  var b=ev.target.closest("[data-theme]"); if(!b) return;
+  S.opts.theme=b.getAttribute("data-theme")||""; save(); applyOpts();
+});
+$("btnSound").addEventListener("click",function(){
+  S.opts.voice=!S.opts.voice; save(); applyOpts();
+  if(S.opts.voice) say("Sound on");
+});
+
+/* =======================================================================
+   Nav
+   ======================================================================= */
+var PENDING_MODE="syn";
+var modeBtns=document.querySelectorAll("[data-mode]");
+for(var mb=0;mb<modeBtns.length;mb++){
+  modeBtns[mb].addEventListener("click", function(){
+    PENDING_MODE=this.getAttribute("data-mode");
+    var MD=MODES[PENDING_MODE];
+    $("lvTitle").textContent=MD.name;
+    $("lvSub").textContent=MD.sub;
+    show("scLevel");
+  });
+}
+var lvlBtns=document.querySelectorAll("[data-level]");
+for(var b=0;b<lvlBtns.length;b++){
+  lvlBtns[b].addEventListener("click", function(){ startMatch(PENDING_MODE, +this.getAttribute("data-level")); });
+}
+$("btnHomeLevel").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnSettings").addEventListener("click",function(){ show("scSettings"); });
+$("btnHomeSet").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnAvatar").addEventListener("click",function(){ renderAvatars(); show("scAvatar"); });
+$("btnHomeAvatar").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnSquad").addEventListener("click",function(){ renderSquad(); show("scSquad"); });
+$("btnHomeSquad").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnParent").addEventListener("click",function(){ renderParent(); show("scParent"); });
+$("btnHomeParent").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnHomeFT").addEventListener("click",function(){ renderHome(); show("scHome"); });
+$("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.mode:"syn", M?M.level:2); });
+
+applyOpts();
+fillVoiceList();
+renderHome();
+
+/* Add ?play=run or ?play=pen to the address to drop straight into a minigame
+   and keep replaying it. Handy for testing the feel without answering
+   twelve questions first. Practice runs are not counted in the season. */
+(function testHook(){
+  var m=/[?&]play=(run|pen)/.exec(location.search);
+  if(!m) return;
+  var isRun = m[1]==="run";
+  var again=function(){
+    setTimeout(function(){
+      var before = isRun ? {t:S.runs.taken,s:S.runs.scored} : {t:S.pens.taken,s:S.pens.scored};
+      (isRun?takeRun:takePenalty)(function(){
+        // roll the counters back so practice does not skew the parent zone
+        if(isRun){ S.runs.taken=before.t; S.runs.scored=before.s; }
+        else { S.pens.taken=before.t; S.pens.scored=before.s; }
+        save(); again();
+      });
+    }, 450);
+  };
+  again();
+})();
+</script>
+</body>
+</html>
