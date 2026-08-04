@@ -110,7 +110,8 @@
   .chsq.chk { box-shadow: inset 0 0 0 3px #e8604c, inset 0 0 0 40px rgba(232,96,76,.3); }
   .chmsg { text-align:center; font-weight:700; padding:8px 6px 12px; line-height:1.4; }
   .chmsg.bad { color:#ffb3a7; }
-  .say { font-family:inherit; font-size:1rem; line-height:1; cursor:pointer; flex:none;
+  .say { display:inline-flex; align-items:center; justify-content:center; font-family:inherit;
+    font-size:1rem; line-height:1; cursor:pointer; flex:none; -webkit-user-select:none; user-select:none;
     background:rgba(0,0,0,.25); color:#fff; border:1px solid rgba(255,255,255,.3);
     border-radius:10px; padding:6px 9px; margin-left:8px; }
   .say:active { transform:scale(.92); }
@@ -118,7 +119,9 @@
   .qrow { display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:18px; }
   .qrow .question { margin-bottom:0; }
   #opts .btn { position:relative; }
-  #opts .btn .say { position:absolute; right:8px; top:50%; transform:translateY(-50%); margin:0; }
+  #opts .btn .say { position:absolute; right:8px; top:50%; transform:translateY(-50%); margin:0;
+    background:rgba(0,0,0,.14); border-color:rgba(0,0,0,.22); color:#1b3a4d; }
+  #opts .btn .say:active { transform:translateY(-50%) scale(.9); }
   #opts .btn.hassay { padding-right:52px; }
   .expl { margin:10px 0 4px; }
   .explbtn { font-family:inherit; font-weight:800; font-size:.95rem; cursor:pointer; width:100%;
@@ -10140,7 +10143,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v61 · Quizzical Puffin · 8,958 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v62 · Quizzical Puffin · 8,958 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -11022,7 +11025,7 @@ function ttsCycle(){
 function sayBtn(text, cls){
   if(!TTS_OK || !ttsMode) return "";
   const t = ttsClean(text).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
-  return '<button class="say '+(cls||"")+'" aria-label="Read aloud" onclick="event.stopPropagation();speak(this.dataset.t)" data-t="'+t+'">🔊</button>';
+  return '<span class="say '+(cls||"")+'" role="button" tabindex="0" aria-label="Read aloud" onclick="event.stopPropagation();speak(this.dataset.t)" data-t="'+t+'">🔊</span>';
 }
 function speakQuestion(q, opts){
   if(!ttsMode) return;
@@ -11109,7 +11112,8 @@ function showQuestion(){
   </div>
   <div class="quitbar"><button onclick="quitRound()">🏠 Back to Menu</button></div>`;
   $("#opts").addEventListener("click", e=>{
-    const b=e.target.closest("button"); if(!b||b.classList.contains("say")||round.answered) return;
+    if(e.target.closest(".say")) return;
+    const b=e.target.closest("button"); if(!b||round.answered) return;
     ttsStop();
     answer(b, b.dataset.o===q[1], q);
   });
