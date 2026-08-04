@@ -228,7 +228,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   transition:fill .14s,stroke .14s,r .14s}
 .ptarget.hot{fill:#E8A317;stroke:#fff;stroke-dasharray:none;stroke-width:3}
 .pkeeper,.pball{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:view-box;transform-origin:0 0}
-.kbody{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:fill-box;transform-origin:50% 68%}
+.kbody{transition:transform .42s cubic-bezier(.2,.8,.3,1);transform-box:fill-box;transform-origin:50% 56%}
 .pkeeper.dive-l .kbody{transform:rotate(-42deg)}
 .pkeeper.dive-r .kbody{transform:rotate(42deg)}
 .pkeeper.dive-u .kbody{transform:translateY(-3px) scale(1.04)}
@@ -642,7 +642,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
         <circle class="ptarget" data-zone="BR" cx="300" cy="190" r="19"/>
 
         <g class="pkeeper" id="penKeeper" style="transform:translate(200px,182px)">
-          <ellipse cx="0" cy="37" rx="17" ry="4" fill="rgba(0,0,0,.20)"/>
+          <ellipse id="kshadow" cx="0" cy="37" rx="17" ry="4" fill="rgba(0,0,0,.20)"/>
           <g class="kbody">
             <rect x="-40" y="-21" width="27" height="10" rx="5" fill="#B8E31E"/>
             <rect x="-40" y="-21" width="9"  height="10" rx="5" fill="#8FBE0F"/>
@@ -2069,12 +2069,72 @@ function showPower(p){
 var PEN = { live:false, done:null, startPt:null, aim:null, timer:null, result:false };
 
 function placeAt(el,p,scale){ el.style.transform="translate("+p.x+"px,"+p.y+"px)"+(scale?" scale("+scale+")":""); }
+
+/* The dive. A real keeper does three things a sliding shape does not: he dips
+   to load his legs, he leaves the ground in an arc, and he turns horizontal on
+   the way so the hands get there before the body. Driven frame by frame rather
+   than by a CSS transition so the rotation can build across the flight. */
+var DIVE = { anims:[], ms:430 };
+function keeperStopDive(){
+  DIVE.anims.forEach(function(a){ try{ a.cancel(); }catch(e){} });
+  DIVE.anims=[];
+}
+function keeperDive(k, to){
+  keeperStopDive();
+  var body=k.querySelector(".kbody"), shad=$("kshadow");
+  var from=PEN_KEEPER_HOME, dx=to.x-from.x, dy=to.y-from.y;
+  var side=(dx<-6)?-1:((dx>6)?1:0);
+  var lift=18+Math.min(32, Math.abs(dx)*0.17);      // longer dives get more air
+  var T=function(x,y){ return "translate("+(from.x+x)+"px,"+(from.y+y)+"px)"; };
+
+  if(!k.animate){                                    // very old browser: no arc, but still lands
+    placeAt(k,to);
+    k.classList.add(side<0?"dive-l":(side>0?"dive-r":"dive-u"));
+    return;
+  }
+  k.style.transition="none";
+
+  var path=[
+    { transform:T(0,0),                       offset:0,    easing:"ease-in"    },
+    { transform:T(dx*0.04, 5),                offset:0.13, easing:"ease-out"   },  // dip and load
+    { transform:T(dx*0.55, dy*0.55 - lift),   offset:0.44, easing:"linear"     },  // top of the arc
+    { transform:T(dx*0.94, dy*0.94 - lift*0.34), offset:0.74, easing:"ease-in" },
+    { transform:T(dx, dy+3),                  offset:0.90, easing:"ease-out"   },  // lands heavy
+    { transform:T(dx, dy),                    offset:1 }
+  ];
+  DIVE.anims.push(k.animate(path,{duration:DIVE.ms, fill:"forwards"}));
+
+  var turn = side===0
+    ? [ { transform:"translateY(0) scale(1)",        offset:0,    easing:"ease-in"  },
+        { transform:"translateY(4) scaleY(.92)",     offset:0.13, easing:"ease-out" },
+        { transform:"translateY(-15) scale(1.07)",   offset:0.46, easing:"ease-in"  },
+        { transform:"translateY(-4) scale(1.03)",    offset:1 } ]
+    : [ { transform:"rotate(0deg) scaleY(1)",                     offset:0,    easing:"ease-in"  },
+        { transform:"rotate("+(-side*7)+"deg) scaleY(.93)",       offset:0.13, easing:"ease-out" },
+        { transform:"rotate("+(side*50)+"deg) scaleY(1.07)",      offset:0.44, easing:"linear"   },
+        { transform:"rotate("+(side*80)+"deg) scaleY(1.05)",      offset:0.74, easing:"ease-out" },
+        { transform:"rotate("+(side*74)+"deg) scaleY(1)",         offset:1 } ];
+  DIVE.anims.push(body.animate(turn,{duration:DIVE.ms, fill:"forwards"}));
+
+  if(shad) DIVE.anims.push(shad.animate([          // the shadow tells you he is airborne
+    { opacity:1,   transform:"scale(1)"    , offset:0    },
+    { opacity:.45, transform:"scale(.62)"  , offset:0.46 },
+    { opacity:1,   transform:"scale(1.05)" , offset:0.92 },
+    { opacity:1,   transform:"scale(1)"    , offset:1    }
+  ],{duration:DIVE.ms, fill:"forwards"}));
+}
 function penReset(){
   var k=$("penKeeper"), b=$("penBall");
-  k.className="pkeeper"; k.style.transition="none"; b.style.transition="none";
+  keeperStopDive();
+  k.setAttribute("class","pkeeper");        // SVG: className is read-only, must use setAttribute
+  k.style.transition="none"; b.style.transition="none";
+  var kb=k.querySelector(".kbody");
+  if(kb){ kb.style.transition="none"; kb.style.transform=""; }
+  var ks=$("kshadow"); if(ks){ ks.style.opacity=""; ks.style.transform=""; }
   placeAt(k,PEN_KEEPER_HOME); placeAt(b,PEN_BALL_HOME);
   void k.getBoundingClientRect();
   k.style.transition=""; b.style.transition="";
+  if(kb) kb.style.transition="";
   var t=$("penField").querySelectorAll(".ptarget");
   for(var i=0;i<t.length;i++) t[i].classList.remove("hot");
   $("penNet").classList.remove("ripple");
@@ -2106,10 +2166,7 @@ function shoot(zone, power){
   var saved = over ? false : penIsSaved(zone,keep,power);
   var k=$("penKeeper"), b=$("penBall");
 
-  placeAt(k, PEN_POS[keep]);
-  if(PEN_POS[keep].x < 190) k.classList.add("dive-l");
-  else if(PEN_POS[keep].x > 210) k.classList.add("dive-r");
-  else k.classList.add("dive-u");
+  keeperDive(k, PEN_POS[keep]);
   // harder strikes travel faster
   b.style.transitionDuration = (0.46 - Math.min(power,1)*0.20)+"s";
   if(over) placeAt(b, {x:PEN_POS[zone].x, y:-30}, 0.7);
