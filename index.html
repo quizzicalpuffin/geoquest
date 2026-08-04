@@ -110,6 +110,16 @@
   .chsq.chk { box-shadow: inset 0 0 0 3px #e8604c, inset 0 0 0 40px rgba(232,96,76,.3); }
   .chmsg { text-align:center; font-weight:700; padding:8px 6px 12px; line-height:1.4; }
   .chmsg.bad { color:#ffb3a7; }
+  .say { font-family:inherit; font-size:1rem; line-height:1; cursor:pointer; flex:none;
+    background:rgba(0,0,0,.25); color:#fff; border:1px solid rgba(255,255,255,.3);
+    border-radius:10px; padding:6px 9px; margin-left:8px; }
+  .say:active { transform:scale(.92); }
+  .say.qsay { margin:0 0 0 10px; vertical-align:middle; }
+  .qrow { display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:18px; }
+  .qrow .question { margin-bottom:0; }
+  #opts .btn { position:relative; }
+  #opts .btn .say { position:absolute; right:8px; top:50%; transform:translateY(-50%); margin:0; }
+  #opts .btn.hassay { padding-right:52px; }
   .expl { margin:10px 0 4px; }
   .explbtn { font-family:inherit; font-weight:800; font-size:.95rem; cursor:pointer; width:100%;
     background:rgba(0,0,0,.22); color:#fff; border:1px solid rgba(255,255,255,.28);
@@ -10130,7 +10140,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v60 · Quizzical Puffin · 8,958 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v61 · Quizzical Puffin · 8,958 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -10939,11 +10949,87 @@ function screenHome(){
   <div class="row">
     <button class="btn ghost center" onclick="screenBadges()">🏅 Badges</button>
     <button class="btn ghost center" onclick="toggleSound()">${soundOn?"🔊 Sound On":"🔇 Sound Off"}</button>
+    <button class="btn ghost center" onclick="ttsCycle()">${TTS_OK?TTS_LABEL[ttsMode]:"🔇 No voice"}</button>
     <button class="btn ghost center" onclick="screenProfiles()">👥 Switch</button>
   </div>`;
   app.innerHTML=html;
 }
 function setLevel(l){ sel.level=l; save("gq_level",l); screenHome(); }
+/* ================= READ ALOUD ================= */
+let ttsMode = load("gq_tts", 0);       /* 0 off · 1 tap to read · 2 read automatically */
+let ttsVoice = null, ttsPrimed = false;
+const TTS_OK = (typeof window!=="undefined") && ("speechSynthesis" in window);
+function ttsPick(){
+  if(!TTS_OK) return null;
+  let vs=[]; try{ vs = speechSynthesis.getVoices()||[]; }catch(e){ return null; }
+  if(!vs.length) return null;
+  const junk=/novelty|whisper|bells|organ|zarvox|bubbles|bad news|good news|jester|trinoids|boing|deranged|hysterical|wobble|superstar/i;
+  const en = vs.filter(v=>(v.lang||"").toLowerCase().replace("_","-").startsWith("en"));
+  const pool = en.length?en:vs;
+  for(const tag of ["en-ie","en-gb","en-au","en-us"]){
+    const v = pool.find(v=>(v.lang||"").toLowerCase().replace("_","-")===tag && !junk.test(v.name||""));
+    if(v) return v;
+  }
+  return pool.find(v=>!junk.test(v.name||"")) || pool[0];
+}
+if(TTS_OK){
+  try{
+    ttsVoice = ttsPick();
+    speechSynthesis.addEventListener("voiceschanged", function(){ ttsVoice = ttsPick(); });
+  }catch(e){}
+}
+function ttsClean(s){
+  return String(s==null?"":s)
+    .replace(/<[^>]*>/g," ")
+    .replace(/&amp;/g," and ").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{2BFF}\u{FE0E}\u{FE0F}\u{2600}-\u{27BF}]/gu," ")
+    .replace(/\s+/g," ").trim();
+}
+function ttsStop(){ if(TTS_OK){ try{ speechSynthesis.cancel(); }catch(e){} } }
+function speak(text){
+  if(!TTS_OK || !ttsMode) return;
+  const parts = (Array.isArray(text)?text:[text]).map(ttsClean).filter(Boolean);
+  if(!parts.length) return;
+  try{
+    speechSynthesis.cancel();
+    for(var i=0;i<parts.length;i++){
+      const u = new SpeechSynthesisUtterance(parts[i]);
+      if(ttsVoice) u.voice = ttsVoice;
+      u.rate = 0.95; u.pitch = 1; u.volume = 1;
+      u.lang = (ttsVoice && ttsVoice.lang) || "en-GB";
+      speechSynthesis.speak(u);
+    }
+    ttsPrimed = true;
+  }catch(e){}
+}
+/* some phones refuse to speak unless the first utterance follows a tap */
+function ttsPrime(){
+  if(!TTS_OK || ttsPrimed || !ttsMode) return;
+  try{
+    const u=new SpeechSynthesisUtterance(" ");
+    u.volume=0; if(ttsVoice) u.voice=ttsVoice;
+    speechSynthesis.speak(u); ttsPrimed=true;
+  }catch(e){}
+}
+const TTS_LABEL = ["🔇 Voice off","🔊 Voice: tap to read","🗣️ Voice: read aloud"];
+function ttsCycle(){
+  ttsMode = (ttsMode+1)%3;
+  save("gq_tts", ttsMode);
+  ttsStop(); ttsPrimed=false;
+  if(ttsMode){ ttsPrime(); speak(ttsMode===1?"Tap a speaker button to hear the words.":"I will read each question out loud for you."); }
+  screenHome();
+}
+function sayBtn(text, cls){
+  if(!TTS_OK || !ttsMode) return "";
+  const t = ttsClean(text).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  return '<button class="say '+(cls||"")+'" aria-label="Read aloud" onclick="event.stopPropagation();speak(this.dataset.t)" data-t="'+t+'">🔊</button>';
+}
+function speakQuestion(q, opts){
+  if(!ttsMode) return;
+  const letters=["A","B","C","D"];
+  speak([q].concat(opts.map(function(o,i){ return letters[i]+". "+o; })));
+}
+
 function toggleSound(){ soundOn=!soundOn; save("gq_sound",soundOn); screenHome(); }
 
 /* ================= BADGES ================= */
@@ -11017,15 +11103,17 @@ function showQuestion(){
   <div class="streakflame">${streakTxt}</div>
   <div class="card">
     ${q[4]?`<div class="qimg">${ART[q[4]]||""}</div>`:""}
-    <div class="question">${esc(q[0])}</div>
-    <div id="opts">${opts.map(o=>`<button class="btn center" style="${flagOpts?'font-size:2.6rem;padding:10px':''}" data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div>
+    <div class="qrow"><div class="question">${esc(q[0])}</div>${sayBtn(q[0],"qsay")}</div>
+    <div id="opts">${opts.map(o=>`<button class="btn center ${(ttsMode&&!flagOpts)?'hassay':''}" style="${flagOpts?'font-size:2.6rem;padding:10px':''}" data-o="${esc(o)}">${esc(o)}${flagOpts?"":sayBtn(o)}</button>`).join("")}</div>
     <div id="after"></div>
   </div>
   <div class="quitbar"><button onclick="quitRound()">🏠 Back to Menu</button></div>`;
   $("#opts").addEventListener("click", e=>{
-    const b=e.target.closest("button"); if(!b||round.answered) return;
+    const b=e.target.closest("button"); if(!b||b.classList.contains("say")||round.answered) return;
+    ttsStop();
     answer(b, b.dataset.o===q[1], q);
   });
+  if(ttsMode===2) setTimeout(()=>speakQuestion(q[0],opts),180);
 }
 function answer(btn, right, q){
   round.answered=true;
@@ -11057,11 +11145,12 @@ function answer(btn, right, q){
     msg = `<b>Not quite!</b> The answer is <b>${esc(q[1])}</b>.`;
     sndWrong();
   }
-  $("#after").innerHTML = `<div class="fact">${msg}<br><br>💡 <b>Fun fact:</b> ${esc(q[3])}</div>
-    ${q[5]?`<div class="expl"><button class="explbtn" onclick="this.parentNode.classList.toggle('open')">📖 Explain this to me</button><div class="explbody">${esc(q[5])}</div></div>`:""}
+  $("#after").innerHTML = `<div class="fact">${msg}<br><br>💡 <b>Fun fact:</b> ${esc(q[3])} ${sayBtn((right?"Correct. ":"Not quite. The answer is "+q[1]+". ")+q[3])}</div>
+    ${q[5]?`<div class="expl"><button class="explbtn" onclick="this.parentNode.classList.toggle('open')">📖 Explain this to me</button><div class="explbody">${esc(q[5])} ${sayBtn(q[5])}</div></div>`:""}
     <button class="btn primary center" onclick="next()">${round.i+1<ROUND_LEN?"Next Question ➡️":"See My Score 🏁"}</button>`;
 }
 function quitRound(){
+  ttsStop();
   const gained = round ? round.gained : 0;
   const msg = gained>0
     ? `Finish here and go back to the menu?\n\nYou'll keep the ${gained} points you've earned so far.`
@@ -11076,6 +11165,7 @@ function quitRound(){
   screenHome();
 }
 function next(){
+  ttsStop();
   round.answered=false; round.i++;
   if(round.i<ROUND_LEN) showQuestion(); else finishRound();
 }
