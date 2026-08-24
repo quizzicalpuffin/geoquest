@@ -1,7 +1,7 @@
 /* Quizzical Puffin — offline service worker.
    Serves instantly from the cache, then quietly refreshes it in the background,
    so the quiz works with no signal at all and still picks up new versions. */
-const CACHE = "puffin-v67";
+const CACHE = "puffin-v68";
 const SHELL = ["./", "./index.html", "./med.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
