@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Quizzical Puffin">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1b4a6b">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <title>Quizzical Puffin 🐧 Family Quiz</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -125,6 +128,14 @@
     background:#1b4a6b; border-color:rgba(255,255,255,.45); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); }
   #opts .btn .say:active { transform:translateY(-50%) scale(.9); }
   #opts .btn.hassay { padding-right:52px; }
+  .podsel { width:100%; font-family:inherit; font-size:1rem; font-weight:700; padding:13px;
+    border-radius:16px; border:none; margin-bottom:12px; color:#1b3a4d; }
+  .podwave { display:flex; align-items:flex-end; justify-content:center; gap:6px; height:56px; }
+  .podwave span { width:8px; height:12px; border-radius:4px; background:#FFD93D; opacity:.5; }
+  .podwave.on span { animation:podb .9s ease-in-out infinite; opacity:1; }
+  .podwave.on span:nth-child(2){ animation-delay:.15s } .podwave.on span:nth-child(3){ animation-delay:.3s }
+  .podwave.on span:nth-child(4){ animation-delay:.45s } .podwave.on span:nth-child(5){ animation-delay:.6s }
+  @keyframes podb { 0%,100%{ height:12px } 50%{ height:48px } }
   .expl { margin:10px 0 4px; }
   .explbtn { font-family:inherit; font-weight:800; font-size:.95rem; cursor:pointer; width:100%;
     background:rgba(0,0,0,.22); color:#fff; border:1px solid rgba(255,255,255,.28);
@@ -10305,7 +10316,7 @@ function screenProfiles(){
     html += `<button class="btn" onclick="pickProfile(${i})"><span class="av">${p.avatar}</span> ${esc(p.name)} <span class="pts">⭐ ${p.points}</span></button>`;
   });
   html += `<button class="btn primary center" onclick="screenNewProfile()">➕ New Explorer</button></div>
-  <div class="footerlink" id="verline" onclick="tapVersion()">v66 · Quizzical Puffin · 9,035 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
+  <div class="footerlink" id="verline" onclick="tapVersion()">v67 · Quizzical Puffin · 9,035 questions · Tip: in Safari tap Share → “Add to Home Screen” to make this an app!</div>`;
   app.innerHTML = html;
 }
 function screenNewProfile(){
@@ -10789,6 +10800,144 @@ function wmRender(){
   wmBind(); wmApplyView();
 }
 
+/* ================= PODCAST MODE ================= */
+let pod = null;
+const POD_GAP = [4,7,10,15];          /* seconds to think, before the answer */
+function podLoad(){ try{ return load("gq_pod",{gap:1,cat:"mix",level:2}); }catch(e){ return {gap:1,cat:"mix",level:2}; } }
+function podSave(){ try{ save("gq_pod",{gap:pod.gapIdx,cat:pod.cat,level:pod.level}); }catch(e){} }
+function screenPodcast(){
+  const s=podLoad();
+  const cats=[["mix","🎲 Mix It Up!"]].concat(
+    GROUPS.flatMap(g=>g.cats.filter(k=>CATS[k]&&DATA[s.level]&&DATA[s.level][k]&&DATA[s.level][k].length)
+      .map(k=>[k,CATS[k].emoji+" "+CATS[k].name])));
+  app.innerHTML=`
+  <div class="topbar"><span class="pill">🎧 Podcast Mode</span></div>
+  <div class="card"><h2>Listen without looking</h2>
+    <p style="margin:0 0 12px;line-height:1.45">The quiz reads a question and the four answers aloud, leaves you time to think, then gives the answer and a fact — and moves straight on. Made for the car, or for resting your eyes.</p>
+    ${!TTS_OK?`<div class="chmsg bad">This device cannot read aloud, so podcast mode is not available.</div>`:`
+    <div class="grouphdr">Level</div>
+    <div class="row">${Object.entries(LEVELS).map(([k,l])=>
+      `<button class="btn ${+k===s.level?"primary":"ghost"} center" style="padding:9px" onclick="podSet('level',${k})">${l.emoji} ${l.name}</button>`).join("")}</div>
+    <div class="grouphdr">Thinking time</div>
+    <div class="row">${POD_GAP.map((g,i)=>
+      `<button class="btn ${i===s.gap?"primary":"ghost"} center" style="padding:9px" onclick="podSet('gap',${i})">${g}s</button>`).join("")}</div>
+    <div class="grouphdr">Topic</div>
+    <select id="podcat" class="podsel">${cats.map(([k,n])=>{
+      const raw = k==="mix" ? [].concat(...Object.values(DATA[s.level]))
+                : (COMBO[k] ? [].concat(...COMBO[k].map(c=>DATA[s.level][c]||[])) : (DATA[s.level][k]||[]));
+      const n2 = raw.filter(podListenable).length;
+      return n2 ? `<option value="${k}" ${k===s.cat?"selected":""}>${esc(n)} — ${n2}</option>` : "";
+    }).join("")}</select>
+    <button class="btn primary center" onclick="podStart()">▶ Start listening</button>`}
+  </div>
+  <button class="btn ghost center" onclick="screenHome()">← Back to the quiz</button>`;
+}
+function podSet(k,v){ const s=podLoad(); s[k]=v; try{ save("gq_pod",s); }catch(e){}
+  const sel=document.getElementById("podcat"); if(sel) s.cat=sel.value;
+  try{ save("gq_pod",s); }catch(e){}
+  screenPodcast(); }
+/* a question only works with your eyes shut if it needs no picture and no flag symbols */
+const POD_FLAG=/[\u{1F1E6}-\u{1F1FF}]|\u{1F3F4}/u;
+function podListenable(q){
+  if(q[4]) return false;                                   /* map, diagram, chart or flag picture */
+  if(POD_FLAG.test(q[0])) return false;
+  for(const o of [q[1],...q[2]]) if(POD_FLAG.test(o)) return false;
+  return true;
+}
+function podNoAudio(cat){
+  app.innerHTML=`<div class="card center"><div style="font-size:3rem">🎧</div>
+    <h2>Not one for listening</h2>
+    <p style="opacity:.85;line-height:1.45">Every question in this topic needs you to look at a picture, so there is nothing to read aloud. Try another topic.</p>
+    <button class="btn primary center" onclick="screenPodcast()">Pick another topic</button></div>`;
+}
+function podStart(){
+  const s=podLoad();
+  const sel=document.getElementById("podcat");
+  const cat=sel?sel.value:s.cat;
+  const level=s.level, gapIdx=s.gap;
+  const raw = cat==="mix" ? [].concat(...Object.values(DATA[level]))
+            : (COMBO[cat] ? [].concat(...COMBO[cat].map(k=>DATA[level][k]||[])) : (DATA[level][cat]||[]));
+  const bank = raw.filter(podListenable);
+  if(!bank.length){ podNoAudio(cat); return; }
+  pod={cat,level,gapIdx,queue:shuffle(bank.slice()),i:0,playing:true,asked:0,timer:null,phase:"q"};
+  podSave(); podRender(); podNext();
+}
+function podStop(){
+  if(pod&&pod.timer){ clearTimeout(pod.timer); pod.timer=null; }
+  ttsStop();
+}
+function podQuit(){ podStop(); pod=null; screenPodcast(); }
+function podToggle(){
+  if(!pod) return;
+  pod.playing=!pod.playing;
+  if(!pod.playing){ podStop(); podRender(); }
+  else { podRender(); podSpeakCurrent(); }
+}
+function podSkip(){ if(!pod) return; podStop(); pod.i++; pod.phase="q"; podNext(); }
+function podNext(){
+  if(!pod||!pod.playing) return;
+  if(pod.i>=pod.queue.length){ pod.queue=shuffle(pod.queue); pod.i=0; }
+  pod.phase="q"; pod.asked++; podRender(); podSpeakCurrent();
+}
+function podSpeakCurrent(){
+  if(!pod||!pod.playing) return;
+  const q=pod.queue[pod.i];
+  if(!q) return;
+  const letters=["A","B","C","D"];
+  if(pod.phase==="q"){
+    const opts=shuffle([q[1],...q[2]]);
+    pod.opts=opts;
+    const parts=["Question "+pod.asked+".", q[0]].concat(opts.map((o,i)=>letters[i]+". "+o));
+    podSpeak(parts, ()=>{
+      pod.phase="gap"; podRender();
+      pod.timer=setTimeout(()=>{ if(!pod||!pod.playing) return; pod.phase="a"; podRender(); podSpeakCurrent(); }, POD_GAP[pod.gapIdx]*1000);
+    });
+  } else if(pod.phase==="a"){
+    const letter=letters[(pod.opts||[]).indexOf(q[1])];
+    const parts=["The answer is "+(letter?letter+". ":"")+q[1]+".", q[3]];
+    podSpeak(parts, ()=>{
+      pod.timer=setTimeout(()=>{ if(!pod||!pod.playing) return; pod.i++; podNext(); }, 900);
+    });
+  }
+}
+/* speak a list of lines, then call done() — works even when the voice list is slow to load */
+function podSpeak(lines, done){
+  if(!TTS_OK){ done&&done(); return; }
+  try{
+    speechSynthesis.cancel();
+    const clean=lines.map(ttsClean).filter(Boolean);
+    if(!clean.length){ done&&done(); return; }
+    let finished=0;
+    clean.forEach((t,idx)=>{
+      const u=new SpeechSynthesisUtterance(t);
+      if(ttsVoice) u.voice=ttsVoice;
+      u.rate=0.95; u.pitch=1; u.volume=1; u.lang=(ttsVoice&&ttsVoice.lang)||"en-GB";
+      u.onend=u.onerror=()=>{ if(++finished===clean.length && pod && pod.playing) done&&done(); };
+      speechSynthesis.speak(u);
+    });
+  }catch(e){ done&&done(); }
+}
+function podRender(){
+  if(!pod) return;
+  const q=pod.queue[pod.i]||["","",[],""];
+  const label = pod.phase==="q" ? "Listening to the question…"
+              : pod.phase==="gap" ? "Have a think…"
+              : "Here comes the answer…";
+  app.innerHTML=`
+  <div class="topbar"><span class="pill">🎧 ${esc(pod.cat==="mix"?"Mix It Up!":CATS[pod.cat].name)}</span><span class="pill">${pod.asked}</span></div>
+  <div class="card center">
+    <div class="podwave ${pod.playing&&pod.phase!=="gap"?"on":""}"><span></span><span></span><span></span><span></span><span></span></div>
+    <h2 style="margin:14px 0 6px">${pod.playing?label:"Paused"}</h2>
+    <p style="opacity:.85;line-height:1.45;min-height:3.2em">${pod.playing&&pod.phase!=="q"?esc(q[0]):"Question "+pod.asked}</p>
+    <div class="row">
+      <button class="btn primary center" onclick="podToggle()">${pod.playing?"⏸ Pause":"▶ Play"}</button>
+      <button class="btn ghost center" onclick="podSkip()">⏭ Skip</button>
+    </div>
+    <button class="btn ghost center" onclick="podQuit()">■ Stop listening</button>
+  </div>
+  <p class="footerlink">Keep the screen on — phones stop the voice when they lock.</p>`;
+}
+
 /* ================= CHESS OPENING TRAINER ================= */
 const CH_BODY={
  p:'<circle cx="22.5" cy="13" r="5.2"/><path d="M18 18h9c0 5 2 9 4 12H14c2-3 4-7 4-12z"/><path d="M12.5 30h20v3.5h-20z"/>',
@@ -11100,6 +11249,7 @@ function screenHome(){
     ${Object.entries(LEVELS).map(([k,l])=>`<button class="btn ${sel.level==k?'primary':''}" onclick="setLevel(${k})">${l.emoji} ${l.name} <small style="opacity:.7;font-weight:600"> · ${l.sub}</small></button>`).join("")}
   </div>
   <div class="card"><h2>Something different</h2>
+    <button class="btn primary" onclick="screenPodcast()">🎧 Podcast Mode <small style="opacity:.7;font-weight:600"> · listen hands-free in the car</small></button>
     <button class="btn primary" onclick="screenMap()">🗺️ Find It on the Map <small style="opacity:.7;font-weight:600"> · tap where places are in the world</small></button>
     <button class="btn primary" onclick="screenChess()">♞ Chess Opening Trainer <small style="opacity:.7;font-weight:600"> · play the moves the masters play</small></button>
   </div>
@@ -11382,6 +11532,13 @@ window.screenBadges=screenBadges; window.gateAsk=gateAsk; window.gateCheck=gateC
 /* start */
 puffinBackdrop();
 if(profiles.length===0) screenNewProfile(); else screenProfiles();
+
+/* ---- offline: cache the whole app so it works with no signal ---- */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
