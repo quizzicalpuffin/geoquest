@@ -1,0 +1,15 @@
+{
+  "name": "Word Vault",
+  "short_name": "Word Vault",
+  "start_url": "wordvault.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F0E1",
+  "theme_color": "#6B3FA0",
+  "icons": [
+    { "src": "icons2/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons2/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons2/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -253,6 +253,10 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 .penres.scored{color:var(--good)}
 .penres.saved{color:var(--miss)}
 </style>
+<link rel="apple-touch-icon" href="icons2/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons2/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons2/icon-192.png">
+<link rel="manifest" href="manifest-vault.webmanifest">
 </head>
 <body>
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs>
@@ -306,6 +310,9 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 
   <!-- ================= HOME ================= -->
   <section class="screen on" id="scHome">
+        <p class="small hidden" id="updateNote"
+       style="margin:0 0 10px;padding:.5em .7em;border:2px solid var(--pitch);border-radius:10px">
+      A new version has downloaded. Close the app and open it again to use it.</p>
     <div class="hero">
       <svg viewBox="0 0 400 120" role="img" aria-label="A gym with a beam, bars and a landing mat">
         <rect width="400" height="120" fill="#E7DCC6"/>
@@ -2800,6 +2807,28 @@ renderHome();
   };
   again();
 })();
+
+/* ---- offline ----------------------------------------------------------
+   Registered only over http(s); opening the file straight off disk has no
+   service worker and simply carries on working as before. When a new build
+   is uploaded the worker updates in the background and takes over on the
+   next open, so he is never stuck on an old version. */
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      reg.addEventListener("updatefound", function(){
+        var nw=reg.installing;
+        if(!nw) return;
+        nw.addEventListener("statechange", function(){
+          if(nw.state==="installed" && navigator.serviceWorker.controller){
+            var el=document.getElementById("updateNote");
+            if(el) el.classList.remove("hidden");
+          }
+        });
+      });
+    }).catch(function(){ /* offline support is a bonus, never a blocker */ });
+  });
+}
 </script>
 </body>
 </html>
