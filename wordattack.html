@@ -103,6 +103,35 @@ h3{font-size:1.05em}
 .crest b{font-size:1.05em;letter-spacing:.02em}
 .iconbtn{width:44px;height:44px;flex:none;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15em;cursor:pointer;display:grid;place-items:center}
 
+/* ---------- the club ---------- */
+.clubtabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.clubtab{flex:1 1 auto;min-width:76px;padding:.5em .3em;border:2px solid var(--line);border-radius:10px;
+  background:var(--panel);font:inherit;font-weight:700;font-size:.86em;cursor:pointer;color:var(--ink)}
+.clubtab.on{border-color:var(--pitch);background:var(--bg)}
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:10px}
+.shopcard{border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--panel);
+  display:flex;flex-direction:column;gap:6px}
+.shopcard.owned{border-color:#8FBE8F}
+.shopcard.on{border-color:var(--pitch);border-width:3px;background:var(--bg)}
+.shopcard.locked{opacity:.62}
+.shopcard b{font-size:.95em;line-height:1.2}
+.shopcard .sd{font-size:.78em;color:var(--muted);line-height:1.3}
+.shopbtn{margin-top:auto;padding:.42em .5em;border-radius:9px;border:2px solid var(--line);
+  background:var(--bg);font:inherit;font-weight:700;font-size:.82em;cursor:pointer;color:var(--ink)}
+.shopbtn.buy{background:var(--pitch);border-color:var(--pitch-dk);color:#fff}
+.shopbtn:disabled{opacity:.5;cursor:default}
+.kitswatch{height:44px;border-radius:8px;border:1px solid rgba(0,0,0,.18);position:relative;overflow:hidden}
+.swatchrow{display:flex;gap:6px;flex-wrap:wrap;margin:.3em 0 .2em}
+.dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.dot.on{border-color:var(--ink);border-width:3px}
+.clubname{width:100%;padding:.55em .6em;border:2px solid var(--line);border-radius:10px;
+  background:var(--panel);font:inherit;font-weight:700;color:var(--ink)}
+.sheetrow{display:flex;align-items:center;gap:9px;padding:.42em 0;border-bottom:1px solid var(--line)}
+.sheetrow:last-child{border-bottom:none}
+.poschip{font-size:.72em;font-weight:800;padding:.15em .45em;border-radius:6px;background:var(--bg);
+  border:1px solid var(--line);min-width:26px;text-align:center}
+.xpbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+
 /* ---------- pitch ---------- */
 .pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
   margin-bottom:12px;line-height:0;background:#3E8F5C}
@@ -290,15 +319,8 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 
   <div class="topbar">
     <div class="crest">
-      <svg class="badge" viewBox="0 0 40 44" role="img" aria-label="Word Attack FC crest">
-        <path d="M20 1 L38 7 V24 C38 34 30 40 20 43 C10 40 2 34 2 24 V7 Z" fill="#2E7D4F" stroke="#1C5836" stroke-width="2"/>
-        <path d="M20 1 L38 7 V13 H2 V7 Z" fill="#E8A317"/>
-        <circle cx="20" cy="26" r="8.5" fill="#FFFFFF" stroke="#1C5836" stroke-width="1.6"/>
-        <path d="M20 21 L24.8 24.4 L23 30 L17 30 L15.2 24.4 Z" fill="#1C5836"/>
-        <text x="20" y="11.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#3A2A00"
-              font-family="-apple-system,BlinkMacSystemFont,sans-serif">WA</text>
-      </svg>
-      <b>WORD&nbsp;ATTACK&nbsp;FC</b>
+      <span id="hdrCrest"></span>
+      <b id="hdrName">WORD ATTACK FC</b>
     </div>
     <div style="display:flex;gap:8px">
       <button class="iconbtn" id="btnSound" title="Sound">&#128266;</button>
@@ -308,34 +330,9 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 
   <!-- ================= HOME ================= -->
   <section class="screen on" id="scHome">
-    <div class="hero">
-      <svg viewBox="0 0 400 120" role="img" aria-label="Floodlit stadium with a ball on the centre spot">
-        <rect width="400" height="120" fill="#1D5E3C"/>
-        <rect width="400" height="52" fill="url(#crowd2)"/>
-        <rect y="48" width="400" height="6" fill="#5C0A14"/>
-        <rect y="54" width="400" height="18" fill="#46A167"/>
-        <rect y="72" width="400" height="18" fill="#3E8F5C"/>
-        <rect y="90" width="400" height="16" fill="#46A167"/>
-        <rect y="106" width="400" height="14" fill="#3E8F5C"/>
-        <defs>
-          <pattern id="crowd2" width="10" height="10" patternUnits="userSpaceOnUse">
-            <rect width="10" height="10" fill="#8A1220"/>
-            <circle cx="2.5" cy="2.5" r="1.5" fill="#C5303C"/>
-            <circle cx="7.5" cy="7" r="1.5" fill="#E24B57"/>
-          </pattern>
-        </defs>
-        <g stroke="rgba(255,255,255,.6)" stroke-width="2" fill="none">
-          <circle cx="200" cy="88" r="26"/><path d="M200 54 V120"/>
-          <path d="M0 66 H40 V110 H0"/><path d="M400 66 H360 V110 H400"/>
-        </g>
-        <g fill="#C9D3DC"><rect x="52" y="14" width="4" height="36"/><rect x="344" y="14" width="4" height="36"/></g>
-        <g fill="#FFF6D8"><circle cx="54" cy="11" r="4"/><circle cx="346" cy="11" r="4"/></g>
-        <g transform="translate(200,88)">
-          <circle r="11" fill="#fff" stroke="#1B2430" stroke-width="2"/>
-          <path d="M0 -6.4 L6 -2 L3.7 5.2 L-3.7 5.2 L-6 -2 Z" fill="#1B2430"/>
-        </g>
-      </svg>
-    </div>
+    <div class="hero" id="homeHero"></div>
+    <p class="small muted" id="homeClubLine" style="margin:-6px 0 12px"></p>
+
     <div class="card">
       <h1>Pick your game</h1>
       <p class="muted">12 attacks. Three correct in a row wins a penalty — swipe to pick your corner.</p>
@@ -352,6 +349,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <div id="seasonBody"></div>
     </div>
     <div class="row">
+      <button class="btn ghost" id="btnClub">Your club</button>
       <button class="btn ghost" id="btnAvatar">Your player</button>
       <button class="btn ghost" id="btnSquad">Squad list</button>
       <button class="btn ghost" id="btnParent">Parent zone</button>
@@ -359,6 +357,25 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   </section>
 
   <!-- ================= AVATAR ================= -->
+  <section class="screen" id="scClub">
+    <div class="xpbar">
+      <h1 style="margin:0">Your club</h1>
+      <span class="xppill" id="clubXP">0 XP</span>
+    </div>
+    <p class="muted" style="margin-top:0">Everything here is for show. Nothing you buy makes a
+      question easier or a penalty more likely — the words earn it, and the club is what they buy.</p>
+    <div class="clubtabs" id="clubTabs">
+      <button class="clubtab on" data-tab="badge">Badge</button>
+      <button class="clubtab" data-tab="kit">Kit</button>
+      <button class="clubtab" data-tab="ground">Ground</button>
+      <button class="clubtab" data-tab="squad">Squad</button>
+      <button class="clubtab" data-tab="boss">Manager</button>
+      <button class="clubtab" data-tab="cups">Cup room</button>
+    </div>
+    <div class="card" id="clubBody"></div>
+    <button class="btn ghost" id="btnClubHome">Back to home</button>
+  </section>
+
   <section class="screen" id="scAvatar">
     <div class="card">
       <h1>Pick your player</h1>
@@ -441,7 +458,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   <section class="screen" id="scFT">
     <div class="board">
       <div class="bt">Full time</div>
-      <div class="bn"><span>Word Attack FC</span><span id="ftOpp">Visitors</span></div>
+      <div class="bn"><span id="ftUs">Word Attack FC</span><span id="ftOpp">Visitors</span></div>
       <div class="bs" id="ftScore">0 – 0</div>
     </div>
     <div class="card">
@@ -562,6 +579,16 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 </div>
 
 <!-- ================= RUN ================= -->
+<div class="penwrap" id="miniWrap">
+  <div class="pencard">
+    <div class="penhead" id="miniHead">Free kick</div>
+    <h2 style="margin:.1em 0 .2em" id="miniTitle">Free kick</h2>
+    <p class="small muted" id="miniMsg" style="margin:0"></p>
+    <div class="runfield"><canvas id="miniCanvas" width="360" height="520"></canvas></div>
+    <div class="penres" id="miniRes">&nbsp;</div>
+  </div>
+</div>
+
 <div class="penwrap" id="runWrap">
   <div class="pencard">
     <div class="penhead">Counter attack</div>
@@ -599,8 +626,11 @@ body.theme-dark .pill.lg-weak{background:#39281A}
           </g>
         </defs>
 
-        <rect width="400" height="94" fill="url(#crowd)"/>
-        <rect y="86" width="400" height="10" fill="#5C0A14"/>
+        <g id="standArt">
+          <rect width="400" height="94" fill="url(#crowd)"/>
+          <rect y="86" width="400" height="10" fill="#5C0A14"/>
+        </g>
+        <g id="mgrArt"></g>
 
         <rect y="96"  width="400" height="46" fill="#46A167"/>
         <rect y="142" width="400" height="44" fill="#3E8F5C"/>
@@ -1279,9 +1309,213 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
-  avatar:0, days:{last:"",streak:0,best:0},
+  avatar:0, rewardTurn:0, days:{last:"",streak:0,best:0},
+  club:{ name:"Word Attack FC", crest:0, c1:"#2E7D4F", c2:"#E8A317", kit:0,
+         stadium:0, manager:0, squad:[], built:[], own:{kit:[0,1],crest:[0],manager:[0],player:[]} },
+  tro:{ won:[], perfect:0, bestPens:0, winRun:0, bestRun:0, modes:{} },
   opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false,
         dayStreak:true,oppGoals:true} };
+function esc(t){ return String(t==null?"":t)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+
+/* =======================================================================
+   THE CLUB
+   Everything here is cosmetic on purpose. Nothing bought can make a
+   question easier or a penalty more likely to go in — the words decide the
+   result, and the club is what the words earn. Prices are set against the
+   real rate of about 30-35 XP a match, so the first upgrade lands after a
+   couple of sessions and the last is a long-term thing to save for.
+   ======================================================================= */
+var STADIUMS = [
+  {n:"Parish Field",   cost:0,   d:"A rope round the pitch and a shed for the kit."},
+  {n:"Town Ground",    cost:40,  d:"Proper barriers, a few hundred in on a Sunday."},
+  {n:"Main Stand",     cost:110, d:"One covered stand down the near side."},
+  {n:"Two-Tier Stand", cost:240, d:"A second tier goes up. It gets loud."},
+  {n:"Floodlit Arena", cost:400, d:"Four pylons. Thursday nights under the lights."},
+  {n:"The Cathedral",  cost:620, d:"Full bowl, closed corners, sold out every week."}
+];
+var KITS = [
+  {n:"Classic Red",     c1:"#C8102E", c2:"#FFFFFF", st:"plain",   cost:0},
+  {n:"Away White",      c1:"#F2F2EE", c2:"#1F5FA8", st:"plain",   cost:0},
+  {n:"Sky Blue",        c1:"#5BA7E0", c2:"#12315A", st:"plain",   cost:30},
+  {n:"Green Hoops",     c1:"#2E7D4F", c2:"#FFFFFF", st:"hoops",   cost:40},
+  {n:"Black Stripes",   c1:"#14151A", c2:"#F2F2EE", st:"stripes", cost:45},
+  {n:"Amber & Navy",    c1:"#E8A317", c2:"#12315A", st:"plain",   cost:55},
+  {n:"Purple Sash",     c1:"#6B3FA0", c2:"#F2C230", st:"stripes", cost:65},
+  {n:"Seaside Pink",    c1:"#E77CA3", c2:"#14151A", st:"plain",   cost:70},
+  {n:"Gold Trim",       c1:"#1B1B1B", c2:"#D4AF37", st:"hoops",   cost:90},
+  {n:"Emerald & Silver",c1:"#0F7C74", c2:"#C0C0C0", st:"stripes", cost:110}
+];
+/* Six plots round the ground. Cosmetic, like everything else in here, but
+   they make the place look like it is growing as the words are learned. */
+var BUILDINGS = [
+  {id:"train",  n:"Training Ground", cost:80,  d:"Cones and spare pitches. Opens up free kicks."},
+  {id:"gym",    n:"Gym",             cost:120, d:"Weights and a loud coach. Opens up one-on-ones."},
+  {id:"medical",n:"Medical Room",    cost:100, d:"Ice baths and a physio bench."},
+  {id:"shop",   n:"Club Shop",       cost:150, d:"Replica kits and far too many scarves."},
+  {id:"youth",  n:"Youth Academy",   cost:200, d:"Where the next lot come through. Opens up headers."},
+  {id:"museum", n:"Club Museum",     cost:260, d:"Puts the cup room on show to visitors."}
+];
+var CRESTS = [
+  {n:"Shield",     cost:0},
+  {n:"Roundel",    cost:25},
+  {n:"Diamond",    cost:40},
+  {n:"Pennant",    cost:55},
+  {n:"Star Badge", cost:80}
+];
+var CREST_C1 = ["#2E7D4F","#C8102E","#1F5FA8","#6B3FA0","#14151A","#E8A317","#0F7C74","#B03060"];
+var CREST_C2 = ["#E8A317","#FFFFFF","#F2C230","#14151A","#C8102E","#7FD4C1","#F49AC2","#C0C0C0"];
+var PLAYERS = [
+  {n:"Danny Quinn",    pos:"GK", cost:25},
+  {n:"Ollie Burke",    pos:"DF", cost:30},
+  {n:"Sam Reilly",     pos:"DF", cost:35},
+  {n:"Cian Doyle",     pos:"MF", cost:45},
+  {n:"Rory Hayes",     pos:"MF", cost:55},
+  {n:"Jack Nolan",     pos:"FW", cost:65},
+  {n:"Luca Moretti",   pos:"FW", cost:80},
+  {n:"Kai Andersen",   pos:"MF", cost:95},
+  {n:"Marco Silva",    pos:"DF", cost:110},
+  {n:"Diego Nunes",    pos:"FW", cost:130},
+  {n:"Yuki Tanaka",    pos:"MF", cost:150},
+  {n:"Amadou Diallo",  pos:"FW", cost:180}
+];
+var MANAGERS = [
+  {n:"Player-Manager", cost:0,   d:"You. Picking the team and taking the penalties.",
+   q:["We go again next week.","That will do for today."]},
+  {n:"Mick Farrell",   cost:60,  d:"Old school. Shouts a lot. Means every word of it.",
+   q:["First to every ball. That is all I ask.","Grand. Now do it again on Tuesday."]},
+  {n:"Elena Rossi",    cost:110, d:"Keep the ball, be patient, no hoofing it.",
+   q:["We kept the ball. The rest follows.","Patience won us that one."]},
+  {n:"Pep Nolan",      cost:170, d:"Wants it back within six seconds of losing it.",
+   q:["Six seconds. Every time.","Press higher and they crumble."]},
+  {n:"Sir Ronan Blake",cost:250, d:"Won everything there is. Says very little.",
+   q:["Good.","That is more like it."]}
+];
+
+function migrateClub(c){
+  var d={ name:"Word Attack FC", crest:0, c1:"#2E7D4F", c2:"#E8A317", kit:0,
+          stadium:0, manager:0, squad:[], built:[], own:{kit:[0,1],crest:[0],manager:[0],player:[]} };
+  if(!c || typeof c!=="object") return d;
+  var o=c.own||{};
+  var own={ kit:ownList(o.kit,[0,1],KITS.length), crest:ownList(o.crest,[0],CRESTS.length),
+            manager:ownList(o.manager,[0],MANAGERS.length), player:ownList(o.player,[],PLAYERS.length) };
+  var eq=function(v,len,list){ v=clampIdx(v,len); return list.indexOf(v)>=0 ? v : list[0]; };
+  return { name:(typeof c.name==="string"&&c.name.trim())?c.name.slice(0,20):d.name,
+           crest:eq(c.crest,CRESTS.length,own.crest), c1:c.c1||d.c1, c2:c.c2||d.c2,
+           kit:eq(c.kit,KITS.length,own.kit), stadium:clampIdx(c.stadium,STADIUMS.length),
+           manager:eq(c.manager,MANAGERS.length,own.manager),
+           squad:Array.isArray(c.squad)                       // only players actually signed
+             ? c.squad.filter(function(i){ return own.player.indexOf(i)>=0; })
+             : [],
+           built:ownList(c.built,[],BUILDINGS.length),
+           own:own };
+}
+function clampIdx(v,len){ v=parseInt(v,10); return (isNaN(v)||v<0||v>=len)?0:v; }
+function ownList(a,base,len){
+  var out=base.slice();
+  if(Array.isArray(a)) a.forEach(function(i){ i=parseInt(i,10);
+    if(!isNaN(i)&&i>=0&&i<len&&out.indexOf(i)<0) out.push(i); });
+  return out;
+}
+function club(){ if(!S.club) S.club=migrateClub(null); return S.club; }
+
+/* =======================================================================
+   THE CUP ROOM
+   These cannot be bought. Every one is won by doing the reading and the
+   listening, so the cabinet is a record of what he has actually covered
+   rather than what he has saved up for.
+   ======================================================================= */
+function migrateTro(t){
+  var d={ won:[], perfect:0, bestPens:0, winRun:0, bestRun:0, modes:{} };
+  if(!t || typeof t!=="object") return d;
+  var num=function(v){ v=parseInt(v,10); return (isNaN(v)||v<0)?0:v; };
+  return { won:Array.isArray(t.won)?t.won.filter(function(x){return typeof x==="string";}):[],
+           perfect:num(t.perfect), bestPens:num(t.bestPens),
+           winRun:num(t.winRun), bestRun:num(t.bestRun),
+           modes:(t.modes&&typeof t.modes==="object")?t.modes:{} };
+}
+function tro(){ if(!S.tro) S.tro=migrateTro(null); return S.tro; }
+
+/* How many different words he has got right in a given game. */
+function rightIn(mode){
+  var c=0;
+  for(var k in S.stats){
+    var sp=splitKey(k);
+    if(sp.mode===mode && S.stats[k].right>0) c++;
+  }
+  return c;
+}
+function totalRight(){
+  var t=0; for(var k in S.stats) t+=S.stats[k].right; return t;
+}
+function modesPlayed(){ var c=0; for(var m in tro().modes) c++; return c; }
+
+var TROPHIES = [
+  {id:"first",   tier:1, n:"First Whistle",        d:"Finish your first match.",              need:function(){return S.season.p>=1;}},
+  {id:"c100",    tier:1, n:"The Century",          d:"100 right answers altogether.",         need:function(){return totalRight()>=100;}},
+  {id:"c500",    tier:2, n:"Five Hundred",         d:"500 right answers altogether.",         need:function(){return totalRight()>=500;}},
+  {id:"c1000",   tier:3, n:"The Thousand",         d:"1,000 right answers altogether.",       need:function(){return totalRight()>=1000;}},
+  {id:"clean",   tier:2, n:"Clean Sheet",          d:"A whole match without a single miss.",  need:function(){return tro().perfect>=1;}},
+  {id:"clean5",  tier:3, n:"Five Clean Sheets",    d:"Five faultless matches.",               need:function(){return tro().perfect>=5;}},
+  {id:"allgames",tier:2, n:"All Rounder",          d:"Play all seven games at least once.",   need:function(){return modesPlayed()>=7;}},
+  {id:"days7",   tier:1, n:"A Full Week",          d:"Seven days in a row.",                  need:function(){return (S.days.best||0)>=7;}},
+  {id:"days30",  tier:3, n:"Ever-present",         d:"Thirty days in a row.",                 need:function(){return (S.days.best||0)>=30;}},
+  {id:"syn50",   tier:1, n:"Fifty Synonyms",       d:"50 different headwords right.",         need:function(){return rightIn("syn")>=50;}},
+  {id:"syn96",   tier:3, n:"The Full List",        d:"All 96 headwords right at least once.", need:function(){return rightIn("syn")>=96;}},
+  {id:"ant40",   tier:2, n:"Both Ways",            d:"40 different opposites right.",         need:function(){return rightIn("ant")>=40;}},
+  {id:"tricky40",tier:2, n:"Tricky Customer",      d:"40 different tricky words right.",      need:function(){return rightIn("tricky")>=40;}},
+  {id:"spell30", tier:2, n:"Set Piece Specialist", d:"30 different spellings right.",         need:function(){return rightIn("spell")>=30;}},
+  {id:"listen25",tier:2, n:"Good Listener",        d:"25 commentary questions right.",        need:function(){return rightIn("listen")>=25;}},
+  {id:"sent20",  tier:2, n:"Playmaker",            d:"20 joined-up sentences right.",         need:function(){return rightIn("sent")>=20;}},
+  {id:"team20",  tier:2, n:"The Selector",         d:"20 team-sheet groups right.",           need:function(){return rightIn("team")>=20;}},
+  {id:"pens20",  tier:2, n:"Spot Kick King",       d:"Score 20 penalties.",                   need:function(){return (S.pens.scored||0)>=20;}},
+  {id:"hat",     tier:2, n:"Hat-trick",            d:"Three penalties scored in one match.",  need:function(){return tro().bestPens>=3;}},
+  {id:"wins5",   tier:1, n:"Promotion",            d:"Win five matches.",                     need:function(){return (S.season.w||0)>=5;}},
+  {id:"run3",    tier:3, n:"Unbeaten Run",         d:"Win three matches in a row.",           need:function(){return tro().bestRun>=3;}}
+];
+function trophyWon(id){ return tro().won.indexOf(id)>=0; }
+/* Returns the ones newly won by whatever just happened. */
+function checkTrophies(){
+  var fresh=[];
+  TROPHIES.forEach(function(t){
+    if(trophyWon(t.id)) return;
+    var ok=false; try{ ok=t.need(); }catch(e){ ok=false; }
+    if(ok){ tro().won.push(t.id); fresh.push(t); }
+  });
+  if(fresh.length) save();
+  return fresh;
+}
+function owns(kind,i){ return club().own[kind].indexOf(i)>=0; }
+function clubKit(){ return KITS[clampIdx(club().kit,KITS.length)]; }
+function clubInitials(){
+  var w=(club().name||"").trim().split(/\s+/).filter(function(x){return /[A-Za-z0-9]/.test(x);});
+  if(!w.length) return "WA";
+  if(w.length===1) return w[0].slice(0,2).toUpperCase();
+  return (w[0][0]+w[1][0]).toUpperCase();
+}
+/* One crest drawing used by the header, the club screen and the team sheet. */
+function crestSVG(px){
+  var c=club(), sh=clampIdx(c.crest,CRESTS.length), a=c.c1, b=c.c2, ini=clubInitials();
+  var body;
+  if(sh===0) body='<path d="M20 1 L38 7 V24 C38 34 30 40 20 43 C10 40 2 34 2 24 V7 Z" fill="'+a+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>'
+                 +'<path d="M20 1 L38 7 V13 H2 V7 Z" fill="'+b+'"/>';
+  else if(sh===1) body='<circle cx="20" cy="22" r="20" fill="'+a+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>'
+                 +'<path d="M0 16 H40 V26 H0 Z" fill="'+b+'" opacity=".92"/>';
+  else if(sh===2) body='<path d="M20 1 L39 22 L20 43 L1 22 Z" fill="'+a+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>'
+                 +'<path d="M20 1 L30 12 L20 23 L10 12 Z" fill="'+b+'"/>';
+  else if(sh===3) body='<path d="M3 2 H37 V29 L20 43 L3 29 Z" fill="'+a+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>'
+                 +'<path d="M3 2 H37 V12 H3 Z" fill="'+b+'"/>';
+  else body='<path d="M20 0 L25 9 L35 10 L28 17 L30 27 L20 22 L10 27 L12 17 L5 10 L15 9 Z" fill="'+b+'"/>'
+           +'<path d="M20 8 L36 13 V26 C36 34 29 39 20 42 C11 39 4 34 4 26 V13 Z" fill="'+a+'" stroke="rgba(0,0,0,.35)" stroke-width="2"/>';
+  var ty = sh===4 ? 30 : (sh===2 ? 30 : 26);
+  return '<svg class="badge" viewBox="0 0 40 44" style="width:'+px+'px;height:'+(px*1.1)+'px" role="img" aria-label="Club crest">'
+    + body
+    + '<text x="20" y="'+ty+'" text-anchor="middle" font-size="11" font-weight="800" fill="#FFFFFF"'
+    + ' stroke="rgba(0,0,0,.45)" stroke-width="0.6" paint-order="stroke"'
+    + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
+}
+
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1289,7 +1523,9 @@ function load(){
       opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
       runs:Object.assign({taken:0,scored:0},o.runs||{}),
-      xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0,
+      xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0, rewardTurn: o.rewardTurn||0,
+      club: migrateClub(o.club),
+      tro: migrateTro(o.tro),
       days: Object.assign({last:"",streak:0,best:0}, o.days||{})
     }); } }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -1643,10 +1879,13 @@ var M=null;
 var ATTACKS=12;
 
 function startMatch(mode, level){
+  tro().modes[mode]=1;
   // clear any penalty left pending from a match that was restarted or abandoned
   $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
   $("runWrap").classList.remove("on"); RUN.live=false; RUN.done=null;
   if(RUN.raf){ cancelAnimationFrame(RUN.raf); RUN.raf=null; }
+  $("miniWrap").classList.remove("on"); MINI.live=false; MINI.done=null; MINI.phase="";
+  if(MINI.raf){ cancelAnimationFrame(MINI.raf); MINI.raf=null; }
   var MD=MODES[mode];
   var pool=MD.pool(level);
 
@@ -1921,7 +2160,12 @@ function grade(){
       M.streak=0; M.pens++;
       $("btnConfirm").classList.add("hidden");
       // Alternate the reward: penalty, counter attack, penalty, ...
-      var reward = (M.rewards % 2 === 0) ? takePenalty : takeRun;
+      var pool = rewardPool();
+      // the turn carries across matches, otherwise a five-game rotation would
+      // never reach the fifth — a match only ever hands out four rewards
+      S.rewardTurn = (S.rewardTurn||0) % pool.length;
+      var reward = pool[S.rewardTurn];
+      S.rewardTurn = (S.rewardTurn+1) % pool.length;
       M.rewards++;
       setTimeout(function(){
         reward(function(scored){
@@ -2124,6 +2368,7 @@ function keeperDive(k, to){
   ],{duration:DIVE.ms, fill:"forwards"}));
 }
 function penReset(){
+  paintStand(); paintManager();
   var k=$("penKeeper"), b=$("penBall");
   keeperStopDive();
   k.setAttribute("class","pkeeper");        // SVG: className is read-only, must use setAttribute
@@ -2297,15 +2542,29 @@ var AVATARS = [
  {n:"Stripes",      no:5,  kit:"#23262B", trim:"#FFFFFF", shorts:"#23262B", socks:"#23262B", skin:"#E9C39C", hair:"#4A3722", style:"stripes"},
  {n:"Orange",       no:6,  kit:"#E8712A", trim:"#14151A", shorts:"#14151A", socks:"#E8712A", skin:"#C68642", hair:"#B5651D", style:"plain"}
 ];
-function myAvatar(){ return AVATARS[Math.min(S.avatar||0, AVATARS.length-1)]; }
+function myAvatar(){
+  var a=AVATARS[Math.min(S.avatar||0, AVATARS.length-1)], k=clubKit();
+  return { n:a.n, no:a.no, skin:a.skin, hair:a.hair,        // his face stays his own
+           kit:k.c1, trim:k.c2, shorts:k.c2, socks:k.c1, style:k.st };
+}
 
 /* Defenders wear whichever colour contrasts with the chosen kit, so the
    player is never the same colour as the people tackling him. */
 var RUN_KIT = "#C8102E";
+/* Defenders must never be confusable with the player, and the club kit can
+   now be any colour, so pick whichever stock colour is furthest from it. */
+var DEF_COLOURS = ["#C8102E","#1F5FA8","#2E7D4F","#14151A","#E8A317"];
 function defenderKit(){
   var k=myAvatar().kit.toUpperCase();
   var r=parseInt(k.substr(1,2),16), g=parseInt(k.substr(3,2),16), b=parseInt(k.substr(5,2),16);
-  return (r>140 && r>b+40) ? "#1F5FA8" : "#C8102E";   // reddish kit -> blue defenders
+  if(isNaN(r)) return "#C8102E";
+  var best=DEF_COLOURS[0], bestD=-1;
+  DEF_COLOURS.forEach(function(col){
+    var cr=parseInt(col.substr(1,2),16), cg=parseInt(col.substr(3,2),16), cb=parseInt(col.substr(5,2),16);
+    var d=(cr-r)*(cr-r)+(cg-g)*(cg-g)+(cb-b)*(cb-b);
+    if(d>bestD){ bestD=d; best=col; }
+  });
+  return best;
 }
 var RUN_CFG = {
   rows:8, gap:250, gapVar:70, lead:430, runIn:260, goalAhead:200,
@@ -2333,6 +2592,380 @@ function makeCourse(){
     pick_.push({ z:mid, lane:(Math.random()*3)|0, got:false });
   }
   return { rows:rows, picks:pick_, end:z+RUN_CFG.runIn };
+}
+
+
+/* =======================================================================
+   THREE MORE WAYS TO FINISH
+   Free kick, header and one-on-one. Each is unlocked by a building, so the
+   plots round the ground buy variety rather than any advantage — none of
+   them is easier to score than the penalty, they are just different.
+   All three are tuned by simulation to about seven goals in ten, the same
+   as the penalty and the counter attack.
+   ======================================================================= */
+var MINI_W=360, MINI_H=520;
+var MINI = { live:false, done:null, game:null, raf:null, t:0, last:0, phase:"", result:false,
+             timer:null, power:0, chargeT0:0, aim:0.5, hold:false, ctx:null, s:{} };
+var MINI_DEF = {
+  free:  { head:"Free kick",  title:"Free kick — bend it round the wall.",
+           msg:"Hold to build power, slide left or right to aim, let go." },
+  head:  { head:"Corner",     title:"It is coming in — get your head on it.",
+           msg:"Tap the moment the ball reaches you. Where you tap is where it goes." },
+  solo:  { head:"One on one", title:"Through on goal, just the keeper to beat.",
+           msg:"Swipe left or right the moment he commits." }
+};
+/* Which building opens which game up. */
+var MINI_UNLOCK = { free:0, head:4, solo:1 };      // Training Ground, Youth Academy, Gym
+function miniUnlocked(g){ return club().built.indexOf(MINI_UNLOCK[g])>=0; }
+
+function miniCtx(){
+  var cv=document.getElementById("miniCanvas");
+  return (cv && cv.getContext) ? cv.getContext("2d") : null;
+}
+function takeFreeKick(cb){ openMini("free", cb); }
+function takeHeader(cb){   openMini("head", cb); }
+function takeSolo(cb){     openMini("solo", cb); }
+
+function openMini(game, cb){
+  MINI.done=cb; MINI.game=game; MINI.result=false; MINI.t=0; MINI.last=0;
+  MINI.power=0; MINI.hold=false; MINI.aim=0.5; MINI.phase="aim";
+  var d=MINI_DEF[game];
+  document.getElementById("miniHead").textContent=d.head;
+  document.getElementById("miniTitle").textContent=d.title;
+  document.getElementById("miniMsg").textContent=d.msg;
+  var r=document.getElementById("miniRes"); r.innerHTML="&nbsp;"; r.className="penres";
+  document.getElementById("miniWrap").classList.add("on");
+
+  if(game==="free") MINI.s={ keep:miniPick3(), wallY:300, ballX:180, ballY:440, flight:0 };
+  if(game==="head") MINI.s={ keep:miniPick3(), cross:0, hit:null, zone:null, flight:0 };
+  if(game==="solo") MINI.s={ rush:0, swipe:0, dir:0, flight:0, wrongWay:false, zone:1,
+                             lean:(Math.random()<0.5?-1:1) };   // the side he dives to
+
+  var ctx=miniCtx();
+  if(!ctx){ miniFinish(true,"GOAL!","Buried it."); return; }   // headless: never punish
+  MINI.ctx=ctx; MINI.live=true;
+  MINI.raf=requestAnimationFrame(miniStep);
+}
+/* The keeper leans towards wherever he has been putting them, so hammering
+   the same side every time stops working — same idea as the penalty. */
+function miniKeeperPick(){
+  var h=S.pens.mz || (S.pens.mz={});
+  var wts=[0,1,2].map(function(z){ return (h[z]||0)+0.7; });
+  var tot=wts[0]+wts[1]+wts[2], r=Math.random()*tot;
+  for(var z=0;z<3;z++){ if(r<wts[z]) return z; r-=wts[z]; }
+  return 1;
+}
+function miniRemember(zone){
+  var h=S.pens.mz || (S.pens.mz={});
+  h[zone]=(h[zone]||0)+1;
+}
+function miniPick3(){ return miniKeeperPick(); }
+
+function miniFinish(scored, title, msg){
+  if(MINI.phase==="done") return;
+  if(MINI.raf) cancelAnimationFrame(MINI.raf);
+  MINI.raf=null; MINI.live=false; MINI.phase="done"; MINI.result=scored;
+  S.pens.taken++; if(scored){ S.pens.scored++; addXP(XP_GOAL); }
+  save();
+  var r=document.getElementById("miniRes");
+  r.textContent=title; r.className="penres "+(scored?"scored":"saved");
+  document.getElementById("miniMsg").textContent=msg+(scored?"  +"+XP_GOAL+" XP":"");
+  MINI.timer=setTimeout(miniDismiss, 2400);
+}
+function miniDismiss(){
+  if(MINI.timer){ clearTimeout(MINI.timer); MINI.timer=null; }
+  if(!MINI.done) return;
+  document.getElementById("miniWrap").classList.remove("on");
+  var cb=MINI.done; MINI.done=null; cb(MINI.result);
+}
+
+/* ---- the loop ---- */
+function miniStep(ts){
+  if(!MINI.live) return;
+  if(!MINI.last) MINI.last=ts;
+  var dt=Math.min(50, ts-MINI.last); MINI.last=ts;
+  MINI.t+=dt;
+  var g=MINI.game, s=MINI.s;
+
+  if(g==="free"){
+    if(MINI.hold) MINI.power=chargePower(Date.now()-MINI.chargeT0);
+    if(MINI.phase==="fly"){ s.flight+=dt;
+      if(s.flight>900){ miniResolveFree(); return; } }
+  }
+  if(g==="head"){
+    if(MINI.phase==="aim"){ s.cross+=dt;
+      if(s.cross>2600){ miniFinish(false,"MISSED IT","You had to attack that ball."); return; } }
+    else if(MINI.phase==="fly"){ s.flight+=dt;
+      if(s.flight>700){ miniResolveHead(); return; } }
+  }
+  if(g==="solo"){
+    if(MINI.phase==="aim"){ s.rush+=dt;
+      if(s.rush>2400){ miniFinish(false,"SMOTHERED","You left it too long — he came out and took it."); return; } }
+    else if(MINI.phase==="fly"){ s.flight+=dt;
+      if(s.flight>800){ miniResolveSolo(); return; } }
+  }
+  miniDraw();
+  MINI.raf=requestAnimationFrame(miniStep);
+}
+
+/* ---- shared scenery ---- */
+function miniPitch(c){
+  c.fillStyle="#3E8F5C"; c.fillRect(0,0,MINI_W,MINI_H);
+  for(var y=0;y<MINI_H;y+=60){ c.fillStyle=(y/60)%2?"#46A167":"#3E8F5C"; c.fillRect(0,y,MINI_W,60); }
+}
+function miniGoal(c){
+  c.fillStyle="rgba(10,25,15,.28)"; c.fillRect(72,62,216,88);
+  c.strokeStyle="rgba(255,255,255,.5)"; c.lineWidth=1;
+  for(var x=72;x<=288;x+=12){ c.beginPath(); c.moveTo(x,62); c.lineTo(x,150); c.stroke(); }
+  for(var y=62;y<=150;y+=12){ c.beginPath(); c.moveTo(72,y); c.lineTo(288,y); c.stroke(); }
+  c.fillStyle="#FFFFFF";
+  c.fillRect(66,56,228,8); c.fillRect(66,56,8,96); c.fillRect(286,56,8,96);
+  c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=2.5;
+  c.strokeRect(30,150,300,74);
+}
+function miniKeeper(c,x,y,scale,dive){
+  scale=scale||1;
+  c.save(); c.translate(x,y); c.scale(scale,scale); if(dive) c.rotate(dive);
+  c.fillStyle="rgba(0,0,0,.20)"; c.beginPath(); c.ellipse(0,16,15,4,0,0,6.3); c.fill();
+  c.fillStyle="#B8E31E"; c.fillRect(-24,-20,48,8);
+  c.fillStyle="#F7F7F5"; c.beginPath(); c.arc(-26,-16,5,0,6.3); c.fill();
+  c.beginPath(); c.arc(26,-16,5,0,6.3); c.fill();
+  c.fillStyle="#B8E31E"; c.fillRect(-11,-22,22,22);
+  c.fillStyle="#14151A"; c.fillRect(-10,0,8,14); c.fillRect(2,0,8,14);
+  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(0,-29,7,0,6.3); c.fill();
+  c.fillStyle="#2B2118"; c.beginPath(); c.arc(0,-31,7,3.35,6.07); c.fill();
+  c.restore();
+}
+function miniBall(c,x,y,r){
+  c.fillStyle="#FFFFFF"; c.beginPath(); c.arc(x,y,r,0,6.3); c.fill();
+  c.strokeStyle="#1B2430"; c.lineWidth=2; c.stroke();
+  c.fillStyle="#1B2430"; c.beginPath();
+  for(var i=0;i<5;i++){ var a=-Math.PI/2+i*2*Math.PI/5;
+    c[i?"lineTo":"moveTo"](x+Math.cos(a)*r*0.5, y+Math.sin(a)*r*0.5); }
+  c.closePath(); c.fill();
+}
+function miniZoneX(z){ return [110,180,250][z]; }        // left, centre, right of the goal
+function miniPowerBar(c,p){
+  var w=MINI_W-40, x=20, y=MINI_H-26;
+  c.fillStyle="rgba(0,0,0,.28)"; c.fillRect(x,y,w,14);
+  var band=powerBand(p);
+  c.fillStyle = band==="good" ? "#5FBF87" : (band==="over" ? "#E2924C" : "#9AA8A0");
+  c.fillRect(x,y,Math.min(p/PEN_POWER.scale,1)*w,14);
+  c.strokeStyle="rgba(255,255,255,.85)"; c.lineWidth=2;
+  c.strokeRect(x+ (PEN_POWER.weak/PEN_POWER.scale)*w, y-2,
+               ((PEN_POWER.sweetHi-PEN_POWER.weak)/PEN_POWER.scale)*w, 18);
+}
+
+/* ---- 1. FREE KICK ---- */
+function miniDrawFree(c){
+  var s=MINI.s;
+  miniPitch(c); miniGoal(c);
+  var kx = MINI.phase==="fly" ? miniZoneX(s.keep) : 180;
+  var t = MINI.phase==="fly" ? Math.min(1,s.flight/620) : 0;
+  miniKeeper(c, 180+(kx-180)*t, 140, 1, (kx-180)/180*0.9*t);
+  // the wall
+  var jump = MINI.phase==="fly" ? Math.max(0, Math.sin(Math.min(1,s.flight/420)*Math.PI))*16 : 0;
+  for(var i=0;i<4;i++){
+    var wx=132+i*26, wy=s.wallY-jump;
+    c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(wx,s.wallY+22,11,4,0,0,6.3); c.fill();
+    c.fillStyle="#1F5FA8"; c.fillRect(wx-9,wy-30,18,26);
+    c.fillStyle="#14151A"; c.fillRect(wx-8,wy-4,7,22); c.fillRect(wx+1,wy-4,7,22);
+    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(wx,wy-38,8,0,6.3); c.fill();
+    c.fillStyle="#3A2A20"; c.beginPath(); c.arc(wx,wy-40,8,3.35,6.07); c.fill();
+    c.fillStyle="#E9C39C"; c.fillRect(wx-13,wy-34,5,16); c.fillRect(wx+8,wy-34,5,16);
+  }
+  // aim marker and ball
+  if(MINI.phase==="aim"){
+    var ax=72+MINI.aim*216;
+    c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=3; c.setLineDash([5,5]);
+    c.beginPath(); c.arc(ax,106,15,0,6.3); c.stroke(); c.setLineDash([]);
+    c.strokeStyle="rgba(255,255,255,.45)"; c.lineWidth=2;
+    c.beginPath(); c.moveTo(s.ballX,s.ballY); c.quadraticCurveTo((s.ballX+ax)/2+(ax-180)*0.5, 300, ax,106); c.stroke();
+    miniBall(c,s.ballX,s.ballY,10);
+    miniPowerBar(c,MINI.power);
+  } else {
+    var f=Math.min(1,s.flight/620), ax2=72+MINI.aim*216;
+    var bx=(1-f)*(1-f)*s.ballX + 2*(1-f)*f*((s.ballX+ax2)/2+(ax2-180)*0.5) + f*f*ax2;
+    var by=(1-f)*(1-f)*s.ballY + 2*(1-f)*f*300 + f*f*106;
+    miniBall(c,bx,by,10-f*2);
+  }
+}
+function miniResolveFree(){
+  var band=powerBand(MINI.power), s=MINI.s;
+  if(band==="weak")  return miniFinish(false,"INTO THE WALL","Not enough on it — they blocked it.");
+  if(band==="over")  return miniFinish(false,"OVER THE BAR","Too much. Ease off a fraction.");
+  var zone = MINI.aim<0.34 ? 0 : (MINI.aim<0.67 ? 1 : 2);
+  miniRemember(zone);
+  if(zone===1 && Math.random()<0.45)
+    return miniFinish(false,"BLOCKED","Straight at the wall — bend it round one side.");
+  if(zone===s.keep && Math.random()<0.42)
+    return miniFinish(false,"SAVED!","He read it and got across.");
+  miniFinish(true,"GOAL!",pick(["Right in the top corner.","Round the wall and in.","Unstoppable."]));
+}
+
+/* ---- 2. HEADER FROM A CORNER ---- */
+var HEAD_WIN = [1150,1750];          // the window, in ms, when the ball is on his head
+function miniDrawHead(c){
+  var s=MINI.s;
+  miniPitch(c); miniGoal(c);
+  var kx = MINI.phase==="fly" ? miniZoneX(s.keep) : 180;
+  var t  = MINI.phase==="fly" ? Math.min(1,s.flight/500) : 0;
+  miniKeeper(c, 180+(kx-180)*t, 140, 1, (kx-180)/180*0.8*t);
+  // the cross comes in from the left
+  var p=Math.min(1, s.cross/2200);
+  var cx=-10+p*250, cy=250-Math.sin(p*Math.PI)*120;
+  // the attacker waits at the far post
+  var ax=232, ay=232;
+  var inWin = s.cross>=HEAD_WIN[0] && s.cross<=HEAD_WIN[1];
+  c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(ax,ay+24,13,4,0,0,6.3); c.fill();
+  c.fillStyle=clubKit().c1; c.fillRect(ax-11,ay-26,22,26);
+  c.fillStyle="#14151A"; c.fillRect(ax-10,ay,8,22); c.fillRect(ax+2,ay,8,22);
+  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(ax,ay-35,9,0,6.3); c.fill();
+  c.fillStyle="#3A2A20"; c.beginPath(); c.arc(ax,ay-37,9,3.35,6.07); c.fill();
+  if(inWin && MINI.phase==="aim"){
+    c.strokeStyle="rgba(255,255,255,.95)"; c.lineWidth=3;
+    c.beginPath(); c.arc(ax,ay-35,20,0,6.3); c.stroke();
+  }
+  if(MINI.phase==="aim") miniBall(c,cx,cy,10);
+  else {
+    var f=Math.min(1,s.flight/500), tx=miniZoneX(s.zone);
+    miniBall(c, ax+(tx-ax)*f, (ay-35)+(106-(ay-35))*f, 10-f*2);
+  }
+  if(MINI.phase==="aim"){
+    c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 14px -apple-system,sans-serif"; c.textAlign="center";
+    c.fillText(inWin?"NOW — tap where you want it":"wait for it…", MINI_W/2, MINI_H-24);
+    c.textAlign="start";
+  }
+}
+function miniResolveHead(){
+  var s=MINI.s;
+  miniRemember(s.zone);
+  if(s.zone===s.keep && Math.random()<0.34)
+    return miniFinish(false,"SAVED!","Straight at him — pick a corner next time.");
+  miniFinish(true,"GOAL!",pick(["Thumped it in.","Rose above everyone.","Perfect contact."]));
+}
+
+/* ---- 3. ONE ON ONE ---- */
+var SOLO_WIN = [900,1450];           // when the keeper has committed
+function miniDrawSolo(c){
+  var s=MINI.s;
+  miniPitch(c); miniGoal(c);
+  var p=Math.min(1, s.rush/2300);
+  var ky=150+p*150;                                   // keeper comes out
+  var spread=1+p*0.5;
+  var inWin = s.rush>=SOLO_WIN[0] && s.rush<=SOLO_WIN[1];
+  if(MINI.phase==="aim"){
+    miniKeeper(c,180,ky,spread,0);
+    var ay=430;
+    c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(180,ay+24,13,4,0,0,6.3); c.fill();
+    c.fillStyle=clubKit().c1; c.fillRect(169,ay-26,22,26);
+    c.fillStyle="#14151A"; c.fillRect(170,ay,8,22); c.fillRect(182,ay,8,22);
+    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(180,ay-35,9,0,6.3); c.fill();
+    miniBall(c,196,ay+18,9);
+    if(inWin){
+      c.strokeStyle="rgba(255,255,255,.95)"; c.lineWidth=3;
+      c.beginPath(); c.arc(180,ky-14,34,0,6.3); c.stroke();
+      // he shows you which way he is going — go the other way
+      c.fillStyle="rgba(255,255,255,.92)";
+      var axx=180+s.lean*54;
+      c.beginPath(); c.moveTo(axx+s.lean*16,ky-14); c.lineTo(axx,ky-26); c.lineTo(axx,ky-2); c.closePath(); c.fill();
+    }
+    c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 14px -apple-system,sans-serif"; c.textAlign="center";
+    c.fillText(inWin?"NOW — go the other way":"hold your nerve…", MINI_W/2, MINI_H-24);
+    c.textAlign="start";
+  } else {
+    var f=Math.min(1,s.flight/560);
+    miniKeeper(c,180,ky,spread,s.dir*0.9);
+    var px=180+s.dir*70*Math.min(1,f*2), py=430-f*40;
+    c.fillStyle=clubKit().c1; c.fillRect(px-11,py-26,22,26);
+    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(px,py-35,9,0,6.3); c.fill();
+    miniBall(c, px+(miniZoneX(s.zone)-px)*f, py+(106-py)*f, 10-f*2);
+  }
+}
+function miniResolveSolo(){
+  if(MINI.s.wrongWay && Math.random()<0.6)
+    return miniFinish(false,"BLOCKED","You went the same way he did — take the other side.");
+  miniFinish(true,"GOAL!",pick(["Round him and into the empty net.","Made that look easy.","Cool as you like."]));
+}
+
+function miniDraw(){
+  var c=MINI.ctx; if(!c) return;
+  if(MINI.game==="free") miniDrawFree(c);
+  else if(MINI.game==="head") miniDrawHead(c);
+  else miniDrawSolo(c);
+}
+
+/* ---- input ---- */
+(function bindMini(){
+  var f=document.getElementById("miniCanvas"); if(!f) return;
+  function cpt(e){ var r=f.getBoundingClientRect();
+    return { x:(e.clientX-r.left)/r.width*MINI_W, y:(e.clientY-r.top)/r.height*MINI_H }; }
+  function zoneFromX(x){ return x<MINI_W*0.36 ? 0 : (x<MINI_W*0.64 ? 1 : 2); }
+
+  f.addEventListener("pointerdown", function(ev){
+    if(!MINI.live || MINI.phase!=="aim") return;
+    try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
+    ev.preventDefault();
+    var p=cpt(ev);
+    if(MINI.game==="free"){
+      MINI.hold=true; MINI.chargeT0=Date.now();
+      MINI.aim=Math.max(0,Math.min(1,(p.x-72)/216));
+      document.getElementById("miniMsg").textContent="Slide to aim, let go in the green.";
+    } else if(MINI.game==="solo"){
+      MINI.s.down=p;
+    }
+  });
+  f.addEventListener("pointermove", function(ev){
+    if(!MINI.live || MINI.phase!=="aim") return;
+    if(MINI.game==="free" && MINI.hold){
+      MINI.aim=Math.max(0,Math.min(1,(cpt(ev).x-72)/216)); ev.preventDefault();
+    }
+  });
+  f.addEventListener("pointerup", function(ev){
+    if(!MINI.live || MINI.phase!=="aim") return;
+    ev.preventDefault();
+    var p=cpt(ev), s=MINI.s;
+
+    if(MINI.game==="free"){
+      if(!MINI.hold) return;
+      MINI.hold=false;
+      MINI.power=chargePower(Date.now()-MINI.chargeT0);
+      MINI.phase="fly"; s.flight=0;
+      document.getElementById("miniMsg").textContent="";
+      return;
+    }
+    if(MINI.game==="head"){
+      if(s.cross<HEAD_WIN[0])  return miniFinish(false,"TOO EARLY","You jumped before it got there.");
+      if(s.cross>HEAD_WIN[1])  return miniFinish(false,"TOO LATE","It was past you by then.");
+      s.zone=zoneFromX(p.x); MINI.phase="fly"; s.flight=0;
+      document.getElementById("miniMsg").textContent="";
+      return;
+    }
+    // solo: needs a real swipe, in the window
+    var d=s.down; s.down=null;
+    if(!d) return;
+    var dx=p.x-d.x;
+    if(Math.abs(dx)<24) return;                       // a tap is not a swipe
+    if(s.rush<SOLO_WIN[0]) return miniFinish(false,"TOO SOON","He hadn't committed — easy for him.");
+    if(s.rush>SOLO_WIN[1]) return miniFinish(false,"SMOTHERED","A fraction late and he was on it.");
+    s.dir = dx>0?1:-1;
+    s.zone = dx>0?2:0;
+    s.wrongWay = (s.dir===s.lean);            // he went the same way as the keeper
+    MINI.phase="fly"; s.flight=0;
+    document.getElementById("miniMsg").textContent="";
+  });
+  f.addEventListener("pointercancel", function(){ MINI.hold=false; if(MINI.s) MINI.s.down=null; });
+})();
+
+/* The penalty and the counter attack are always there. The rest are opened
+   up by what he has built, so the plots change what he plays, not how hard
+   it is — every one of these is tuned to the same success rate. */
+function rewardPool(){
+  var pool=[takePenalty, takeRun];
+  if(miniUnlocked("free")) pool.push(takeFreeKick);
+  if(miniUnlocked("head")) pool.push(takeHeader);
+  if(miniUnlocked("solo")) pool.push(takeSolo);
+  return pool;
 }
 
 function takeRun(cb){
@@ -2913,7 +3546,13 @@ function endMatch(){
   S.history.unshift({ d:new Date().toISOString().slice(0,10), us:M.us, them:M.them,
     right:M.right, total:total, lvl:M.level });
   S.history=S.history.slice(0,12);
+  var T=tro();
+  if(M.wrong===0 && total>=ATTACKS) T.perfect++;
+  if(M.pensScored > T.bestPens) T.bestPens=M.pensScored;
+  T.winRun = (res==="w") ? T.winRun+1 : 0;
+  if(T.winRun > T.bestRun) T.bestRun=T.winRun;
   save();
+  var freshCups = checkTrophies();
 
   $("ftHead").textContent = res==="w" ? "You won." : (res==="d" ? "Honours even." : "Not this time.");
   $("ftScore").textContent = M.us+" – "+M.them;
@@ -2926,6 +3565,25 @@ function endMatch(){
               '</b> · scored: <b>'+M.pensScored+'</b>'+
               (M.pens-M.pensScored ? ' · saved: <b>'+(M.pens-M.pensScored)+'</b>' : '')+'</p>'
             : '<p class="small muted" style="margin-top:.7em">No penalties this match — three correct in a row wins you one.</p>');
+
+  var c=club(), extra="";
+  if(res==="w" && c.squad.length){
+    var pl=PLAYERS[c.squad[(M.right + M.us) % c.squad.length]];
+    extra+='<p class="small" style="margin-top:.5em">Man of the match: <b>'+esc(pl.n)+'</b> ('+pl.pos+')</p>';
+  }
+  var mg=MANAGERS[clampIdx(c.manager,MANAGERS.length)];
+  if(c.manager>0) extra+='<p class="small muted" style="margin-top:.5em">'+esc(mg.n)+': \u201c'+
+    esc(mg.q[res==="w"?0:1])+'\u201d</p>';
+  if(freshCups.length){
+    extra+='<div style="margin-top:.8em;padding:.7em .8em;border:2px solid var(--pitch);border-radius:12px">'+
+      '<b>'+(freshCups.length===1?'New trophy':'New trophies')+'</b>';
+    freshCups.forEach(function(t){
+      extra+='<div class="sheetrow">'+cupSVG(t.tier,22)+'<div><b>'+esc(t.n)+'</b><br>'+
+             '<span class="small muted">'+esc(t.d)+'</span></div></div>';
+    });
+    extra+='</div>';
+  }
+  if(extra) $("ftStats").innerHTML += extra;
 
   if(M.missed.length){
     $("ftReviewCard").classList.remove("hidden");
@@ -2950,6 +3608,8 @@ $("btnQuit").addEventListener("click", function(){
   $("penWrap").classList.remove("on"); PEN.live=false; PEN.done=null;
   $("runWrap").classList.remove("on"); RUN.live=false; RUN.done=null;
   if(RUN.raf){ cancelAnimationFrame(RUN.raf); RUN.raf=null; }
+  $("miniWrap").classList.remove("on"); MINI.live=false; MINI.done=null; MINI.phase="";
+  if(MINI.raf){ cancelAnimationFrame(MINI.raf); MINI.raf=null; }
   renderHome(); show("scHome");
 });
 
@@ -2957,6 +3617,7 @@ $("btnQuit").addEventListener("click", function(){
    Home / season
    ======================================================================= */
 function renderHome(){
+  paintHome();                      // the grounds change as he builds and wins
   var s=S.season;
   var d=S.opts.dayStreak ? (S.days.streak||0) : 0;
   var dayBit = d>0 ? '<span class="daystreak"><span class="fl">&#9679;</span>'+
@@ -2993,7 +3654,9 @@ function renderAvatars(){
     ctx.clearRect(0,0,150,190);
     ctx.fillStyle="rgba(0,0,0,.10)";
     ctx.beginPath(); ctx.ellipse(75,172,30,7,0,0,6.3); ctx.fill();
-    drawFooballer(ctx, 75, 168, AVATARS[i], "stand", 0, 1.55);
+    var k=clubKit(), av=AVATARS[i];
+    drawFooballer(ctx, 75, 168, { n:av.n, no:av.no, skin:av.skin, hair:av.hair,
+      kit:k.c1, trim:k.c2, shorts:k.c2, socks:k.c1, style:k.st }, "stand", 0, 1.55);
   }
 }
 $("avGrid").addEventListener("click", function(ev){
@@ -3164,6 +3827,7 @@ $("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(
 $("swatches").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-theme]"); if(!b) return;
   S.opts.theme=b.getAttribute("data-theme")||""; save(); applyOpts();
+paintClub();
 });
 $("btnSound").addEventListener("click",function(){
   S.opts.voice=!S.opts.voice; save(); applyOpts();
@@ -3191,6 +3855,391 @@ for(var b=0;b<lvlBtns.length;b++){
 $("btnHomeLevel").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnSettings").addEventListener("click",function(){ show("scSettings"); });
 $("btnHomeSet").addEventListener("click",function(){ renderHome(); show("scHome"); });
+
+/* ---------------- the club screen ---------------- */
+
+/* Put everything the club owns on screen. Called on load, after any purchase,
+   and whenever a match or penalty opens. */
+var STAND_LOOK = [
+  { back:"#6E7F52", dot1:"#8CA06A", dot2:"#A8BC84", front:"#5A6A44", h:26, tier:false, roof:false, lights:false, screen:false, rope:true  },
+  { back:"#8A1220", dot1:"#C5303C", dot2:"#E24B57", front:"#5C0A14", h:48, tier:false, roof:false, lights:false, screen:false, rope:false },
+  { back:"#8A1220", dot1:"#C5303C", dot2:"#E24B57", front:"#5C0A14", h:70, tier:false, roof:true,  lights:false, screen:false, rope:false },
+  { back:"#7A1030", dot1:"#C5305C", dot2:"#E24B77", front:"#4E0A1E", h:88, tier:true,  roof:true,  lights:false, screen:false, rope:false },
+  { back:"#3B2E63", dot1:"#6E5CA8", dot2:"#8E7CC8", front:"#281F45", h:88, tier:true,  roof:true,  lights:true,  screen:false, rope:false },
+  { back:"#12315A", dot1:"#3C6FA8", dot2:"#5B90CC", front:"#0B2140", h:94, tier:true,  roof:true,  lights:true,  screen:true,  rope:false }
+];
+function paintStand(){
+  var g=document.getElementById("standArt"); if(!g) return;
+  var L=STAND_LOOK[clampIdx(club().stadium,STAND_LOOK.length)], top=94-L.h, h="";
+  var pat=document.getElementById("crowd");
+  if(pat){
+    var r=pat.querySelector("rect"), cs=pat.querySelectorAll("circle");
+    if(r) r.setAttribute("fill", L.back);
+    if(cs[0]) cs[0].setAttribute("fill", L.dot1);
+    if(cs[1]) cs[1].setAttribute("fill", L.dot2);
+    if(cs[2]) cs[2].setAttribute("fill", L.back);
+    if(cs[3]) cs[3].setAttribute("fill", L.dot1);
+  }
+  h+='<rect width="400" height="94" fill="#CFE3F2"/>';                       // sky
+  if(L.rope){                                                                // a field with a hedge
+    h+='<rect y="52" width="400" height="42" fill="#5C7A46"/>';
+    for(var t=0;t<9;t++) h+='<circle cx="'+(16+t*46)+'" cy="56" r="15" fill="#4A6838"/>';
+    h+='<g stroke="#D8D8D0" stroke-width="2">';
+    for(var q=0;q<11;q++) h+='<path d="M'+(10+q*38)+' 78 v14"/>';
+    h+='<path d="M0 82 H400"/></g>';
+  } else {
+    h+='<rect y="'+top+'" width="400" height="'+(94-top)+'" fill="url(#crowd)"/>';
+    if(L.tier)  h+='<rect y="'+(top+(94-top)*0.46)+'" width="400" height="5" fill="rgba(0,0,0,.42)"/>';
+    if(L.roof)  h+='<rect y="'+Math.max(0,top-9)+'" width="400" height="10" fill="#43505C"/>'+
+                   '<rect y="'+Math.max(0,top-9)+'" width="400" height="3" fill="#5C6B79"/>';
+    if(L.screen){                                                            // the big screen
+      h+='<rect x="150" y="4" width="100" height="34" rx="3" fill="#1B2430" stroke="#5C6B79" stroke-width="2"/>'+
+         '<rect x="155" y="9" width="90" height="24" fill="#2E4A6B"/>'+
+         '<rect x="160" y="14" width="34" height="5" fill="#9FC4E8"/>'+
+         '<rect x="160" y="23" width="52" height="5" fill="#6E97C0"/>';
+      h+='<g fill="#43505C"><rect x="60" y="'+top+'" width="8" height="'+(94-top)+'"/>'+
+         '<rect x="332" y="'+top+'" width="8" height="'+(94-top)+'"/></g>';   // closed corners
+    }
+  }
+  h+='<rect y="86" width="400" height="10" fill="'+L.front+'"/>';
+  g.innerHTML=h;
+  var fl=document.getElementById("floodL"), fr=document.getElementById("floodR");
+  if(fl) fl.style.display=L.lights?"":"none";
+  if(fr) fr.style.display=L.lights?"":"none";
+}
+function paintManager(){
+  var g=document.getElementById("mgrArt"); if(!g) return;
+  var m=clampIdx(club().manager,MANAGERS.length);
+  if(m===0){ g.innerHTML=""; return; }                                  // player-manager is on the pitch
+  var coat=["","#2B3A4A","#1F4638","#3A2B4A","#14151A"][m];
+  g.innerHTML='<g transform="translate(30,300)">'+
+    '<ellipse cx="0" cy="4" rx="11" ry="3" fill="rgba(0,0,0,.22)"/>'+
+    '<rect x="-6" y="-14" width="5" height="16" fill="#2A2A30"/><rect x="1" y="-14" width="5" height="16" fill="#2A2A30"/>'+
+    '<rect x="-9" y="-32" width="18" height="20" rx="4" fill="'+coat+'"/>'+
+    '<rect x="-12" y="-31" width="4" height="15" rx="2" fill="'+coat+'"/>'+
+    '<rect x="8" y="-31" width="4" height="15" rx="2" fill="'+coat+'"/>'+
+    '<circle cx="0" cy="-38" r="6" fill="#E9C39C"/>'+
+    '<path d="M-6 -39 a6 6 0 0 1 12 0 q-6 -3.5 -12 0 z" fill="#3A2A20"/></g>';
+}
+
+/* ---------------- the grounds, drawn for the home screen ---------------- */
+var PLOTS = [ {x:168,y:30}, {x:248,y:30}, {x:328,y:30},
+              {x:168,y:86}, {x:248,y:86}, {x:328,y:86} ];
+var PLOT_W=64, PLOT_H=48;
+
+function buildingArt(id,x,y,w,h){
+  var g='<g transform="translate('+x+','+y+')">';
+  if(id==="train"){
+    g+='<rect width="'+w+'" height="'+h+'" rx="3" fill="#3E8F5C"/>'+
+       '<rect x="3" y="3" width="'+(w-6)+'" height="'+(h-6)+'" rx="2" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4"/>'+
+       '<path d="M'+(w/2)+' 3 V'+(h-3)+'" stroke="rgba(255,255,255,.7)" stroke-width="1.4"/>'+
+       '<rect x="0" y="'+(h/2-6)+'" width="4" height="12" fill="#F2F2EE"/>'+
+       '<rect x="'+(w-4)+'" y="'+(h/2-6)+'" width="4" height="12" fill="#F2F2EE"/>';
+  } else if(id==="gym"){
+    g+='<rect y="10" width="'+w+'" height="'+(h-10)+'" rx="2" fill="#8C93A0"/>'+
+       '<path d="M0 10 L'+(w/2)+' 0 L'+w+' 10 Z" fill="#6E7681"/>'+
+       '<g fill="#3A4048"><rect x="'+(w/2-13)+'" y="'+(h/2+2)+'" width="5" height="12" rx="1.5"/>'+
+       '<rect x="'+(w/2+8)+'" y="'+(h/2+2)+'" width="5" height="12" rx="1.5"/>'+
+       '<rect x="'+(w/2-9)+'" y="'+(h/2+6)+'" width="18" height="4"/></g>';
+  } else if(id==="medical"){
+    g+='<rect y="8" width="'+w+'" height="'+(h-8)+'" rx="2" fill="#F2F2EE"/>'+
+       '<rect y="8" width="'+w+'" height="5" fill="#C8102E"/>'+
+       '<g fill="#C8102E"><rect x="'+(w/2-3)+'" y="'+(h/2)+'" width="6" height="18"/>'+
+       '<rect x="'+(w/2-9)+'" y="'+(h/2+6)+'" width="18" height="6"/></g>';
+  } else if(id==="shop"){
+    g+='<rect y="10" width="'+w+'" height="'+(h-10)+'" rx="2" fill="#D9C3A0"/>'+
+       '<rect y="10" width="'+w+'" height="8" fill="#2E7D4F"/>'+
+       '<g fill="#F2F2EE">'+
+       '<rect x="4" y="10" width="7" height="8"/><rect x="18" y="10" width="7" height="8"/>'+
+       '<rect x="32" y="10" width="7" height="8"/><rect x="46" y="10" width="7" height="8"/></g>'+
+       '<rect x="'+(w/2-8)+'" y="'+(h-16)+'" width="16" height="16" fill="#8C6A3A"/>';
+  } else if(id==="youth"){
+    g+='<rect y="12" width="'+w+'" height="'+(h-12)+'" rx="2" fill="#C9A06A"/>'+
+       '<path d="M0 12 L'+(w/2)+' 2 L'+w+' 12 Z" fill="#9A7647"/>'+
+       '<g fill="#5E4526"><rect x="8" y="'+(h/2)+'" width="8" height="8"/>'+
+       '<rect x="'+(w/2-4)+'" y="'+(h/2)+'" width="8" height="8"/>'+
+       '<rect x="'+(w-16)+'" y="'+(h/2)+'" width="8" height="8"/></g>'+
+       '<path d="M'+(w/2)+' 2 V-8 h10 l-3 4 3 4 h-10" fill="#C8102E"/>';
+  } else {  // museum
+    g+='<rect y="14" width="'+w+'" height="'+(h-14)+'" fill="#EDE7DA"/>'+
+       '<path d="M-2 14 L'+(w/2)+' 2 L'+(w+2)+' 14 Z" fill="#D8CFBC"/>'+
+       '<g fill="#C6BCA6">';
+    for(var c=0;c<5;c++) g+='<rect x="'+(5+c*((w-14)/4))+'" y="18" width="6" height="'+(h-22)+'"/>';
+    g+='</g><rect y="'+(h-4)+'" width="'+w+'" height="4" fill="#C6BCA6"/>';
+  }
+  return g+'</g>';
+}
+
+function paintHome(){
+  var host=document.getElementById("homeHero"); if(!host) return;
+  var c=club(), L=STAND_LOOK[clampIdx(c.stadium,STAND_LOOK.length)];
+  var h='<svg viewBox="0 0 400 150" role="img" aria-label="Your club grounds">';
+  h+='<rect width="400" height="150" fill="#CFE3F2"/>';
+  h+='<rect y="118" width="400" height="32" fill="#6E7A63"/>';          // car park / road
+  h+='<rect y="116" width="400" height="3" fill="#57614E"/>';
+  h+='<g stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-dasharray="9 8"><path d="M0 134 H400"/></g>';
+  h+='<rect y="24" width="400" height="94" fill="#7FA36A"/>';           // grass
+
+  /* the ground itself, matching the tier he has built */
+  h+='<g transform="translate(8,26)">';
+  h+='<rect width="146" height="90" rx="4" fill="'+L.front+'"/>';
+  h+='<rect x="6" y="6" width="134" height="78" rx="3" fill="#3E8F5C"/>';
+  h+='<g stroke="rgba(255,255,255,.72)" stroke-width="1.5" fill="none">'+
+     '<circle cx="73" cy="45" r="13"/><path d="M73 6 V84"/>'+
+     '<path d="M6 26 H24 V64 H6"/><path d="M140 26 H122 V64 H140"/></g>';
+  var seatH = Math.round(6 + c.stadium*3.2);
+  h+='<rect width="146" height="'+seatH+'" rx="3" fill="url(#crowd)"/>';
+  h+='<rect y="'+(90-seatH)+'" width="146" height="'+seatH+'" rx="3" fill="url(#crowd)"/>';
+  if(c.stadium>=2){ h+='<rect x="0" y="'+seatH+'" width="146" height="3" fill="#43505C"/>'+
+                       '<rect x="0" y="'+(90-seatH-3)+'" width="146" height="3" fill="#43505C"/>'; }
+  if(L.lights){
+    h+='<g fill="#C9D3DC"><rect x="2" y="-14" width="3" height="18"/><rect x="141" y="-14" width="3" height="18"/>'+
+       '<rect x="2" y="86" width="3" height="18"/><rect x="141" y="86" width="3" height="18"/></g>'+
+       '<g fill="#FFF6D8"><circle cx="3.5" cy="-15" r="3.4"/><circle cx="142.5" cy="-15" r="3.4"/>'+
+       '<circle cx="3.5" cy="105" r="3.4"/><circle cx="142.5" cy="105" r="3.4"/></g>';
+  }
+  h+='</g>';
+
+  /* the six plots */
+  BUILDINGS.forEach(function(b,i){
+    var pl=PLOTS[i];
+    if(c.built.indexOf(i)>=0){
+      h+=buildingArt(b.id, pl.x, pl.y, PLOT_W, PLOT_H);
+    } else {
+      h+='<rect x="'+pl.x+'" y="'+pl.y+'" width="'+PLOT_W+'" height="'+PLOT_H+'" rx="3" fill="rgba(255,255,255,.16)"'+
+         ' stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-dasharray="5 5"/>'+
+         '<text x="'+(pl.x+PLOT_W/2)+'" y="'+(pl.y+PLOT_H/2+4)+'" text-anchor="middle" font-size="9"'+
+         ' fill="rgba(255,255,255,.85)" font-family="-apple-system,BlinkMacSystemFont,sans-serif">plot</text>';
+    }
+  });
+  h+='</svg>';
+  host.innerHTML=h;
+
+  var line=document.getElementById("homeClubLine");
+  if(line){
+    var cups=tro().won.length, bits=[STADIUMS[c.stadium].n,
+      c.built.length+" of "+BUILDINGS.length+" built"];
+    if(c.built.indexOf(5)>=0 || cups) bits.push(cups+(cups===1?" trophy":" trophies"));
+    line.textContent = c.name+" — "+bits.join(" · ");
+  }
+}
+
+function paintClub(){
+  var c=club();
+  var hc=document.getElementById("hdrCrest"); if(hc) hc.innerHTML=crestSVG(30);
+  var hn=document.getElementById("hdrName"); if(hn) hn.textContent=c.name;
+  var fu=document.getElementById("ftUs");    if(fu) fu.textContent=c.name;
+  paintStand(); paintManager(); paintHome();
+}
+
+var CLUB_TAB="badge";
+
+function canAfford(cost){ return (S.xp||0) >= cost; }
+function spend(cost){
+  if(!canAfford(cost)) return false;          // never let XP go negative
+  S.xp = (S.xp||0) - cost; save(); return true;
+}
+function priceTag(cost, owned){
+  if(owned) return '<span class="small muted">Owned</span>';
+  return '<span class="small'+(canAfford(cost)?'':' muted')+'">'+cost+' XP</span>';
+}
+function kitSwatch(k){
+  var bars="";
+  if(k.st==="stripes") for(var i=0;i<5;i++) bars+='<div style="position:absolute;left:'+(i*20+4)+'%;top:0;bottom:0;width:9%;background:'+k.c2+'"></div>';
+  if(k.st==="hoops")   for(var j=0;j<3;j++) bars+='<div style="position:absolute;top:'+(j*30+12)+'%;left:0;right:0;height:12%;background:'+k.c2+'"></div>';
+  return '<div class="kitswatch" style="background:'+k.c1+'">'+bars+
+         '<div style="position:absolute;left:0;right:0;bottom:0;height:22%;background:'+k.c2+';opacity:.85"></div></div>';
+}
+
+/* tier 0 draws the empty outline of a cup he has not won yet. */
+function cupSVG(tier,px){
+  var body=["none","#B87333","#C0C0C0","#D4AF37"][tier]||"none";
+  var edge=tier?"rgba(0,0,0,.35)":"var(--line)";
+  var op=tier?1:.55;
+  return '<svg viewBox="0 0 40 46" style="width:'+px+'px;height:'+(px*1.15)+'px;opacity:'+op+'" aria-hidden="true">'+
+    '<path d="M11 4 H29 V17 C29 24 25 28 20 28 C15 28 11 24 11 17 Z" fill="'+(tier?body:"none")+'" stroke="'+edge+'" stroke-width="2"/>'+
+    '<path d="M11 8 H6 A5 5 0 0 0 6 18 H12" fill="none" stroke="'+edge+'" stroke-width="2"/>'+
+    '<path d="M29 8 H34 A5 5 0 0 1 34 18 H28" fill="none" stroke="'+edge+'" stroke-width="2"/>'+
+    '<rect x="17" y="28" width="6" height="7" fill="'+(tier?body:"none")+'" stroke="'+edge+'" stroke-width="2"/>'+
+    '<rect x="10" y="35" width="20" height="6" rx="2" fill="'+(tier?body:"none")+'" stroke="'+edge+'" stroke-width="2"/>'+
+    (tier?'<path d="M14 8 H26 V15 H14 Z" fill="rgba(255,255,255,.30)"/>':'')+
+    '</svg>';
+}
+
+function renderClub(){
+  $("clubXP").textContent=(S.xp||0)+" XP";
+  var c=club(), h="";
+
+  if(CLUB_TAB==="badge"){
+    h+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">'+crestSVG(64)+
+       '<div><b style="font-size:1.1em">'+esc(c.name)+'</b><br><span class="small muted">'+
+       STADIUMS[c.stadium].n+'</span></div></div>';
+    h+='<label class="small muted" for="clubNameIn">Club name</label>'+
+       '<input class="clubname" id="clubNameIn" maxlength="20" value="'+esc(c.name)+'">';
+    h+='<h2 style="margin:.9em 0 .3em">Badge shape</h2><div class="shopgrid">';
+    CRESTS.forEach(function(cr,i){
+      var own=owns("crest",i), on=(c.crest===i);
+      h+='<div class="shopcard'+(on?" on":(own?" owned":(canAfford(cr.cost)?"":" locked")))+'">'+
+         '<b>'+cr.n+'</b>'+priceTag(cr.cost,own)+
+         '<button class="shopbtn'+(own?"":" buy")+'" data-act="crest" data-i="'+i+'"'+
+         ((!own && !canAfford(cr.cost))||on ? ' disabled':'')+'>'+
+         (on?"Wearing it":(own?"Use this":"Buy"))+'</button></div>';
+    });
+    h+='</div>';
+    h+='<h2 style="margin:.9em 0 .3em">Badge colours <span class="small muted">— free</span></h2>';
+    h+='<div class="swatchrow">';
+    CREST_C1.forEach(function(col){ h+='<button class="dot'+(c.c1===col?" on":"")+'" data-act="c1" data-v="'+col+'" style="background:'+col+'" aria-label="Main colour"></button>'; });
+    h+='</div><div class="swatchrow">';
+    CREST_C2.forEach(function(col){ h+='<button class="dot'+(c.c2===col?" on":"")+'" data-act="c2" data-v="'+col+'" style="background:'+col+'" aria-label="Trim colour"></button>'; });
+    h+='</div>';
+  }
+
+  else if(CLUB_TAB==="kit"){
+    h+='<p class="small muted" style="margin-top:0">Your player wears the club kit on the pitch.</p><div class="shopgrid">';
+    KITS.forEach(function(k,i){
+      var own=owns("kit",i), on=(c.kit===i);
+      h+='<div class="shopcard'+(on?" on":(own?" owned":(canAfford(k.cost)?"":" locked")))+'">'+
+         kitSwatch(k)+'<b>'+k.n+'</b>'+priceTag(k.cost,own)+
+         '<button class="shopbtn'+(own?"":" buy")+'" data-act="kit" data-i="'+i+'"'+
+         ((!own && !canAfford(k.cost))||on ? ' disabled':'')+'>'+
+         (on?"Wearing it":(own?"Wear this":"Buy"))+'</button></div>';
+    });
+    h+='</div>';
+  }
+
+  else if(CLUB_TAB==="ground"){
+    h+='<p class="small muted" style="margin-top:0">The ground you play your penalties in.</p>';
+    STADIUMS.forEach(function(st,i){
+      var own=(c.stadium>=i), next=(i===c.stadium+1);
+      h+='<div class="shopcard'+(c.stadium===i?" on":(own?" owned":(next&&canAfford(st.cost)?"":" locked")))+
+         '" style="margin-bottom:9px"><b>'+st.n+'</b><span class="sd">'+st.d+'</span>'+
+         priceTag(st.cost, own)+
+         (own ? '<span class="small muted">'+(c.stadium===i?"You are here":"Built")+'</span>'
+              : '<button class="shopbtn buy" data-act="ground" data-i="'+i+'"'+
+                (next&&canAfford(st.cost)?'':' disabled')+'>'+
+                (next?"Build it":"Build the one before first")+'</button>')+
+         '</div>';
+    });
+    h+='<h2 style="margin:1em 0 .3em">Around the ground</h2>'+
+       '<p class="small muted" style="margin-top:0">Six empty plots. Each one you build shows up on the home screen.</p>'+
+       '<div class="shopgrid">';
+    BUILDINGS.forEach(function(b,i){
+      var up=(c.built.indexOf(i)>=0);
+      h+='<div class="shopcard'+(up?" owned":(canAfford(b.cost)?"":" locked"))+'">'+
+         '<b>'+b.n+'</b><span class="sd">'+b.d+'</span>'+priceTag(b.cost,up)+
+         (up ? '<span class="small muted">Built</span>'
+             : '<button class="shopbtn buy" data-act="build" data-i="'+i+'"'+
+               (canAfford(b.cost)?'':' disabled')+'>Build it</button>')+'</div>';
+    });
+    h+='</div>';
+  }
+
+  else if(CLUB_TAB==="squad"){
+    h+='<p class="small muted" style="margin-top:0">Signed players line out on the team sheet, and one of them can be man of the match.</p>';
+    if(c.squad.length){
+      h+='<h2 style="margin:.6em 0 .2em">Team sheet</h2><div style="margin-bottom:.8em">';
+      c.squad.forEach(function(i){ var pl=PLAYERS[i];
+        h+='<div class="sheetrow"><span class="poschip">'+pl.pos+'</span><b>'+pl.n+'</b></div>'; });
+      h+='</div>';
+    }
+    h+='<h2 style="margin:.6em 0 .3em">Transfer list</h2><div class="shopgrid">';
+    PLAYERS.forEach(function(pl,i){
+      var own=owns("player",i);
+      h+='<div class="shopcard'+(own?" owned":(canAfford(pl.cost)?"":" locked"))+'">'+
+         '<span class="poschip" style="align-self:flex-start">'+pl.pos+'</span><b>'+pl.n+'</b>'+
+         priceTag(pl.cost,own)+
+         (own?'<span class="small muted">In the squad</span>'
+             :'<button class="shopbtn buy" data-act="player" data-i="'+i+'"'+
+              (canAfford(pl.cost)?'':' disabled')+'>Sign him</button>')+'</div>';
+    });
+    h+='</div>';
+  }
+
+  else if(CLUB_TAB==="cups"){
+    checkTrophies();                       // so it is never stale when he opens it
+    var wonN=tro().won.length;
+    if(club().built.indexOf(5)>=0)
+      h+='<p class="small" style="margin-top:0">The museum is open — visitors can see the lot.</p>';
+    h+='<p class="small muted" style="margin-top:0">These cannot be bought. Every one is won by '+
+       'doing the words. <b>'+wonN+' of '+TROPHIES.length+'</b> so far.</p>';
+    h+='<div class="shopgrid">';
+    TROPHIES.forEach(function(t){
+      var got=trophyWon(t.id);
+      h+='<div class="shopcard'+(got?" owned":" locked")+'" style="align-items:center;text-align:center">'+
+         cupSVG(got?t.tier:0,44)+'<b>'+esc(t.n)+'</b>'+
+         '<span class="sd">'+esc(t.d)+'</span>'+
+         '<span class="small'+(got?'':' muted')+'">'+(got?'Won':'Not yet')+'</span></div>';
+    });
+    h+='</div>';
+  }
+
+  else {
+    h+='<p class="small muted" style="margin-top:0">Your manager stands on the touchline and has the last word at full time.</p>';
+    MANAGERS.forEach(function(mg,i){
+      var own=owns("manager",i), on=(c.manager===i);
+      h+='<div class="shopcard'+(on?" on":(own?" owned":(canAfford(mg.cost)?"":" locked")))+
+         '" style="margin-bottom:9px"><b>'+mg.n+'</b><span class="sd">'+mg.d+'</span>'+
+         priceTag(mg.cost,own)+
+         '<button class="shopbtn'+(own?"":" buy")+'" data-act="boss" data-i="'+i+'"'+
+         ((!own && !canAfford(mg.cost))||on ? ' disabled':'')+'>'+
+         (on?"In charge":(own?"Put him in charge":"Hire"))+'</button></div>';
+    });
+  }
+  $("clubBody").innerHTML=h;
+}
+
+/* Buying and equipping. Every path checks ownership first so nothing can be
+   paid for twice, and spend() refuses if the XP is not actually there. */
+$("clubBody").addEventListener("click", function(ev){
+  var b=ev.target.closest("button"); if(!b) return;
+  var act=b.getAttribute("data-act"); if(!act) return;
+  var c=club(), i=parseInt(b.getAttribute("data-i"),10);
+
+  if(act==="c1"||act==="c2"){ c[act]=b.getAttribute("data-v"); save(); renderClub(); paintClub(); return; }
+
+  if(act==="crest"){
+    if(!owns("crest",i)){ if(!spend(CRESTS[i].cost)) return; c.own.crest.push(i); }
+    c.crest=i;
+  } else if(act==="kit"){
+    if(!owns("kit",i)){ if(!spend(KITS[i].cost)) return; c.own.kit.push(i); }
+    c.kit=i;
+  } else if(act==="ground"){
+    if(i!==c.stadium+1) return;                       // one tier at a time
+    if(!spend(STADIUMS[i].cost)) return;
+    c.stadium=i;
+  } else if(act==="build"){
+    if(c.built.indexOf(i)>=0) return;                 // never pay twice
+    if(!spend(BUILDINGS[i].cost)) return;
+    c.built.push(i);
+  } else if(act==="player"){
+    if(owns("player",i)) return;
+    if(!spend(PLAYERS[i].cost)) return;
+    c.own.player.push(i); c.squad.push(i);
+  } else if(act==="boss"){
+    if(!owns("manager",i)){ if(!spend(MANAGERS[i].cost)) return; c.own.manager.push(i); }
+    c.manager=i;
+  }
+  save(); renderClub(); paintClub();
+});
+
+$("clubBody").addEventListener("input", function(ev){
+  if(ev.target.id!=="clubNameIn") return;
+  var v=ev.target.value.slice(0,20);
+  club().name = v.trim() ? v : "Word Attack FC";
+  save(); paintClub();
+});
+
+$("clubTabs").addEventListener("click", function(ev){
+  var b=ev.target.closest(".clubtab"); if(!b) return;
+  CLUB_TAB=b.getAttribute("data-tab");
+  var t=$("clubTabs").querySelectorAll(".clubtab");
+  for(var i=0;i<t.length;i++) t[i].classList.toggle("on", t[i]===b);
+  renderClub();
+});
+
+$("btnClub").addEventListener("click", function(){ renderClub(); show("scClub"); });
+$("btnClubHome").addEventListener("click", function(){ renderHome(); show("scHome"); });
+
 $("btnAvatar").addEventListener("click",function(){ renderAvatars(); show("scAvatar"); });
 $("btnHomeAvatar").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnSquad").addEventListener("click",function(){ renderSquad(); show("scSquad"); });
