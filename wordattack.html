@@ -399,7 +399,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <p class="muted" id="lvSub"></p>
       <button class="btn primary" data-level="1">Academy &nbsp;·&nbsp; easier</button>
       <button class="btn primary" data-level="2">First Team &nbsp;·&nbsp; mixed</button>
-      <button class="btn primary" data-level="3">Champions League &nbsp;·&nbsp; hardest</button>
+      <button class="btn primary" data-level="3">Champions League &nbsp;·&nbsp; hardest, double XP</button>
     </div>
     <button class="btn ghost" id="btnHomeLevel">Back</button>
   </section>
@@ -485,7 +485,7 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   <section class="screen" id="scSquad">
     <div class="card">
       <h1>Squad list</h1>
-      <p class="muted small">All 96 words from your report. Tap any word to hear it and see its synonyms.</p>
+      <p class="muted small" id="squadNote">Every word in the squad. Tap any word to hear it and see its synonyms.</p>
       <div class="small" style="margin-bottom:10px">
         <span class="pill lg-good">Strong</span>
         <span class="pill lg-mid">Getting there</span>
@@ -815,7 +815,35 @@ const SQUAD = [
 {w:"ugly",t:2,y:["hideous","unsightly","grotesque","repulsive","monstrous","horrible","unpleasant"],s:"It was an ugly challenge from behind."},
 {w:"unhappy",t:1,y:["sad","miserable","gloomy","downhearted","sorrowful","unfortunate","depressed","glum"],s:"He was unhappy about being subbed."},
 {w:"use",t:2,y:["employ","utilise","expend","consume","exercise","spend"],s:"Use your left foot more often."},
-{w:"wrong",t:1,y:["incorrect","inaccurate","mistaken","erroneous","improper","unsuitable"],s:"He got the answer wrong."}
+{w:"wrong",t:1,y:["incorrect","inaccurate","mistaken","erroneous","improper","unsuitable"],s:"He got the answer wrong."},
+
+/* ---- Champions League extras. These sit above Rita's 96 on purpose:
+   harder vocabulary for the hardest level, in line with her advice to
+   stretch him with material pitched above his reading age. ---- */
+{w:"abundant",t:3,y:["plentiful","ample","copious","generous"],s:"There was abundant space out on the wing."},
+{w:"accurate",t:3,y:["precise","exact","correct","faultless"],s:"His passing was accurate all afternoon."},
+{w:"anxious",t:3,y:["nervous","uneasy","apprehensive","worried","fretful"],s:"The crowd grew anxious in the last ten minutes."},
+{w:"authentic",t:3,y:["genuine","real","original"],s:"The shirt was an authentic 1990s jersey."},
+{w:"bewildered",t:3,y:["confused","puzzled","baffled","perplexed"],s:"The defenders looked bewildered by that free kick."},
+{w:"cautious",t:3,y:["careful","wary","guarded","prudent"],s:"They were cautious after going a goal up."},
+{w:"competent",t:3,y:["capable","able","skilled","proficient"],s:"He is a competent keeper on his day."},
+{w:"conceal",t:3,y:["hide","cover","mask","disguise"],s:"He tried to conceal the ball behind his back."},
+{w:"courteous",t:3,y:["polite","gracious","civil","respectful"],s:"The captain was courteous to the referee."},
+{w:"deliberate",t:3,y:["intentional","planned","calculated","purposeful"],s:"It was a deliberate foul to stop the counter."},
+{w:"diligent",t:3,y:["hard-working","industrious","conscientious","thorough"],s:"He was diligent in training every evening."},
+{w:"persistent",t:3,y:["persevering","determined","tenacious","dogged"],s:"His persistent pressing won the ball back."},
+{w:"elaborate",t:3,y:["detailed","complex","intricate","complicated"],s:"They had an elaborate plan for corners."},
+{w:"essential",t:3,y:["necessary","vital","crucial","indispensable"],s:"A good first touch is essential."},
+{w:"feeble",t:3,y:["weak","frail","faint","puny"],s:"It was a feeble attempt at a shot."},
+{w:"hazardous",t:3,y:["dangerous","risky","perilous","unsafe"],s:"The frozen pitch was hazardous."},
+{w:"hostile",t:3,y:["unfriendly","aggressive","antagonistic","menacing"],s:"It was a hostile atmosphere away from home."},
+{w:"inevitable",t:3,y:["unavoidable","certain","inescapable"],s:"A second goal felt inevitable."},
+{w:"obstinate",t:3,y:["stubborn","headstrong","wilful","unyielding"],s:"He was obstinate about taking the free kicks."},
+{w:"peculiar",t:3,y:["strange","odd","unusual","curious"],s:"There was a peculiar bounce on the wet grass."},
+{w:"reluctant",t:3,y:["unwilling","hesitant","disinclined","grudging"],s:"He was reluctant to come off."},
+{w:"sincere",t:3,y:["honest","heartfelt","earnest","truthful"],s:"His apology to the referee was sincere."},
+{w:"vigilant",t:3,y:["watchful","alert","attentive","observant"],s:"The keeper stayed vigilant all game."},
+{w:"weary",t:3,y:["tired","exhausted","fatigued","drained"],s:"Their legs were weary by extra time."}
 ];
 
 /* ---- ANTONYMS: Rita's next step once the synonyms are learned ---- */
@@ -959,7 +987,56 @@ const SPELLS = [
 {w:"strength",r:"end",t:2,bad:["strenth","strengh"]},
 {w:"twelfth",r:"end",t:3,bad:["twelth","twelvth"]},
 {w:"except",r:"end",t:2,bad:["exept","excpet"]},
-{w:"excellent",r:"end",t:3,bad:["excelent","exellent"]}
+{w:"excellent",r:"end",t:3,bad:["excelent","exellent"]},
+{w:"crumbs",r:"silent",sl:"b",t:2,bad:["crums","crumms"]},
+{w:"plumber",r:"silent",sl:"b",t:3,bad:["plumer","plummer"]},
+{w:"wrap",r:"silent",sl:"w",t:1,bad:["rap","wrapp"]},
+{w:"wreck",r:"silent",sl:"w",t:2,bad:["reck","wrek"]},
+{w:"wrestle",r:"silent",sl:"w",t:3,bad:["restle","wressle"]},
+{w:"knot",r:"silent",sl:"k",t:1,bad:["not","knott"]},
+{w:"knuckle",r:"silent",sl:"k",t:3,bad:["nuckle","knukle"]},
+{w:"gnaw",r:"silent",sl:"g",t:3,bad:["naw","gnawe"]},
+{w:"sword",r:"silent",sl:"w",t:2,bad:["sord","swourd"]},
+{w:"fasten",r:"silent",sl:"t",t:2,bad:["fassen","fasen"]},
+{w:"soften",r:"silent",sl:"t",t:2,bad:["sofen","softten"]},
+{w:"column",r:"silent",sl:"n",t:3,bad:["colum","collumn"]},
+{w:"solemn",r:"silent",sl:"n",t:3,bad:["solem","solemm"]},
+{w:"rhyme",r:"silent",sl:"h",t:3,bad:["ryme","rhime"]},
+{w:"scent",r:"silent",sl:"c",t:3,bad:["sent","scennt"]},
+{w:"guest",r:"silent",sl:"u",t:2,bad:["gest","guesst"]},
+{w:"guard",r:"silent",sl:"u",t:2,bad:["gard","guardd"]},
+{w:"running",r:"double",t:1,bad:["runing","runnning"]},
+{w:"stopped",r:"double",t:1,bad:["stoped","stoppped"]},
+{w:"swimming",r:"double",t:1,bad:["swiming","swimmming"]},
+{w:"dinner",r:"double",t:1,bad:["diner","dinnner"]},
+{w:"better",r:"double",t:1,bad:["beter","bettter"]},
+{w:"rabbit",r:"double",t:1,bad:["rabit","rabbitt"]},
+{w:"ladder",r:"double",t:2,bad:["lader","laddder"]},
+{w:"bottle",r:"double",t:1,bad:["botle","bottel"]},
+{w:"middle",r:"double",t:1,bad:["midle","middel"]},
+{w:"hammer",r:"double",t:2,bad:["hamer","hammmer"]},
+{w:"mirror",r:"double",t:2,bad:["miror","mirrror"]},
+{w:"yellow",r:"double",t:1,bad:["yelow","yellowe"]},
+{w:"success",r:"double",t:3,bad:["succes","sucess"]},
+{w:"necessary",r:"double",t:3,bad:["neccessary","necesary"]},
+{w:"occasion",r:"double",t:3,bad:["ocasion","occassion"]},
+{w:"forgotten",r:"double",t:2,bad:["forgoten","forgottten"]},
+{w:"disappear",r:"double",t:3,bad:["dissapear","disapear"]},
+{w:"station",r:"end",t:1,bad:["stashun","staition"]},
+{w:"question",r:"end",t:2,bad:["questshun","questoin"]},
+{w:"attention",r:"end",t:3,bad:["attenshun","attension"]},
+{w:"decision",r:"end",t:3,bad:["desision","decission"]},
+{w:"musician",r:"end",t:3,bad:["musision","musicion"]},
+{w:"picture",r:"end",t:1,bad:["pictcher","picchure"]},
+{w:"adventure",r:"end",t:2,bad:["adventcher","adventer"]},
+{w:"creature",r:"end",t:2,bad:["creatcher","creture"]},
+{w:"furniture",r:"end",t:3,bad:["furnitcher","furnature"]},
+{w:"famous",r:"end",t:2,bad:["famus","famouse"]},
+{w:"dangerous",r:"end",t:2,bad:["dangerus","dangerious"]},
+{w:"nervous",r:"end",t:2,bad:["nervus","nervious"]},
+{w:"jealous",r:"end",t:3,bad:["jealus","jelous"]},
+{w:"horrible",r:"end",t:2,bad:["horrable","horribel"]},
+{w:"valuable",r:"end",t:3,bad:["valuble","valueable"]}
 ];
 
 /* ---- CONNECTIVES: aimed at Formulated Sentences (SS 10, age equiv 9:07)
@@ -1131,7 +1208,54 @@ const TRICKY = [
 {t:2,s:"He rode the ___ along the strand.",a:"horse",d:["house","hoarse","hose"]},
 {t:2,s:"He can ___ better than anyone in the class.",a:"sing",d:["sign","sting","singe"]},
 {t:2,s:"He wins it ___ single time.",a:"every",d:["evrey","evry","everey"]},
-{t:1,s:"He played the first ___ in goal.",a:"half",d:["haf","hald","have"]}
+{t:1,s:"He played the first ___ in goal.",a:"half",d:["haf","hald","have"]},
+{t:2,s:"The manager was ___ to speak to the press.",a:"allowed",d:["aloud","alowed","alloud"]},
+{t:2,s:"He read the team sheet ___ to the lads.",a:"aloud",d:["allowed","alowd","aloude"]},
+{t:1,s:"Do not ___ the window with that shot.",a:"break",d:["brake","brek","braek"]},
+{t:2,s:"He squeezed the ___ on his bike outside the ground.",a:"brake",d:["break","braek","brayk"]},
+{t:2,s:"The tickets were sold at a fair ___.",a:"price",d:["prize","prise","pryce"]},
+{t:2,s:"He won a ___ for player of the season.",a:"prize",d:["price","prise","pryze"]},
+{t:2,s:"The referee was ___ to both sides.",a:"fair",d:["fare","faire","fayre"]},
+{t:2,s:"He paid the bus ___ to the away game.",a:"fare",d:["fair","faer","farre"]},
+{t:2,s:"His mother used ___ to bake the cake.",a:"flour",d:["flower","floure","flowa"]},
+{t:1,s:"She picked a ___ from the garden.",a:"flower",d:["flour","flowr","floure"]},
+{t:3,s:"The doctor said the cut would ___ quickly.",a:"heal",d:["heel","hele","heap"]},
+{t:2,s:"He hurt his ___ landing awkwardly.",a:"heel",d:["heal","hele","held"]},
+{t:2,s:"A ___ in armour was on the club badge.",a:"knight",d:["night","nite","knigt"]},
+{t:1,s:"They trained late into the ___.",a:"night",d:["knight","nite","nigth"]},
+{t:2,s:"The postman brought the ___ this morning.",a:"mail",d:["male","mial","maile"]},
+{t:2,s:"They will ___ outside the ground at six.",a:"meet",d:["meat","mete","meit"]},
+{t:1,s:"He had ___ and potatoes before the game.",a:"meat",d:["meet","mete","meap"]},
+{t:2,s:"He ___ the target completely.",a:"missed",d:["mist","misst","mised"]},
+{t:2,s:"There was a ___ over the pitch at dawn.",a:"mist",d:["missed","mistt","miste"]},
+{t:2,s:"He bought a new ___ of boots.",a:"pair",d:["pear","pare","paire"]},
+{t:1,s:"She ate a ___ at half time.",a:"pear",d:["pair","pare","peare"]},
+{t:3,s:"The rain began to ___ down at kick-off.",a:"pour",d:["poor","pore","poar"]},
+{t:2,s:"It was a ___ performance from the whole team.",a:"poor",d:["pour","pore","poar"]},
+{t:2,s:"They walked down the ___ to the stadium.",a:"road",d:["rode","rowed","roade"]},
+{t:2,s:"He ___ his bike to training.",a:"rode",d:["road","rowed","roade"]},
+{t:2,s:"The club had a ___ on all shirts.",a:"sale",d:["sail","sael","saile"]},
+{t:3,s:"It was an ugly ___ at the end of the match.",a:"scene",d:["seen","scean","sceen"]},
+{t:3,s:"He was the ___ survivor of that great team.",a:"sole",d:["soul","sowl","soal"]},
+{t:2,s:"He managed to ___ the ball from the winger.",a:"steal",d:["steel","stele","steam"]},
+{t:3,s:"The gates at the ground were made of ___.",a:"steel",d:["steal","stele","steed"]},
+{t:2,s:"He stood on the bottom ___ of the stand.",a:"stair",d:["stare","stayr","staire"]},
+{t:2,s:"Do not ___ at the referee like that.",a:"stare",d:["stair","stayr","start"]},
+{t:2,s:"They had to ___ for the bus home.",a:"wait",d:["weight","wate","waite"]},
+{t:2,s:"He lifted the ___ in the gym.",a:"weight",d:["wait","wieght","weght"]},
+{t:2,s:"___ boots should he wear today?",a:"Which",d:["Witch","Wich","Whitch"]},
+{t:3,s:"The old goal posts were made of ___.",a:"wood",d:["wud","woud","wooden"]},
+{t:3,s:"He could not ___ what he was seeing.",a:"believe",d:["beleive","belive","beleve"]},
+{t:3,s:"He was ___ that he would score.",a:"certain",d:["certian","certin","sertain"]},
+{t:3,s:"They played on a ___ pitch this week.",a:"different",d:["diffrent","differant","diferent"]},
+{t:3,s:"He could not ___ the goal he scored.",a:"describe",d:["discribe","describ","desribe"]},
+{t:3,s:"The crowd fell ___ silent.",a:"completely",d:["completly","compleatly","completley"]},
+{t:3,s:"He was ___ the best player on the pitch.",a:"probably",d:["probaly","probebly","probbably"]},
+{t:3,s:"Please ___ your kit for tomorrow.",a:"remember",d:["remeber","rember","remembre"]},
+{t:3,s:"He ran ___ down the wing.",a:"straight",d:["strait","strght","straigt"]},
+{t:3,s:"It was a ___ result for everyone.",a:"surprise",d:["suprise","surprize","surprice"]},
+{t:3,s:"He has great ___ in his legs.",a:"strength",d:["strenght","strengh","strentgh"]},
+{t:3,s:"They made a ___ to each other.",a:"promise",d:["promiss","promice","promisse"]}
 ];
 
 /* ---- TEAM SHEET: mirrors the CELF-5 Word Classes subtest, where the
@@ -1340,7 +1464,7 @@ var STADIUMS = [
   {n:"Main Stand",     cost:110, d:"One covered stand down the near side."},
   {n:"Two-Tier Stand", cost:240, d:"A second tier goes up. It gets loud."},
   {n:"Floodlit Arena", cost:400, d:"Four pylons. Thursday nights under the lights."},
-  {n:"The Cathedral",  cost:620, d:"Full bowl, closed corners, sold out every week."}
+  {n:"The Cathedral",  cost:1400,d:"Full bowl, closed corners, sold out every week."}
 ];
 var KITS = [
   {n:"Classic Red",     c1:"#C8102E", c2:"#FFFFFF", st:"plain",   cost:0},
@@ -1352,24 +1476,24 @@ var KITS = [
   {n:"Purple Sash",     c1:"#6B3FA0", c2:"#F2C230", st:"stripes", cost:65},
   {n:"Seaside Pink",    c1:"#E77CA3", c2:"#14151A", st:"plain",   cost:70},
   {n:"Gold Trim",       c1:"#1B1B1B", c2:"#D4AF37", st:"hoops",   cost:90},
-  {n:"Emerald & Silver",c1:"#0F7C74", c2:"#C0C0C0", st:"stripes", cost:110}
+  {n:"Emerald & Silver",c1:"#0F7C74", c2:"#C0C0C0", st:"stripes", cost:320}
 ];
 /* Six plots round the ground. Cosmetic, like everything else in here, but
    they make the place look like it is growing as the words are learned. */
 var BUILDINGS = [
   {id:"train",  n:"Training Ground", cost:80,  d:"Cones and spare pitches. Opens up free kicks."},
   {id:"gym",    n:"Gym",             cost:120, d:"Weights and a loud coach. Opens up one-on-ones."},
-  {id:"medical",n:"Medical Room",    cost:100, d:"Ice baths and a physio bench."},
+  {id:"medical",n:"Medical Room",    cost:100, d:"Ice baths and a physio bench. Opens up warm-up drills."},
   {id:"shop",   n:"Club Shop",       cost:150, d:"Replica kits and far too many scarves."},
   {id:"youth",  n:"Youth Academy",   cost:200, d:"Where the next lot come through. Opens up headers."},
-  {id:"museum", n:"Club Museum",     cost:260, d:"Puts the cup room on show to visitors."}
+  {id:"museum", n:"Club Museum",     cost:720, d:"Shows the cup room off, and opens up the memory game."}
 ];
 var CRESTS = [
   {n:"Shield",     cost:0},
   {n:"Roundel",    cost:25},
   {n:"Diamond",    cost:40},
   {n:"Pennant",    cost:55},
-  {n:"Star Badge", cost:80}
+  {n:"Star Badge", cost:240}
 ];
 var CREST_C1 = ["#2E7D4F","#C8102E","#1F5FA8","#6B3FA0","#14151A","#E8A317","#0F7C74","#B03060"];
 var CREST_C2 = ["#E8A317","#FFFFFF","#F2C230","#14151A","#C8102E","#7FD4C1","#F49AC2","#C0C0C0"];
@@ -1385,7 +1509,7 @@ var PLAYERS = [
   {n:"Marco Silva",    pos:"DF", cost:110},
   {n:"Diego Nunes",    pos:"FW", cost:130},
   {n:"Yuki Tanaka",    pos:"MF", cost:150},
-  {n:"Amadou Diallo",  pos:"FW", cost:180}
+  {n:"Amadou Diallo",  pos:"FW", cost:520}
 ];
 var MANAGERS = [
   {n:"Player-Manager", cost:0,   d:"You. Picking the team and taking the penalties.",
@@ -1396,7 +1520,7 @@ var MANAGERS = [
    q:["We kept the ball. The rest follows.","Patience won us that one."]},
   {n:"Pep Nolan",      cost:170, d:"Wants it back within six seconds of losing it.",
    q:["Six seconds. Every time.","Press higher and they crumble."]},
-  {n:"Sir Ronan Blake",cost:250, d:"Won everything there is. Says very little.",
+  {n:"Sir Ronan Blake",cost:700, d:"Won everything there is. Says very little.",
    q:["Good.","That is more like it."]}
 ];
 
@@ -1469,7 +1593,7 @@ var TROPHIES = [
   {id:"days7",   tier:1, n:"A Full Week",          d:"Seven days in a row.",                  need:function(){return (S.days.best||0)>=7;}},
   {id:"days30",  tier:3, n:"Ever-present",         d:"Thirty days in a row.",                 need:function(){return (S.days.best||0)>=30;}},
   {id:"syn50",   tier:1, n:"Fifty Synonyms",       d:"50 different headwords right.",         need:function(){return rightIn("syn")>=50;}},
-  {id:"syn96",   tier:3, n:"The Full List",        d:"All 96 headwords right at least once.", need:function(){return rightIn("syn")>=96;}},
+  {id:"syn96",   tier:3, n:"The Full List",        d:"Every headword right at least once.",   need:function(){return rightIn("syn")>=SQUAD.length;}},
   {id:"ant40",   tier:2, n:"Both Ways",            d:"40 different opposites right.",         need:function(){return rightIn("ant")>=40;}},
   {id:"tricky40",tier:2, n:"Tricky Customer",      d:"40 different tricky words right.",      need:function(){return rightIn("tricky")>=40;}},
   {id:"spell30", tier:2, n:"Set Piece Specialist", d:"30 different spellings right.",         need:function(){return rightIn("spell")>=30;}},
@@ -2061,7 +2185,10 @@ function renderQuestion(){
    XP and the fifty-fifty card
    ======================================================================= */
 var XP_PICKUP=1, XP_GOAL=5, FIFTY_COST=20;
-function addXP(n){ S.xp=(S.xp||0)+n; save(); }
+/* Champions League pays double. It is the only level that uses the hardest
+   words, so the reward follows the difficulty rather than the time spent. */
+function xpMult(){ return (M && M.level===3) ? 2 : 1; }
+function addXP(n){ S.xp=(S.xp||0)+Math.round(n*xpMult()); save(); }
 
 function fiftyAvailable(q){
   if(!q || q.kind==="letters") return false;
@@ -2248,6 +2375,14 @@ function penZoneFromSwipe(dx,dy){
   }
   return best;
 }
+/* A zone he did not shoot at — next door if possible, so a beaten keeper
+   still looks like he nearly got there. */
+function penWrongWayFrom(zone){
+  var others=[]; for(var z in PEN_POS) if(z!==zone) others.push(z);
+  var adj=(PEN_ADJ[zone]||[]).filter(function(x){ return x!==zone && PEN_POS[x]; });
+  var from=(adj.length && Math.random()<0.7) ? adj : others;
+  return from[(Math.random()*from.length)|0];
+}
 function penKeeperPick(shot){
   var zones=["TL","TR","C","BL","BR"];
   if(Math.random() < PEN_TUNING.reflex) return shot;          // read it
@@ -2414,10 +2549,16 @@ function shoot(zone, power){
   S.pens.taken++; S.pens.zones[zone]=(S.pens.zones[zone]||0)+1;
 
   var over = power > PEN_POWER.max;
-  var keep=penKeeperPick(zone);
-  var saved = over ? false : penIsSaved(zone,keep,power);
+  var keepGuess=penKeeperPick(zone);
+  var saved = over ? false : penIsSaved(zone,keepGuess,power);
   var k=$("penKeeper"), b=$("penBall");
 
+  /* The odds decide the result first; the dive is then drawn so the picture
+     agrees with it. Otherwise the keeper could land on the ball and it still
+     be a goal, or dive the wrong way and somehow save it. */
+  var keep = over ? keepGuess
+           : (saved ? zone
+                    : (keepGuess!==zone ? keepGuess : penWrongWayFrom(zone)));
   keeperDive(k, PEN_POS[keep]);
   // harder strikes travel faster
   b.style.transitionDuration = (0.46 - Math.min(power,1)*0.20)+"s";
@@ -2434,7 +2575,7 @@ function shoot(zone, power){
       return;
     }
     if(saved){
-      placeAt(b, {x:(PEN_POS[keep].x<200?30:370), y:250}, 0.7);
+      placeAt(b, {x:(PEN_POS[keep].x<200?30:370), y:250}, 0.7);   // parried away from where he got to
       $("penRes").textContent="SAVED!"; $("penRes").className="penres saved";
       $("penMsg").textContent="The keeper went the right way.";
     } else {
@@ -2443,7 +2584,7 @@ function shoot(zone, power){
       $("penNet").classList.add("ripple");
       $("penRes").textContent="GOAL!"; $("penRes").className="penres scored";
       $("penMsg").textContent=pick(["Buried it.","Unstoppable.","Right in the corner.","No chance."])+
-        "  +"+XP_GOAL+" XP";
+        "  +"+(XP_GOAL*xpMult())+" XP";
     }
     save();
     PEN.result = !saved;
@@ -2619,10 +2760,15 @@ var MINI_DEF = {
   head:  { head:"Corner",     title:"It is coming in — get your head on it.",
            msg:"Tap the moment the ball reaches you. Where you tap is where it goes." },
   solo:  { head:"One on one", title:"Through on goal, just the keeper to beat.",
-           msg:"Swipe left or right the moment he commits." }
+           msg:"Swipe left or right the moment he commits." },
+  warm:  { head:"Warm-up",     title:"Sharpen up — tap the cone that lights.",
+           msg:"Six cones, each lit for less time than the last. Four gets you the goal." },
+  memo:  { head:"The museum",  title:"Match the pairs that mean the same.",
+           msg:"Turn two cards. Words that mean the same stay up. Five wrong turns allowed." }
 };
 /* Which building opens which game up. */
-var MINI_UNLOCK = { free:0, head:4, solo:1 };      // Training Ground, Youth Academy, Gym
+var MINI_UNLOCK = { free:0, head:4, solo:1, warm:2, memo:5 };
+/* Training Ground, Youth Academy, Gym, Medical Room, Club Museum */
 function miniUnlocked(g){ return club().built.indexOf(MINI_UNLOCK[g])>=0; }
 
 function miniCtx(){
@@ -2647,6 +2793,10 @@ function openMini(game, cb){
   if(game==="head") MINI.s={ keep:miniPick3(), cross:0, hit:null, zone:null, flight:0 };
   if(game==="solo") MINI.s={ rush:0, swipe:0, dir:0, flight:0, wrongWay:false, zone:1,
                              lean:(Math.random()<0.5?-1:1) };   // the side he dives to
+  if(game==="warm"){ MINI.s={ step:0, lit:null, litT:0, window:WARM_WINDOWS[0], hits:0,
+                              flash:0, flashAt:-1, flashOk:false }; warmNext(); }
+  if(game==="memo") MINI.s={ cards:memoBuild(), first:null, second:null, flips:0, matched:0,
+                             lock:false, lockT:0 };
 
   var ctx=miniCtx();
   if(!ctx){ miniFinish(true,"GOAL!","Buried it."); return; }   // headless: never punish
@@ -2676,7 +2826,7 @@ function miniFinish(scored, title, msg){
   save();
   var r=document.getElementById("miniRes");
   r.textContent=title; r.className="penres "+(scored?"scored":"saved");
-  document.getElementById("miniMsg").textContent=msg+(scored?"  +"+XP_GOAL+" XP":"");
+  document.getElementById("miniMsg").textContent=msg+(scored?"  +"+(XP_GOAL*xpMult())+" XP":"");
   MINI.timer=setTimeout(miniDismiss, 2400);
 }
 function miniDismiss(){
@@ -2705,6 +2855,28 @@ function miniStep(ts){
     else if(MINI.phase==="fly"){ s.flight+=dt;
       if(s.flight>700){ miniResolveHead(); return; } }
   }
+  if(g==="warm"){
+    if(s.flash>0) s.flash-=dt;
+    s.litT+=dt;
+    if(s.litT>=s.window){                       // missed it
+      s.flash=260; s.flashAt=s.lit; s.flashOk=false;
+      s.step++; warmNext();
+      if(MINI.phase==="done") return;
+    }
+  }
+  if(g==="memo"){
+    if(s.lock){
+      s.lockT+=dt;
+      if(s.lockT>760){
+        s.cards[s.first].up=false; s.cards[s.second].up=false;
+        s.first=null; s.second=null; s.lock=false; s.lockT=0;
+        if(s.flips>=MEMO_FLIPS){
+          miniFinish(false,"OUT OF TURNS","Found "+s.matched+" of "+MEMO_PAIRS+". They are shuffled every time.");
+          return;
+        }
+      }
+    }
+  }
   if(g==="solo"){
     if(MINI.phase==="aim"){ s.rush+=dt;
       if(s.rush>2400){ miniFinish(false,"SMOTHERED","You left it too long — he came out and took it."); return; } }
@@ -2730,17 +2902,19 @@ function miniGoal(c){
   c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=2.5;
   c.strokeRect(30,150,300,74);
 }
+var KEEPER_AV = { n:"Keeper", no:1, kit:"#B8E31E", trim:"#8FBE0F", shorts:"#14151A",
+                  socks:"#B8E31E", skin:"#E9C39C", hair:"#2B2118", style:"plain" };
 function miniKeeper(c,x,y,scale,dive){
   scale=scale||1;
-  c.save(); c.translate(x,y); c.scale(scale,scale); if(dive) c.rotate(dive);
-  c.fillStyle="rgba(0,0,0,.20)"; c.beginPath(); c.ellipse(0,16,15,4,0,0,6.3); c.fill();
-  c.fillStyle="#B8E31E"; c.fillRect(-24,-20,48,8);
-  c.fillStyle="#F7F7F5"; c.beginPath(); c.arc(-26,-16,5,0,6.3); c.fill();
-  c.beginPath(); c.arc(26,-16,5,0,6.3); c.fill();
-  c.fillStyle="#B8E31E"; c.fillRect(-11,-22,22,22);
-  c.fillStyle="#14151A"; c.fillRect(-10,0,8,14); c.fillRect(2,0,8,14);
-  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(0,-29,7,0,6.3); c.fill();
-  c.fillStyle="#2B2118"; c.beginPath(); c.arc(0,-31,7,3.35,6.07); c.fill();
+  c.save(); c.translate(x,y); c.rotate(dive||0);
+  c.fillStyle="rgba(0,0,0,.20)";
+  c.beginPath(); c.ellipse(0,14*scale,17*scale,5*scale,0,0,6.3); c.fill();
+  drawFooballer(c, 0, 12*scale, KEEPER_AV, dive ? "jump" : "stand", 0, scale*0.62);
+  // gloves, so it still reads as a keeper at this size
+  c.fillStyle="#F7F7F5"; c.strokeStyle="rgba(12,16,20,.5)"; c.lineWidth=1.2;
+  [[-17,-24],[17,-24]].forEach(function(g){
+    c.beginPath(); c.arc(g[0]*scale, g[1]*scale, 5.4*scale, 0, 6.3); c.fill(); c.stroke();
+  });
   c.restore();
 }
 function miniBall(c,x,y,r){
@@ -2772,14 +2946,15 @@ function miniDrawFree(c){
   miniKeeper(c, 180+(kx-180)*t, 140, 1, (kx-180)/180*0.9*t);
   // the wall
   var jump = MINI.phase==="fly" ? Math.max(0, Math.sin(Math.min(1,s.flight/420)*Math.PI))*16 : 0;
+  var dk=defenderKit();
+  var wallAv={ n:"D", no:5, kit:dk, trim:"#F2F2EE", shorts:"#14151A",
+               socks:dk, skin:"#D8B08C", hair:"#3A2A20", style:"plain" };
   for(var i=0;i<4;i++){
     var wx=132+i*26, wy=s.wallY-jump;
-    c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(wx,s.wallY+22,11,4,0,0,6.3); c.fill();
-    c.fillStyle="#1F5FA8"; c.fillRect(wx-9,wy-30,18,26);
-    c.fillStyle="#14151A"; c.fillRect(wx-8,wy-4,7,22); c.fillRect(wx+1,wy-4,7,22);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(wx,wy-38,8,0,6.3); c.fill();
-    c.fillStyle="#3A2A20"; c.beginPath(); c.arc(wx,wy-40,8,3.35,6.07); c.fill();
-    c.fillStyle="#E9C39C"; c.fillRect(wx-13,wy-34,5,16); c.fillRect(wx+8,wy-34,5,16);
+    c.fillStyle="rgba(0,0,0,.18)";
+    c.beginPath(); c.ellipse(wx, s.wallY+20, 12-jump*0.25, 4, 0, 0, 6.3); c.fill();
+    // in the air with the arms up, or stood waiting
+    drawFooballer(c, wx, wy+20, wallAv, jump>1 ? "jump" : "stand", 0, 0.62);
   }
   // aim marker and ball
   if(MINI.phase==="aim"){
@@ -2797,16 +2972,26 @@ function miniDrawFree(c){
     miniBall(c,bx,by,10-f*2);
   }
 }
-function miniResolveFree(){
-  var band=powerBand(MINI.power), s=MINI.s;
-  if(band==="weak")  return miniFinish(false,"INTO THE WALL","Not enough on it — they blocked it.");
-  if(band==="over")  return miniFinish(false,"OVER THE BAR","Too much. Ease off a fraction.");
+/* Worked out the moment he lets go, so the keeper can be drawn going the way
+   the result says he went. */
+function freeDecide(){
+  var s=MINI.s, band=powerBand(MINI.power);
   var zone = MINI.aim<0.34 ? 0 : (MINI.aim<0.67 ? 1 : 2);
-  miniRemember(zone);
-  if(zone===1 && Math.random()<0.45)
-    return miniFinish(false,"BLOCKED","Straight at the wall — bend it round one side.");
-  if(zone===s.keep && Math.random()<0.42)
-    return miniFinish(false,"SAVED!","He read it and got across.");
+  s.zone=zone; miniRemember(zone);
+  if(band==="weak"){ s.out="wall";  s.keep=miniOtherZone(zone); return; }
+  if(band==="over"){ s.out="over";  s.keep=miniOtherZone(zone); return; }
+  if(zone===1 && Math.random()<0.45){ s.out="block"; s.keep=miniOtherZone(zone); return; }
+  if(zone===s.keep && Math.random()<0.42){ s.out="save"; s.keep=zone; return; }
+  s.out="goal";
+  if(s.keep===zone) s.keep=miniOtherZone(zone);      // beaten keeper must not be on the ball
+}
+function miniOtherZone(z){ var o=[0,1,2].filter(function(x){return x!==z;}); return o[(Math.random()*o.length)|0]; }
+function miniResolveFree(){
+  var s=MINI.s;
+  if(s.out==="wall")  return miniFinish(false,"INTO THE WALL","Not enough on it — they blocked it.");
+  if(s.out==="over")  return miniFinish(false,"OVER THE BAR","Too much. Ease off a fraction.");
+  if(s.out==="block") return miniFinish(false,"BLOCKED","Straight at the wall — bend it round one side.");
+  if(s.out==="save")  return miniFinish(false,"SAVED!","He read it and got across.");
   miniFinish(true,"GOAL!",pick(["Right in the top corner.","Round the wall and in.","Unstoppable."]));
 }
 
@@ -2824,11 +3009,9 @@ function miniDrawHead(c){
   // the attacker waits at the far post
   var ax=232, ay=232;
   var inWin = s.cross>=HEAD_WIN[0] && s.cross<=HEAD_WIN[1];
-  c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(ax,ay+24,13,4,0,0,6.3); c.fill();
-  c.fillStyle=clubKit().c1; c.fillRect(ax-11,ay-26,22,26);
-  c.fillStyle="#14151A"; c.fillRect(ax-10,ay,8,22); c.fillRect(ax+2,ay,8,22);
-  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(ax,ay-35,9,0,6.3); c.fill();
-  c.fillStyle="#3A2A20"; c.beginPath(); c.arc(ax,ay-37,9,3.35,6.07); c.fill();
+  c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(ax,ay+30,14,4,0,0,6.3); c.fill();
+  // he rises to meet it as the ball arrives
+  drawFooballer(c, ax, ay+30, myAvatar(), inWin ? "jump" : "stand", 0, 0.78);
   if(inWin && MINI.phase==="aim"){
     c.strokeStyle="rgba(255,255,255,.95)"; c.lineWidth=3;
     c.beginPath(); c.arc(ax,ay-35,20,0,6.3); c.stroke();
@@ -2844,10 +3027,15 @@ function miniDrawHead(c){
     c.textAlign="start";
   }
 }
-function miniResolveHead(){
+function headDecide(){
   var s=MINI.s;
   miniRemember(s.zone);
-  if(s.zone===s.keep && Math.random()<0.34)
+  if(s.zone===s.keep && Math.random()<0.34){ s.out="save"; s.keep=s.zone; return; }
+  s.out="goal";
+  if(s.keep===s.zone) s.keep=miniOtherZone(s.zone);
+}
+function miniResolveHead(){
+  if(MINI.s.out==="save")
     return miniFinish(false,"SAVED!","Straight at him — pick a corner next time.");
   miniFinish(true,"GOAL!",pick(["Thumped it in.","Rose above everyone.","Perfect contact."]));
 }
@@ -2864,11 +3052,9 @@ function miniDrawSolo(c){
   if(MINI.phase==="aim"){
     miniKeeper(c,180,ky,spread,0);
     var ay=430;
-    c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(180,ay+24,13,4,0,0,6.3); c.fill();
-    c.fillStyle=clubKit().c1; c.fillRect(169,ay-26,22,26);
-    c.fillStyle="#14151A"; c.fillRect(170,ay,8,22); c.fillRect(182,ay,8,22);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(180,ay-35,9,0,6.3); c.fill();
-    miniBall(c,196,ay+18,9);
+    c.fillStyle="rgba(0,0,0,.18)"; c.beginPath(); c.ellipse(180,ay+28,14,4,0,0,6.3); c.fill();
+    drawFooballer(c, 180, ay+28, myAvatar(), "run", s.rush/110, 0.80);
+    miniBall(c, 198, ay+22, 9);
     if(inWin){
       c.strokeStyle="rgba(255,255,255,.95)"; c.lineWidth=3;
       c.beginPath(); c.arc(180,ky-14,34,0,6.3); c.stroke();
@@ -2884,8 +3070,8 @@ function miniDrawSolo(c){
     var f=Math.min(1,s.flight/560);
     miniKeeper(c,180,ky,spread,s.dir*0.9);
     var px=180+s.dir*70*Math.min(1,f*2), py=430-f*40;
-    c.fillStyle=clubKit().c1; c.fillRect(px-11,py-26,22,26);
-    c.fillStyle="#E9C39C"; c.beginPath(); c.arc(px,py-35,9,0,6.3); c.fill();
+    c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(px,py+28,13,4,0,0,6.3); c.fill();
+    drawFooballer(c, px, py+28, myAvatar(), "run", MINI.t/90, 0.80);
     miniBall(c, px+(miniZoneX(s.zone)-px)*f, py+(106-py)*f, 10-f*2);
   }
 }
@@ -2899,7 +3085,156 @@ function miniDraw(){
   var c=MINI.ctx; if(!c) return;
   if(MINI.game==="free") miniDrawFree(c);
   else if(MINI.game==="head") miniDrawHead(c);
+  else if(MINI.game==="warm") miniDrawWarm(c);
+  else if(MINI.game==="memo") miniDrawMemo(c);
   else miniDrawSolo(c);
+}
+
+/* ---- 4. WARM-UP DRILL (Medical Room) ------------------------------------
+   Six cones, one lit at a time, each lit for a shorter spell than the last.
+   No keeper, no aim: pure reaction and a change of pace from the shooting
+   games. Five of six gets you the goal. */
+var WARM_POS = [ {x:78,y:196}, {x:180,y:174}, {x:282,y:196},
+                 {x:78,y:330}, {x:180,y:356}, {x:282,y:330} ];
+/* Tuned by simulation: about 86% for a typical ten-year-old and still 44% on
+   a slow day. Four of six rather than five, so one fumble is never fatal. */
+var WARM_WINDOWS = [800, 750, 700, 650, 600, 555];
+var WARM_PASS = 4;
+function takeWarmUp(cb){ openMini("warm", cb); }
+
+function warmNext(){
+  var s=MINI.s;
+  if(s.step>=WARM_WINDOWS.length){
+    if(s.hits>=WARM_PASS)
+      miniFinish(true,"SHARP!", "Warmed up and ready — "+s.hits+" out of "+WARM_WINDOWS.length+".");
+    else
+      miniFinish(false,"SLUGGISH", "Only "+s.hits+" of "+WARM_WINDOWS.length+". You need "+WARM_PASS+".");
+    return;
+  }
+  var next;
+  do { next=(Math.random()*WARM_POS.length)|0; } while(next===s.lit && WARM_POS.length>1);
+  s.lit=next; s.litT=0; s.window=WARM_WINDOWS[s.step]; s.flash=0;
+}
+function miniDrawWarm(c){
+  var s=MINI.s;
+  miniPitch(c);
+  c.strokeStyle="rgba(255,255,255,.5)"; c.lineWidth=2.5;
+  c.strokeRect(30,150,300,240);
+  WARM_POS.forEach(function(p,i){
+    var on=(i===s.lit), t=on? Math.min(1, s.litT/s.window) : 0;
+    c.fillStyle="rgba(0,0,0,.22)";
+    c.beginPath(); c.ellipse(p.x,p.y+16,17,5,0,0,6.3); c.fill();
+    if(on){                                   // the ring closes in as the time runs out
+      c.strokeStyle="rgba(255,255,255,.9)"; c.lineWidth=3;
+      c.beginPath(); c.arc(p.x,p.y+2, 34-t*16, 0, 6.3); c.stroke();
+    }
+    c.beginPath(); c.moveTo(p.x,p.y-22); c.lineTo(p.x+15,p.y+14); c.lineTo(p.x-15,p.y+14); c.closePath();
+    c.fillStyle = on ? "#F2C230" : "#D2662B";
+    c.fill(); c.strokeStyle="rgba(12,16,20,.5)"; c.lineWidth=1.4; c.stroke();
+    c.fillStyle="rgba(255,255,255,.35)";
+    c.beginPath(); c.moveTo(p.x,p.y-22); c.lineTo(p.x+6,p.y-4); c.lineTo(p.x-6,p.y-4); c.closePath(); c.fill();
+    if(s.flash && s.flashAt===i){
+      c.fillStyle = s.flashOk ? "rgba(95,191,135,.55)" : "rgba(226,146,76,.55)";
+      c.beginPath(); c.arc(p.x,p.y+2,26,0,6.3); c.fill();
+    }
+  });
+  c.fillStyle="rgba(255,255,255,.95)"; c.font="bold 16px -apple-system,sans-serif"; c.textAlign="center";
+  c.fillText("cone "+Math.min(s.step+1,WARM_WINDOWS.length)+" of "+WARM_WINDOWS.length+
+             "  ·  "+s.hits+" hit", MINI_W/2, 60);
+  c.font="bold 13px -apple-system,sans-serif";
+  c.fillText("tap the yellow cone", MINI_W/2, MINI_H-24);
+  c.textAlign="start";
+}
+
+/* ---- 5. THE MUSEUM: MATCH THE PAIRS -------------------------------------
+   Eight cards, four pairs, each a headword and one of its synonyms. Drawn
+   from words he has already got right, so the museum really is showing off
+   what he has learned. */
+var MEMO_PAIRS = 5;
+var MEMO_FLIPS = 5;          // wrong turns allowed — simulated at ~86% typical
+function takeMemory(cb){ openMini("memo", cb); }
+
+function memoPickWords(){
+  var right=[], rest=[];
+  SQUAD.forEach(function(e,i){
+    if(!e.y || !e.y.length) return;
+    var st=S.stats[e.w];
+    if(st && st.right>0) right.push(i); else if(e.t<=2) rest.push(i);
+  });
+  var pool = right.length>=4 ? right : right.concat(rest);
+  // shuffle and take four
+  for(var i=pool.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+  return pool.slice(0,MEMO_PAIRS);
+}
+function memoBuild(){
+  var picked=memoPickWords(), cards=[];
+  picked.forEach(function(idx,pair){
+    var e=SQUAD[idx];
+    var syn=e.y[(Math.random()*e.y.length)|0];
+    cards.push({ t:e.w, pair:pair, up:false, done:false });
+    cards.push({ t:syn,  pair:pair, up:false, done:false });
+  });
+  for(var i=cards.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=cards[i]; cards[i]=cards[j]; cards[j]=t; }
+  return cards;
+}
+var MEMO_COLS=4, MEMO_CW=78, MEMO_CH=92, MEMO_X0=14, MEMO_Y0=150, MEMO_GAP=8;
+function memoRect(i){
+  var total=MEMO_PAIRS*2, row=(i/MEMO_COLS)|0, col=i%MEMO_COLS;
+  var rows=Math.ceil(total/MEMO_COLS);
+  var inRow=(row===rows-1) ? (total-(rows-1)*MEMO_COLS) : MEMO_COLS;
+  var rowW=inRow*MEMO_CW+(inRow-1)*MEMO_GAP;
+  var x0=(360-rowW)/2;                       // short last row sits centred
+  return { x:x0+col*(MEMO_CW+MEMO_GAP), y:MEMO_Y0+row*(MEMO_CH+MEMO_GAP), w:MEMO_CW, h:MEMO_CH };
+}
+function miniDrawMemo(c){
+  var s=MINI.s;
+  miniPitch(c);
+  c.fillStyle="rgba(255,255,255,.95)"; c.font="bold 16px -apple-system,sans-serif"; c.textAlign="center";
+  c.fillText("find the pairs that mean the same", MINI_W/2, 56);
+  c.font="bold 14px -apple-system,sans-serif";
+  c.fillText(s.matched+" of "+MEMO_PAIRS+" found  ·  "+Math.max(0,MEMO_FLIPS-s.flips)+" wrong turns left", MINI_W/2, 82);
+  s.cards.forEach(function(cd,i){
+    var r=memoRect(i), open=(cd.up||cd.done);
+    c.beginPath();
+    if(c.roundRect) c.roundRect(r.x,r.y,r.w,r.h,10); else c.rect(r.x,r.y,r.w,r.h);
+    c.fillStyle = cd.done ? "#5FBF87" : (open ? "#F7F0E1" : "#2E7D4F");
+    c.fill();
+    c.strokeStyle = cd.done ? "#2F7D55" : "rgba(12,16,20,.45)"; c.lineWidth=2.4; c.stroke();
+    if(open){
+      c.fillStyle="#25303A";
+      var size=17;
+      c.font="bold "+size+"px -apple-system,sans-serif";
+      while(c.measureText(cd.t).width > r.w-12 && size>9){ size--; c.font="bold "+size+"px -apple-system,sans-serif"; }
+      c.textAlign="center"; c.fillText(cd.t, r.x+r.w/2, r.y+r.h/2+size*0.36);
+    } else {
+      c.fillStyle="rgba(255,255,255,.55)";
+      c.beginPath(); c.arc(r.x+r.w/2, r.y+r.h/2, 15, 0, 6.3); c.fill();
+      c.fillStyle="#2E7D4F"; c.font="bold 17px -apple-system,sans-serif"; c.textAlign="center";
+      c.fillText("?", r.x+r.w/2, r.y+r.h/2+6);
+    }
+  });
+  c.textAlign="start";
+}
+function memoTap(px,py){
+  var s=MINI.s;
+  if(s.lock) return;
+  for(var i=0;i<s.cards.length;i++){
+    var r=memoRect(i), cd=s.cards[i];
+    if(px>=r.x && px<=r.x+r.w && py>=r.y && py<=r.y+r.h){
+      if(cd.done || cd.up) return;
+      cd.up=true;
+      if(s.first===null){ s.first=i; return; }
+      s.flips++;
+      if(s.cards[s.first].pair===cd.pair){
+        s.cards[s.first].done=true; cd.done=true;
+        s.matched++; s.first=null;
+        if(s.matched===MEMO_PAIRS) miniFinish(true,"ALL FIVE!","Every pair found. The museum has a new display.");
+        return;
+      }
+      s.second=i; s.lock=true; s.lockT=0;         // wrong: show both, then turn them back
+      return;
+    }
+  }
 }
 
 /* ---- input ---- */
@@ -2914,6 +3249,15 @@ function miniDraw(){
     try{ f.setPointerCapture && f.setPointerCapture(ev.pointerId); }catch(e){}
     ev.preventDefault();
     var p=cpt(ev);
+    if(MINI.game==="warm"){
+      var s=MINI.s, hit=WARM_POS[s.lit];
+      if(hit && Math.abs(p.x-hit.x)<34 && Math.abs(p.y-hit.y-2)<34){
+        s.hits++; s.flash=260; s.flashAt=s.lit; s.flashOk=true;
+        s.step++; warmNext();
+      }
+      return;
+    }
+    if(MINI.game==="memo"){ memoTap(p.x,p.y); return; }
     if(MINI.game==="free"){
       MINI.hold=true; MINI.chargeT0=Date.now();
       MINI.aim=Math.max(0,Math.min(1,(p.x-72)/216));
@@ -2930,6 +3274,7 @@ function miniDraw(){
   });
   f.addEventListener("pointerup", function(ev){
     if(!MINI.live || MINI.phase!=="aim") return;
+    if(MINI.game==="warm" || MINI.game==="memo") return;   // both act on the tap down
     ev.preventDefault();
     var p=cpt(ev), s=MINI.s;
 
@@ -2937,6 +3282,7 @@ function miniDraw(){
       if(!MINI.hold) return;
       MINI.hold=false;
       MINI.power=chargePower(Date.now()-MINI.chargeT0);
+      freeDecide();                     // settle it now so the keeper dives honestly
       MINI.phase="fly"; s.flight=0;
       document.getElementById("miniMsg").textContent="";
       return;
@@ -2944,7 +3290,7 @@ function miniDraw(){
     if(MINI.game==="head"){
       if(s.cross<HEAD_WIN[0])  return miniFinish(false,"TOO EARLY","You jumped before it got there.");
       if(s.cross>HEAD_WIN[1])  return miniFinish(false,"TOO LATE","It was past you by then.");
-      s.zone=zoneFromX(p.x); MINI.phase="fly"; s.flight=0;
+      s.zone=zoneFromX(p.x); headDecide(); MINI.phase="fly"; s.flight=0;
       document.getElementById("miniMsg").textContent="";
       return;
     }
@@ -2972,6 +3318,8 @@ function rewardPool(){
   if(miniUnlocked("free")) pool.push(takeFreeKick);
   if(miniUnlocked("head")) pool.push(takeHeader);
   if(miniUnlocked("solo")) pool.push(takeSolo);
+  if(miniUnlocked("warm")) pool.push(takeWarmUp);
+  if(miniUnlocked("memo")) pool.push(takeMemory);
   return pool;
 }
 
@@ -3128,7 +3476,7 @@ function runFinish(scored, title, msg){
   $("runRes").textContent=title;
   $("runRes").className="penres "+(scored?"scored":"saved");
   $("runMsg").textContent=msg+(RUN.gained>0
-    ? "  +"+RUN.gained+" XP"+(RUN.picked? " ("+RUN.picked+" bonus ball"+(RUN.picked>1?"s":"")+")":"")
+    ? "  +"+Math.round(RUN.gained*xpMult())+" XP"+(RUN.picked? " ("+RUN.picked+" bonus ball"+(RUN.picked>1?"s":"")+")":"")
     : "");
   RUN.resolvedAt=Date.now();
   RUN.timer=setTimeout(runDismiss, 2400);
@@ -4021,9 +4369,9 @@ function paintManager(){
 }
 
 /* ---------------- the grounds, drawn for the home screen ---------------- */
-var PLOTS = [ {x:168,y:30}, {x:248,y:30}, {x:328,y:30},
-              {x:168,y:86}, {x:248,y:86}, {x:328,y:86} ];
-var PLOT_W=64, PLOT_H=48;
+var PLOTS = [ {x:170,y:34}, {x:248,y:34}, {x:326,y:34},
+              {x:170,y:82}, {x:248,y:82}, {x:326,y:82} ];
+var PLOT_W=62, PLOT_H=42;
 
 function buildingArt(id,x,y,w,h){
   var g='<g transform="translate('+x+','+y+')">';
@@ -4071,52 +4419,83 @@ function buildingArt(id,x,y,w,h){
 function paintHome(){
   var host=document.getElementById("homeHero"); if(!host) return;
   var c=club(), L=STAND_LOOK[clampIdx(c.stadium,STAND_LOOK.length)];
-  var h='<svg viewBox="0 0 400 150" role="img" aria-label="Your club grounds">';
-  h+='<rect width="400" height="150" fill="#CFE3F2"/>';
-  h+='<rect y="118" width="400" height="32" fill="#6E7A63"/>';          // car park / road
-  h+='<rect y="116" width="400" height="3" fill="#57614E"/>';
-  h+='<g stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-dasharray="9 8"><path d="M0 134 H400"/></g>';
-  h+='<rect y="24" width="400" height="94" fill="#7FA36A"/>';           // grass
+  var night = c.stadium>=4;                       // the lights change the whole scene
+  var h='<svg viewBox="0 0 400 168" role="img" aria-label="Your club on a match night">';
+  h+='<defs>'+
+     '<linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">'+
+     (night
+       ? '<stop offset="0" stop-color="#101A38"/><stop offset="0.55" stop-color="#2A3A66"/><stop offset="1" stop-color="#5B4A72"/>'
+       : '<stop offset="0" stop-color="#8FC3E8"/><stop offset="0.6" stop-color="#CFE3F2"/><stop offset="1" stop-color="#F3E2C0"/>')+
+     '</linearGradient>'+
+     '<radialGradient id="lampG" cx="0.5" cy="0.5" r="0.5">'+
+     '<stop offset="0" stop-color="#FFF6D8" stop-opacity="'+(night?0.95:0.5)+'"/>'+
+     '<stop offset="1" stop-color="#FFF6D8" stop-opacity="0"/></radialGradient>'+
+     '<linearGradient id="beamG" x1="0" y1="0" x2="0" y2="1">'+
+     '<stop offset="0" stop-color="#FFF6D8" stop-opacity="0.42"/>'+
+     '<stop offset="1" stop-color="#FFF6D8" stop-opacity="0"/></linearGradient>'+
+     '<linearGradient id="grassG" x1="0" y1="0" x2="0" y2="1">'+
+     '<stop offset="0" stop-color="'+(night?"#2F6B47":"#4E8F60")+'"/>'+
+     '<stop offset="1" stop-color="'+(night?"#245538":"#3E7A50")+'"/></linearGradient>'+
+     '</defs>';
+  h+='<rect width="400" height="168" fill="url(#skyG)"/>';
 
-  /* the ground itself, matching the tier he has built */
-  h+='<g transform="translate(8,26)">';
-  h+='<rect width="146" height="90" rx="4" fill="'+L.front+'"/>';
-  h+='<rect x="6" y="6" width="134" height="78" rx="3" fill="#3E8F5C"/>';
-  h+='<g stroke="rgba(255,255,255,.72)" stroke-width="1.5" fill="none">'+
-     '<circle cx="73" cy="45" r="13"/><path d="M73 6 V84"/>'+
-     '<path d="M6 26 H24 V64 H6"/><path d="M140 26 H122 V64 H140"/></g>';
-  var seatH = Math.round(6 + c.stadium*3.2);
-  h+='<rect width="146" height="'+seatH+'" rx="3" fill="url(#crowd)"/>';
-  h+='<rect y="'+(90-seatH)+'" width="146" height="'+seatH+'" rx="3" fill="url(#crowd)"/>';
-  if(c.stadium>=2){ h+='<rect x="0" y="'+seatH+'" width="146" height="3" fill="#43505C"/>'+
-                       '<rect x="0" y="'+(90-seatH-3)+'" width="146" height="3" fill="#43505C"/>'; }
+  if(night){                                       // a few stars, low and sparse
+    for(var st=0;st<14;st++){
+      var sx=(st*137)%390+5, sy=(st*53)%40+4, r=(st%3)?0.9:1.4;
+      h+='<circle cx="'+sx+'" cy="'+sy+'" r="'+r+'" fill="#FFFFFF" opacity="'+(0.35+(st%4)*0.14)+'"/>';
+    }
+  }
+  // hills behind the ground
+  h+='<path d="M0 74 q46 -20 92 -4 q40 14 78 -2 q44 -18 92 0 q40 16 78 -4 q30 -14 60 -2 V96 H0 Z" fill="'+
+     (night?"#1B2A46":"#7FA36A")+'" opacity="'+(night?1:0.55)+'"/>';
+
+  h+='<rect y="128" width="400" height="40" fill="'+(night?"#39404A":"#6E7A63")+'"/>';
+  h+='<rect y="126" width="400" height="3" fill="'+(night?"#262C34":"#57614E")+'"/>';
+  h+='<g stroke="rgba(255,255,255,'+(night?".38":".5")+')" stroke-width="2" stroke-dasharray="9 8"><path d="M0 148 H400"/></g>';
+  h+='<rect y="30" width="400" height="98" fill="'+(night?"#37613F":"#7FA36A")+'"/>';
+
+  /* the ground */
+  h+='<g transform="translate(8,32)">';
+  h+='<rect width="150" height="94" rx="4" fill="'+L.front+'"/>';
+  h+='<rect x="6" y="6" width="138" height="82" rx="3" fill="url(#grassG)"/>';
+  for(var b=0;b<5;b++) h+='<rect x="6" y="'+(6+b*16.4)+'" width="138" height="8.2" fill="rgba(255,255,255,.05)"/>';
+  h+='<g stroke="rgba(255,255,255,.72)" stroke-width="1.4" fill="none">'+
+     '<circle cx="75" cy="47" r="13"/><path d="M75 6 V88"/>'+
+     '<path d="M6 28 H24 V66 H6"/><path d="M144 28 H126 V66 H144"/></g>';
+  var seatH=Math.round(6+c.stadium*3.4);
+  h+='<rect width="150" height="'+seatH+'" rx="3" fill="url(#crowd)"/>';
+  h+='<rect y="'+(94-seatH)+'" width="150" height="'+seatH+'" rx="3" fill="url(#crowd)"/>';
+  if(c.stadium>=2){
+    h+='<rect y="'+seatH+'" width="150" height="3" fill="#43505C"/>'+
+       '<rect y="'+(94-seatH-3)+'" width="150" height="3" fill="#43505C"/>';
+  }
   if(L.lights){
-    h+='<g fill="#C9D3DC"><rect x="2" y="-14" width="3" height="18"/><rect x="141" y="-14" width="3" height="18"/>'+
-       '<rect x="2" y="86" width="3" height="18"/><rect x="141" y="86" width="3" height="18"/></g>'+
-       '<g fill="#FFF6D8"><circle cx="3.5" cy="-15" r="3.4"/><circle cx="142.5" cy="-15" r="3.4"/>'+
-       '<circle cx="3.5" cy="105" r="3.4"/><circle cx="142.5" cy="105" r="3.4"/></g>';
+    [[2,-16],[143,-16],[2,90],[143,90]].forEach(function(pl){
+      var px=pl[0], py=pl[1];
+      h+='<rect x="'+px+'" y="'+py+'" width="3.4" height="20" fill="#C9D3DC"/>';
+      h+='<ellipse cx="'+(px+1.7)+'" cy="'+(py-1)+'" rx="14" ry="11" fill="url(#lampG)"/>';
+      h+='<circle cx="'+(px+1.7)+'" cy="'+(py-1)+'" r="3.4" fill="#FFF6D8"/>';
+      if(night) h+='<path d="M'+(px+1.7)+' '+(py-1)+' l-26 46 l52 0 Z" fill="url(#beamG)"/>';
+    });
   }
   h+='</g>';
 
-  /* the six plots */
-  BUILDINGS.forEach(function(b,i){
+  /* the plots */
+  BUILDINGS.forEach(function(bd,i){
     var pl=PLOTS[i];
-    if(c.built.indexOf(i)>=0){
-      h+=buildingArt(b.id, pl.x, pl.y, PLOT_W, PLOT_H);
-    } else {
-      h+='<rect x="'+pl.x+'" y="'+pl.y+'" width="'+PLOT_W+'" height="'+PLOT_H+'" rx="3" fill="rgba(255,255,255,.16)"'+
-         ' stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-dasharray="5 5"/>'+
-         '<text x="'+(pl.x+PLOT_W/2)+'" y="'+(pl.y+PLOT_H/2+4)+'" text-anchor="middle" font-size="9"'+
-         ' fill="rgba(255,255,255,.85)" font-family="-apple-system,BlinkMacSystemFont,sans-serif">plot</text>';
-    }
+    if(c.built.indexOf(i)>=0) h+=buildingArt(bd.id, pl.x, pl.y, PLOT_W, PLOT_H);
+    else h+='<rect x="'+pl.x+'" y="'+pl.y+'" width="'+PLOT_W+'" height="'+PLOT_H+'" rx="3"'+
+            ' fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-dasharray="5 5"/>'+
+            '<text x="'+(pl.x+PLOT_W/2)+'" y="'+(pl.y+PLOT_H/2+4)+'" text-anchor="middle" font-size="9"'+
+            ' fill="rgba(255,255,255,.8)" font-family="-apple-system,BlinkMacSystemFont,sans-serif">plot</text>';
   });
+  if(night) h+='<rect width="400" height="168" fill="#0B1430" opacity="0.10"/>';
   h+='</svg>';
   host.innerHTML=h;
 
   var line=document.getElementById("homeClubLine");
   if(line){
-    var cups=tro().won.length, bits=[STADIUMS[c.stadium].n,
-      c.built.length+" of "+BUILDINGS.length+" built"];
+    var cups=tro().won.length, bits=[STADIUMS[c.stadium].n, c.built.length+" of "+BUILDINGS.length+" built"];
     if(c.built.indexOf(5)>=0 || cups) bits.push(cups+(cups===1?" trophy":" trophies"));
     line.textContent = c.name+" — "+bits.join(" · ");
   }
