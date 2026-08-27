@@ -103,6 +103,9 @@ h3{font-size:1.05em}
 .crest b{font-size:1.05em;letter-spacing:.02em}
 .iconbtn{width:44px;height:44px;flex:none;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font-size:1.15em;cursor:pointer;display:grid;place-items:center}
 
+.ver{text-align:center;font-size:.70em;line-height:1.5;color:var(--muted);opacity:.6;
+  margin:22px 0 10px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.ver b{font-weight:600}
 /* ---------- floor strip ---------- */
 .pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
   margin-bottom:12px;line-height:0;background:#2F6FA8}
@@ -566,6 +569,8 @@ body.theme-dark .pill.lg-weak{background:#39281A}
     <button class="btn primary" id="btnHomeSet">Done</button>
   </section>
 
+
+  <p class="ver" id="verLine"></p>
 </div>
 
 <!-- ================= RUN ================= -->
@@ -1177,9 +1182,10 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
-  avatar:0, days:{last:"",streak:0,best:0},
+  avatar:0, opens:0, days:{last:"",streak:0,best:0},
   opts:{voice:true,autoSay:true,clock:false,space:true,size:105,theme:"",voiceURI:"",reader:false,
         dayStreak:true,oppGoals:true} };
+var APP_NAME="Word Vault GC", APP_VER="1.4", APP_BUILD="27 Aug 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordvault.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1187,6 +1193,7 @@ function load(){
       opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
       runs:Object.assign({taken:0,scored:0},o.runs||{}),
+      opens: (parseInt(o.opens,10)>0 ? parseInt(o.opens,10) : 0),
       xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0,
       days: Object.assign({last:"",streak:0,best:0}, o.days||{})
     }); } }catch(e){}
@@ -2748,6 +2755,7 @@ $("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(
 $("swatches").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-theme]"); if(!b) return;
   S.opts.theme=b.getAttribute("data-theme")||""; save(); applyOpts();
+applyOpts();
 });
 $("btnSound").addEventListener("click",function(){
   S.opts.voice=!S.opts.voice; save(); applyOpts();
@@ -2783,6 +2791,17 @@ $("btnParent").addEventListener("click",function(){ renderParent(); show("scPare
 $("btnHomeParent").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnHomeFT").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.mode:"syn", M?M.level:2); });
+
+/* A quiet line at the foot of the page: which build he is on, and how many
+   times it has been opened on this device. The count is local — there is no
+   server behind this app and nothing leaves the phone. */
+S.opens = (S.opens||0) + 1; save();
+(function showVersion(){
+  var el=document.getElementById("verLine"); if(!el) return;
+  var t = S.opens===1 ? "opened once on this device"
+                      : "opened "+S.opens+" times on this device";
+  el.innerHTML = '<b>'+APP_NAME+'</b> v'+APP_VER+' &middot; '+APP_BUILD+'<br>'+t;
+})();
 
 applyOpts();
 fillVoiceList();
