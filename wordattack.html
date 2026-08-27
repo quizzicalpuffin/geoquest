@@ -132,6 +132,9 @@ h3{font-size:1.05em}
   border:1px solid var(--line);min-width:26px;text-align:center}
 .xpbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 
+.ver{text-align:center;font-size:.70em;line-height:1.5;color:var(--muted);opacity:.6;
+  margin:22px 0 10px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.ver b{font-weight:600}
 /* ---------- pitch ---------- */
 .pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
   margin-bottom:12px;line-height:0;background:#3E8F5C}
@@ -583,6 +586,8 @@ body.theme-dark .pill.lg-weak{background:#39281A}
     <button class="btn primary" id="btnHomeSet">Done</button>
   </section>
 
+
+  <p class="ver" id="verLine"></p>
 </div>
 
 <!-- ================= RUN ================= -->
@@ -1440,7 +1445,7 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
-  avatar:0, rewardTurn:0, days:{last:"",streak:0,best:0},
+  avatar:0, rewardTurn:0, opens:0, days:{last:"",streak:0,best:0},
   club:{ name:"Word Attack FC", crest:0, c1:"#2E7D4F", c2:"#E8A317", kit:0,
          stadium:0, manager:0, squad:[], built:[], own:{kit:[0,1],crest:[0],manager:[0],player:[]} },
   tro:{ won:[], perfect:0, bestPens:0, winRun:0, bestRun:0, modes:{} },
@@ -1647,6 +1652,7 @@ function crestSVG(px){
     + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
 }
 
+var APP_NAME="Word Attack FC", APP_VER="1.9", APP_BUILD="27 Aug 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1654,6 +1660,7 @@ function load(){
       opts:Object.assign({},DEFAULT_STATE.opts,o.opts||{}),
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
       runs:Object.assign({taken:0,scored:0},o.runs||{}),
+      opens: (parseInt(o.opens,10)>0 ? parseInt(o.opens,10) : 0),
       xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0, rewardTurn: o.rewardTurn||0,
       club: migrateClub(o.club),
       tro: migrateTro(o.tro),
@@ -3719,11 +3726,17 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
     c.quadraticCurveTo(7.6,-4.2,10,-3.2); c.lineTo(10,-6); c.quadraticCurveTo(2,-13.4,-8,-8.4);
     c.closePath(); c.fillStyle=HAIR; c.fill();
     c.fillStyle=HAIR; c.fillRect(-10.2,-3.6,3.1,4.4); c.fillRect(7.1,-3.6,3.1,4.4);
-    // eye and brow, facing the way he runs
-    c.fillStyle="rgba(20,20,24,.85)";
-    c.beginPath(); c.arc(4.6,0.6,1.5,0,6.3); c.fill();
-    c.strokeStyle="rgba(20,20,24,.55)"; c.lineWidth=1.1;
-    c.beginPath(); c.moveTo(2.6,-2.6); c.lineTo(6.4,-2.2); c.stroke();
+    // both eyes, slightly turned so he is looking where he is going
+    c.fillStyle="rgba(20,20,24,.88)";
+    c.beginPath(); c.arc(-2.2,0.4,1.35,0,6.3); c.fill();
+    c.beginPath(); c.arc(3.9,0.6,1.5,0,6.3); c.fill();
+    c.strokeStyle="rgba(20,20,24,.5)"; c.lineWidth=1;
+    c.beginPath(); c.moveTo(-4.2,-2.4); c.lineTo(-0.6,-2.6); c.stroke();
+    c.beginPath(); c.moveTo(2.1,-2.6); c.lineTo(5.8,-2.2); c.stroke();
+    c.strokeStyle="rgba(0,0,0,.22)";                    // nose
+    c.beginPath(); c.moveTo(1.2,1.4); c.lineTo(2.2,3.2); c.stroke();
+    c.strokeStyle="rgba(70,40,35,.55)"; c.lineWidth=1.1;  // mouth
+    c.beginPath(); c.arc(0.6,4.2,2.4,0.25,2.6); c.stroke();
     c.restore();
   }
   function boot(bx,by,dir){
@@ -3735,38 +3748,50 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
     c.fillStyle="rgba(255,255,255,.35)"; c.fillRect(-2.4,-1.4,4.2,1.3);
     c.restore();
   }
+  function torsoPath(w,h){
+    var sw=w/2, ww=w*0.43;                 // shoulder half-width, waist half-width
+    c.beginPath();
+    c.moveTo(-sw+2,-h/2);
+    c.quadraticCurveTo(0,-h/2-2.4, sw-2,-h/2);
+    c.quadraticCurveTo(sw+1.2,-h/2+5, sw-1.2,-h/2+9);
+    c.lineTo(ww+1.4, h/2-3);
+    c.quadraticCurveTo(ww, h/2, ww-2.6, h/2);
+    c.lineTo(-ww+2.6, h/2);
+    c.quadraticCurveTo(-ww, h/2, -ww-1.4, h/2-3);
+    c.lineTo(-sw+1.2,-h/2+9);
+    c.quadraticCurveTo(-sw-1.2,-h/2+5, -sw+2,-h/2);
+    c.closePath();
+  }
   function torso(tx,ty,w,h,lean){
     c.save(); c.translate(tx,ty); c.rotate(lean||0);
-    rr(-w/2,-h/2,w,h,5.5,a.kit);
+    torsoPath(w,h); c.fillStyle=a.kit; c.fill();
+    c.strokeStyle=OUT; c.lineWidth=1.2; c.stroke();
     if(a.style==="stripes"){
-      c.save();
-      c.beginPath(); if(c.roundRect) c.roundRect(-w/2,-h/2,w,h,5.5); else c.rect(-w/2,-h/2,w,h);
-      c.clip(); c.fillStyle=a.trim;
-      for(var i=-w/2+3;i<w/2;i+=10) c.fillRect(i,-h/2,4.6,h);
+      c.save(); torsoPath(w,h); c.clip(); c.fillStyle=a.trim;
+      for(var i=-w/2+3;i<w/2;i+=9) c.fillRect(i,-h/2-3,4.2,h+6);
       c.restore();
     } else if(a.style==="hoops"){
-      c.save();
-      c.beginPath(); if(c.roundRect) c.roundRect(-w/2,-h/2,w,h,5.5); else c.rect(-w/2,-h/2,w,h);
-      c.clip(); c.fillStyle=a.trim;
-      for(var j=-h/2+6;j<h/2;j+=10) c.fillRect(-w/2,j,w,4.6);
+      c.save(); torsoPath(w,h); c.clip(); c.fillStyle=a.trim;
+      for(var j=-h/2+5;j<h/2;j+=9) c.fillRect(-w/2-2,j,w+4,4.2);
       c.restore();
     }
     // collar, shading and a hint of a crest
     c.fillStyle=a.trim; c.beginPath();
-    c.moveTo(-6.5,-h/2); c.lineTo(6.5,-h/2); c.lineTo(0,-h/2+6); c.closePath(); c.fill();
-    c.fillStyle=light; c.fillRect(-w/2+1,-h/2+1,w-2,3);
-    c.fillStyle=dark;  c.fillRect(-w/2+1,h/2-4,w-2,3);
-    c.fillStyle="rgba(255,255,255,.55)"; c.fillRect(-w/2+4,-h/2+8,4,4);
-    c.strokeStyle=OUT; c.lineWidth=1.2;
-    c.beginPath(); if(c.roundRect) c.roundRect(-w/2,-h/2,w,h,5.5); else c.rect(-w/2,-h/2,w,h);
-    c.stroke();
+    c.moveTo(-6,-h/2-1.1); c.lineTo(6,-h/2-1.1); c.lineTo(0,-h/2+5.4); c.closePath(); c.fill();
+    c.save(); torsoPath(w,h); c.clip();
+    c.fillStyle=light; c.fillRect(-w/2,-h/2,w,3.4);
+    c.fillStyle=dark;  c.fillRect(-w/2,h/2-4,w,4);
+    c.fillStyle="rgba(0,0,0,.10)"; c.fillRect(w*0.26,-h/2,w,h);   // shading down one side
+    c.restore();
+    c.fillStyle="rgba(255,255,255,.60)"; c.fillRect(-w/2+4,-h/2+8,3.6,3.6);
+    c.strokeStyle=OUT; c.lineWidth=1.2; torsoPath(w,h); c.stroke();
     c.restore();
   }
   function shortsAt(sx,sy,w,h){
     c.save(); c.translate(sx,sy);
-    c.beginPath();                       // waist straight, hems flared, split up the middle
+    c.beginPath();                       // waist straight, hems barely flared, split up the middle
     c.moveTo(-w/2,0); c.lineTo(w/2,0);
-    c.lineTo(w/2+1.5,h); c.lineTo(2.2,h); c.lineTo(0,h-4.2); c.lineTo(-2.2,h); c.lineTo(-w/2-1.5,h);
+    c.lineTo(w/2+0.8,h); c.lineTo(1.9,h); c.lineTo(0,h-4); c.lineTo(-1.9,h); c.lineTo(-w/2-0.8,h);
     c.closePath();
     c.fillStyle=a.shorts; c.fill(); c.strokeStyle=OUT; c.lineWidth=1.2; c.stroke();
     c.fillStyle=dark; c.fillRect(-w/2,h-2.2,w,1.6);
@@ -3788,7 +3813,7 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
     var by0=-9;
     legDown(-6,by0-6,  10,by0-4,  26,by0-3, 1, 8);       // the leg that goes in
     legDown(-8,by0-3,   2,by0+5,  13,by0+7, 1, 7.6);     // trailing leg tucked under
-    shortsAt(-12,by0-13,18,11);
+    shortsAt(-12,by0-13,17,11);
     torso(-21,by0-18, 27, 23, -0.34);
     limb(-27,by0-27, -12,by0-30, 6.4, a.kit);            // arms out to balance
     limb(-12,by0-30, -2,by0-29, 6.0, SKIN);
@@ -3799,14 +3824,14 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
 
   } else if(pose==="kick"){
     var g0=-2;
-    legDown(-6,g0-30, -9,g0-17, -11,g0-4, -1, 8.4);      // standing leg, planted
-    legDown(-2,g0-31,  9,g0-33,  22,g0-30, 1, 8.8);      // striking leg swung through
-    shortsAt(-4,g0-41,20,12);
-    torso(-4,g0-55, 30, 28, 0.13);
-    limb(-17,g0-64, -30,g0-52, 6.6, a.kit);              // arms out for balance
-    limb(-30,g0-52, -37,g0-42, 6.0, SKIN);
-    limb(12,g0-66, 24,g0-74, 6.6, a.kit);
-    head(-2,g0-75, 0.12);
+    legDown(-6,g0-34, -9,g0-19, -11,g0-4, -1, 8);        // standing leg, planted
+    legDown(-2,g0-35,  9,g0-37,  23,g0-33, 1, 8.4);      // striking leg swung through
+    shortsAt(-4,g0-45,19,12);
+    torso(-4,g0-56, 30, 26, 0.13);
+    limb(-17,g0-64, -30,g0-52, 6.2, a.kit);              // arms out for balance
+    limb(-30,g0-52, -37,g0-42, 5.8, SKIN);
+    limb(12,g0-66, 24,g0-74, 6.2, a.kit);
+    head(-2,g0-76, 0.12);
 
   } else {
     var air=(pose==="jump");
@@ -3815,26 +3840,26 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
     var hipY=-22+bob;
     if(air){
       // knees tucked up, arms driving upwards
-      legDown(-4,hipY, -12,hipY+9, -14,hipY+17, -1, 8);
-      legDown( 4,hipY,  12,hipY+8,  14,hipY+16,  1, 8.4);
-      shortsAt(0,hipY-10,21,12);
-      torso(0,hipY-26, 32, 29, 0.05);
-      limb(-14,hipY-36, -22,hipY-48, 6.8, a.kit);
-      limb(-22,hipY-48, -25,hipY-58, 6.2, SKIN);
-      limb(14,hipY-36, 22,hipY-48, 6.8, a.kit);
-      limb(22,hipY-48, 25,hipY-58, 6.2, SKIN);
-      head(1,hipY-46, 0.03);
+      legDown(-4,hipY+2, -13,hipY+13, -15,hipY+23, -1, 7.6);
+      legDown( 4,hipY+2,  13,hipY+12,  15,hipY+22,  1, 8);
+      shortsAt(0,hipY-9,19,12);
+      torso(0,hipY-22, 30, 26, 0.05);
+      limb(-12,hipY-33, -20,hipY-44, 6.2, a.kit);
+      limb(-20,hipY-44, -23,hipY-54, 5.6, SKIN);
+      limb(12,hipY-33, 20,hipY-44, 6.2, a.kit);
+      limb(20,hipY-44, 23,hipY-54, 5.6, SKIN);
+      head(1,hipY-44, 0.03);
     } else {
       // back leg first so the near one overlaps it
-      legDown(-3,hipY, -6-sw*7,hipY+10-Math.abs(sw)*2, -7-sw*11,hipY+20-Math.abs(sw)*5, -1, 7.6);
-      legDown( 3,hipY,  6+sw*7,hipY+10+Math.abs(sw)*1,  8+sw*11,hipY+20-Math.abs(sw)*3,  1, 8.2);
-      shortsAt(0,hipY-10,21,12);
-      torso(0,hipY-26, 32, 29, 0.16);
-      limb(-13,hipY-34, -21+sw*9, hipY-23, 6.8, a.kit);
-      limb(-21+sw*9,hipY-23, -25+sw*13, hipY-13, 6.2, SKIN);
-      limb(13,hipY-34, 21-sw*9, hipY-23, 6.8, a.kit);
-      limb(21-sw*9,hipY-23, 25-sw*13, hipY-13, 6.2, SKIN);
-      head(1,hipY-46, 0.12);
+      legDown(-3,hipY+2, -6-sw*8,hipY+14-Math.abs(sw)*2, -8-sw*12,hipY+26-Math.abs(sw)*5, -1, 7.2);
+      legDown( 3,hipY+2,  6+sw*8,hipY+14+Math.abs(sw)*1,  9+sw*12,hipY+26-Math.abs(sw)*3,  1, 7.8);
+      shortsAt(0,hipY-9,19,12);
+      torso(0,hipY-22, 30, 26, 0.15);
+      limb(-12,hipY-32, -19+sw*9, hipY-20, 6.2, a.kit);
+      limb(-19+sw*9,hipY-20, -23+sw*13, hipY-10, 5.6, SKIN);
+      limb(12,hipY-32, 19-sw*9, hipY-20, 6.2, a.kit);
+      limb(19-sw*9,hipY-20, 23-sw*13, hipY-10, 5.6, SKIN);
+      head(1,hipY-44, 0.11);
     }
   }
   c.restore();
@@ -4272,8 +4297,7 @@ $("setOppGoals").addEventListener("change",function(){ S.opts.oppGoals=this.chec
 $("setSize").addEventListener("input",function(){ S.opts.size=+this.value; save(); applyOpts(); });
 $("swatches").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-theme]"); if(!b) return;
-  S.opts.theme=b.getAttribute("data-theme")||""; save(); applyOpts();
-paintClub();
+  S.opts.theme=b.getAttribute("data-theme")||""; save(); applyOpts(); paintClub();
 });
 $("btnSound").addEventListener("click",function(){
   S.opts.voice=!S.opts.voice; save(); applyOpts();
@@ -4726,7 +4750,19 @@ $("btnHomeParent").addEventListener("click",function(){ renderHome(); show("scHo
 $("btnHomeFT").addEventListener("click",function(){ renderHome(); show("scHome"); });
 $("btnPlayAgain").addEventListener("click",function(){ startMatch(M?M.mode:"syn", M?M.level:2); });
 
+/* A quiet line at the foot of the page: which build he is on, and how many
+   times it has been opened on this device. The count is local — there is no
+   server behind this app and nothing leaves the phone. */
+S.opens = (S.opens||0) + 1; save();
+(function showVersion(){
+  var el=document.getElementById("verLine"); if(!el) return;
+  var t = S.opens===1 ? "opened once on this device"
+                      : "opened "+S.opens+" times on this device";
+  el.innerHTML = '<b>'+APP_NAME+'</b> v'+APP_VER+' &middot; '+APP_BUILD+'<br>'+t;
+})();
+
 applyOpts();
+paintClub();
 fillVoiceList();
 renderHome();
 
