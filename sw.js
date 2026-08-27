@@ -1,81 +1,45 @@
-/* Word Attack FC / Word Vault GC — offline shell.
-   Bump CACHE when a new build is uploaded; the old cache is then deleted and
-   the new page fetched once. Network-first for the pages themselves so an
-   update is never more than one load away, cache-first for the icons. */
-var CACHE = "wordgames-v3";
-var SHELL = [
-  "wordattack.html",
-  "wordvault.html",
-  "icons/apple-touch-icon.png",
-  "icons/icon-180.png",
-  "icons/icon-192.png",
-  "icons/icon-512.png",
-  "icons2/apple-touch-icon.png",
-  "icons2/icon-180.png",
-  "icons2/icon-192.png",
-  "icons2/icon-512.png",
-  "manifest.webmanifest",
-  "manifest-vault.webmanifest"
-];
+/* Quizzical Puffin — offline service worker.
+   Serves instantly from the cache, then quietly refreshes it in the background,
+   so the quiz works with no signal at all and still picks up new versions. */
+const CACHE = "puffin-v70";
+const SHELL = ["./", "./index.html", "./med.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
-self.addEventListener("install", function(e){
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function(c){
-    // one missing file must not sink the whole install
-    return Promise.all(SHELL.map(function(u){
-      return c.add(new Request(u, {cache:"reload"})).catch(function(){});
-    }));
-  }));
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => Promise.allSettled(SHELL.map(u => c.add(u))))
+      .then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener("activate", function(e){
-  e.waitUntil(caches.keys().then(function(keys){
-    return Promise.all(keys.map(function(k){ return k===CACHE ? null : caches.delete(k); }));
-  }).then(function(){ return self.clients.claim(); }));
+self.addEventListener("activate", e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
 });
 
-self.addEventListener("fetch", function(e){
-  var req=e.request;
-  if(req.method!=="GET") return;
-  var url=new URL(req.url);
-  if(url.origin!==location.origin) return;          // never touch anything off-site
+self.addEventListener("fetch", e => {
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
 
-  var isPage = req.mode==="navigate" || /\.html?$/.test(url.pathname);
-  if(isPage){
-    // fresh if we can reach the network, cached if we cannot
-    e.respondWith(
-      fetch(req).then(function(res){
-        var copy=res.clone();
-        caches.open(CACHE).then(function(c){ c.put(req, copy); });
-        return res;
-      }).catch(function(){
-        // exact match first, then the same page ignoring any ?query, and never
-        // the other child's app as a stand-in
-        return caches.match(req).then(function(hit){
-          if(hit) return hit;
-          return caches.match(req, {ignoreSearch:true}).then(function(hit2){
-            if(hit2) return hit2;
-            return new Response(
-              "<!doctype html><meta name=viewport content='width=device-width,initial-scale=1'>"+
-              "<style>body{font:17px -apple-system,sans-serif;padding:2em;color:#25303a;background:#F7F0E1}</style>"+
-              "<h1>Not saved for offline yet</h1>"+
-              "<p>Open this page once with a signal and it will work without one after that.</p>",
-              { headers:{ "Content-Type":"text/html; charset=utf-8" } });
-          });
-        });
-      })
-    );
-    return;
-  }
   e.respondWith(
-    caches.match(req).then(function(hit){
-      return hit || fetch(req).then(function(res){
-        if(res && res.status===200){
-          var copy=res.clone();
-          caches.open(CACHE).then(function(c){ c.put(req, copy); });
-        }
-        return res;
-      }).catch(function(){ return hit; });
+    caches.open(CACHE).then(async cache => {
+      const cached = await cache.match(req, { ignoreSearch: true });
+      const network = fetch(req)
+        .then(res => { if (res && res.ok) cache.put(req, res.clone()); return res; })
+        .catch(() => null);
+      if (cached) { e.waitUntil(network); return cached; }
+      const res = await network;
+      if (res) return res;
+      /* offline and never cached — fall back to the app itself */
+      return (await cache.match("./index.html")) ||
+             new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
     })
   );
 });
+
+self.addEventListener("message", e => { if (e.data === "skipWaiting") self.skipWaiting(); });
