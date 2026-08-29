@@ -1,79 +1,45 @@
-/* Word Attack FC — offline.
-   Lives in its own folder so it has its own scope. Sharing a folder with
-   another app means sharing one service worker, which is why this did not
-   work before: the page was registering the geography app's worker.
+/* Quizzical Puffin — offline service worker.
+   Serves instantly from the cache, then quietly refreshes it in the background,
+   so the quiz works with no signal at all and still picks up new versions. */
+const CACHE = "puffin-v70";
+const SHELL = ["./", "./index.html", "./med.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
-   Pages are network-first, so a new upload always lands. Everything else is
-   cache-first. Bump CACHE when the shell changes. */
-var CACHE = "wordattack-v2";
-var SCOPE = new URL("./", self.location).href;
-var SHELL = [
-  "./",                       // the folder URL, which is what a shortcut usually opens
-  "index.html",
-  "manifest.webmanifest",
-  "icons/apple-touch-icon.png",
-  "icons/icon-180.png",
-  "icons/icon-192.png",
-  "icons/icon-512.png"
-];
-
-self.addEventListener("install", function(e){
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function(c){
-    return Promise.all(SHELL.map(function(u){        // one bad file must not sink the install
-      return c.add(new Request(u, {cache:"reload"})).catch(function(){});
-    }));
-  }));
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => Promise.allSettled(SHELL.map(u => c.add(u))))
+      .then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener("activate", function(e){
-  e.waitUntil(caches.keys().then(function(keys){
-    return Promise.all(keys.map(function(k){ return k===CACHE ? null : caches.delete(k); }));
-  }).then(function(){ return self.clients.claim(); }));
+self.addEventListener("activate", e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
 });
 
-self.addEventListener("fetch", function(e){
-  var req=e.request;
-  if(req.method!=="GET") return;
-  if(req.url.indexOf(SCOPE)!==0) return;      // anything outside this folder is none of our business
+self.addEventListener("fetch", e => {
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
 
-  var isPage = req.mode==="navigate" || /\.html?$/.test(new URL(req.url).pathname) ||
-               req.url===SCOPE;
-  if(isPage){
-    e.respondWith(
-      fetch(req).then(function(res){
-        var copy=res.clone();
-        caches.open(CACHE).then(function(c){ c.put(req, copy); });
-        return res;
-      }).catch(function(){
-        return caches.match(req).then(function(hit){
-          if(hit) return hit;
-          return caches.match(req, {ignoreSearch:true}).then(function(h2){
-            if(h2) return h2;
-            return caches.match(SCOPE+"index.html").then(function(h3){   // same app, never another
-              if(h3) return h3;
-              return new Response(
-                "<!doctype html><meta name=viewport content='width=device-width,initial-scale=1'>"+
-                "<style>body{font:17px -apple-system,sans-serif;padding:2em;color:#25303a;background:#F7F0E1}</style>"+
-                "<h1>Not saved for offline yet</h1>"+
-                "<p>Open this once with a signal and it will work without one after that.</p>",
-                { headers:{ "Content-Type":"text/html; charset=utf-8" } });
-            });
-          });
-        });
-      })
-    );
-    return;
-  }
   e.respondWith(
-    caches.match(req).then(function(hit){
-      return hit || fetch(req).then(function(res){
-        if(res && res.status===200){
-          var copy=res.clone();
-          caches.open(CACHE).then(function(c){ c.put(req, copy); });
-        }
-        return res;
-      }).catch(function(){ return hit; });
+    caches.open(CACHE).then(async cache => {
+      const cached = await cache.match(req, { ignoreSearch: true });
+      const network = fetch(req)
+        .then(res => { if (res && res.ok) cache.put(req, res.clone()); return res; })
+        .catch(() => null);
+      if (cached) { e.waitUntil(network); return cached; }
+      const res = await network;
+      if (res) return res;
+      /* offline and never cached — fall back to the app itself */
+      return (await cache.match("./index.html")) ||
+             new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } });
     })
   );
 });
+
+self.addEventListener("message", e => { if (e.data === "skipWaiting") self.skipWaiting(); });
