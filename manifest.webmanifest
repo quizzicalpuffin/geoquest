@@ -1,7 +1,7 @@
 {
   "name": "Word Attack FC",
   "short_name": "Word Attack",
-  "start_url": "wordattack.html",
+  "start_url": "index.html",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
