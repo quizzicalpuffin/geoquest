@@ -1674,7 +1674,7 @@ var KITS = [
    they make the place look like it is growing as the words are learned. */
 var BUILDINGS = [
   {id:"train",  n:"Training Ground", cost:80,  d:"Cones and spare pitches. Opens up free kicks."},
-  {id:"gym",    n:"Gym",             cost:120, d:"Weights and a loud coach. Opens up last-ditch tackles."},
+  {id:"gym",    n:"Gym",             cost:120, d:"Weights and a loud coach. Opens up keepy-uppies."},
   {id:"medical",n:"Medical Room",    cost:100, d:"Ice baths and a physio bench. Opens up warm-up drills."},
   {id:"shop",   n:"Club Shop",       cost:150, d:"Replica kits and far too many scarves."},
   {id:"youth",  n:"Youth Academy",   cost:200, d:"Where the next lot come through. Opens up headers."},
@@ -1839,7 +1839,7 @@ function crestSVG(px){
     + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
 }
 
-var APP_NAME="Word Attack FC", APP_VER="2.2", APP_BUILD="29 Aug 2026";
+var APP_NAME="Word Attack FC", APP_VER="2.3", APP_BUILD="29 Aug 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -2951,15 +2951,15 @@ var MINI_DEF = {
            msg:"Hold to build power, slide left or right to aim, let go." },
   head:  { head:"Corner",     title:"It is coming in — get your head on it.",
            msg:"Tap the moment the ball reaches you. Where you tap is where it goes." },
-  solo:  { head:"Defending",   title:"He is through — get back and win the ball.",
-           msg:"Watch which way he pushes it, then swipe THAT way to take it off him." },
+  keepy: { head:"Keepy-uppies", title:"Keep it up — twenty touches.",
+           msg:"Tap the ball each time it drops. Three balls, and every touch counts towards the twenty." },
   warm:  { head:"Warm-up",     title:"Sharpen up — tap the cone that lights.",
            msg:"Six cones, each lit for less time than the last. Four gets you the goal." },
   memo:  { head:"The museum",  title:"Match the pairs that mean the same.",
            msg:"Turn two cards. Words that mean the same stay up. Five wrong turns allowed." }
 };
 /* Which building opens which game up. */
-var MINI_UNLOCK = { free:0, head:4, solo:1, warm:2, memo:5 };
+var MINI_UNLOCK = { free:0, head:4, keepy:1, warm:2, memo:5 };
 /* Training Ground, Youth Academy, Gym, Medical Room, Club Museum */
 function miniUnlocked(g){ return club().built.indexOf(MINI_UNLOCK[g])>=0; }
 
@@ -2969,7 +2969,7 @@ function miniCtx(){
 }
 function takeFreeKick(cb){ openMini("free", cb); }
 function takeHeader(cb){   openMini("head", cb); }
-function takeSolo(cb){     openMini("solo", cb); }   // the last-ditch tackle
+function takeKeepy(cb){    openMini("keepy", cb); }
 
 function openMini(game, cb){
   MINI.done=cb; MINI.game=game; MINI.result=false; MINI.t=0; MINI.last=0;
@@ -2983,8 +2983,8 @@ function openMini(game, cb){
 
   if(game==="free") MINI.s={ keep:miniPick3(), wallY:300, ballX:180, ballY:440, flight:0 };
   if(game==="head") MINI.s={ keep:miniPick3(), cross:0, hit:null, zone:null, flight:0 };
-  if(game==="solo") MINI.s={ rush:0, swipe:0, dir:0, flight:0, wrongWay:false, zone:1,
-                             lean:(Math.random()<0.5?-1:1) };   // the side he knocks it
+  if(game==="keepy") MINI.s={ x:MINI_W/2, y:250, vx:0, vy:0, touch:0, total:0, ball:0,
+                              hitAt:0, started:false, serveAt:0 };
   if(game==="warm"){ MINI.s={ step:0, lit:null, litT:0, window:WARM_WINDOWS[0], hits:0,
                               flash:0, flashAt:-1, flashOk:false }; warmNext(); }
   if(game==="memo") MINI.s={ cards:memoBuild(), first:null, second:null, flips:0, matched:0,
@@ -3069,12 +3069,7 @@ function miniStep(ts){
       }
     }
   }
-  if(g==="solo"){
-    if(MINI.phase==="aim"){ s.rush+=dt;
-      if(s.rush>2400){ miniFinish(false,"HE IS GONE","You stood off him too long."); return; } }
-    else if(MINI.phase==="fly"){ s.flight+=dt;
-      if(s.flight>800){ miniResolveSolo(); return; } }
-  }
+  if(g==="keepy") keepyStep(dt);
   miniDraw();
   MINI.raf=requestAnimationFrame(miniStep);
 }
@@ -3233,69 +3228,88 @@ function miniResolveHead(){
 }
 
 /* ---- 3. ONE ON ONE ---- */
-var SOLO_WIN = [900,1450];           // when he pushes the ball past you
-function miniDrawSolo(c){
-  var s=MINI.s;
-  miniPitch(c);
-  // our goal is behind us now — he is running at it
-  c.save(); c.translate(0,-38); miniGoal(c); c.restore();
-  var p=Math.min(1, s.rush/2300);
-  var ay=120+p*180;                                   // the attacker bearing down
-  var inWin = s.rush>=SOLO_WIN[0] && s.rush<=SOLO_WIN[1];
-  var dk=defenderKit();
-  var att={ n:"A", no:9, kit:dk, trim:"#F2F2EE", shorts:"#14151A",
-            socks:dk, skin:"#D8B08C", hair:"#3A2A20", style:"plain" };
-
-  if(MINI.phase==="aim"){
-    // him, with the ball at his feet
-    c.fillStyle="rgba(0,0,0,.18)";
-    c.beginPath(); c.ellipse(180,ay+26,14,4,0,0,6.3); c.fill();
-    drawFooballer(c, 180, ay+26, att, "run", s.rush/95, 0.82);
-    var bx=180+(inWin? s.lean*26 : 16);
-    miniBall(c, bx, ay+22, 9);
-    if(inWin){
-      // he has knocked it to one side — that is the side to go for
-      c.strokeStyle="rgba(255,255,255,.95)"; c.lineWidth=3;
-      c.beginPath(); c.arc(bx, ay+22, 24, 0, 6.3); c.stroke();
-      c.fillStyle="rgba(255,255,255,.92)";
-      var tipX=bx+s.lean*30;
-      c.beginPath(); c.moveTo(tipX+s.lean*14, ay+22);
-      c.lineTo(tipX, ay+10); c.lineTo(tipX, ay+34); c.closePath(); c.fill();
-    }
-    // us, backing off, facing him
-    c.fillStyle="rgba(0,0,0,.18)";
-    c.beginPath(); c.ellipse(180,452,14,4,0,0,6.3); c.fill();
-    drawFooballer(c, 180, 452, myAvatar(), "stand", 0, 0.86);
-    c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 14px -apple-system,sans-serif"; c.textAlign="center";
-    c.fillText(inWin?"NOW — swipe to the ball":"stay on your feet…", MINI_W/2, MINI_H-24);
-    c.textAlign="start";
-  } else {
-    var f=Math.min(1,s.flight/560);
-    // he carries on, the ball goes the way he knocked it
-    drawFooballer(c, 180+s.lean*40*f, ay+26, att, "run", 6, 0.82);
-    miniBall(c, 180+s.lean*(26+58*f), ay+22, 9);
-    // we slide in towards it
-    var sx=180+s.dir*70*f, sy=452-f*120;
-    c.fillStyle="rgba(0,0,0,.16)";
-    c.beginPath(); c.ellipse(sx,sy+22,16,4,0,0,6.3); c.fill();
-    c.save(); c.translate(sx,sy+22); if(s.dir>0) c.scale(-1,1);
-    drawFooballer(c, 0, 0, myAvatar(), "slide", 0, 0.86);
-    c.restore();
-  }
-}
-function miniResolveSolo(){
-  if(MINI.s.wrongWay && Math.random()<0.6)
-    return miniFinish(false,"WRONG SIDE","He knocked it the other way and went past you.");
-  miniFinish(true,"WON IT!",pick(["Clean tackle, ball first.","Took it off his toe.","Perfectly timed."]));
-}
-
 function miniDraw(){
   var c=MINI.ctx; if(!c) return;
   if(MINI.game==="free") miniDrawFree(c);
   else if(MINI.game==="head") miniDrawHead(c);
   else if(MINI.game==="warm") miniDrawWarm(c);
   else if(MINI.game==="memo") miniDrawMemo(c);
-  else miniDrawSolo(c);
+  else miniDrawKeepy(c);
+}
+
+/* ---- KEEPY-UPPIES (Gym) --------------------------------------------------
+   The only game here with continuous control rather than one decision. You get
+   three balls and need twenty touches in total, so dropping one is not the end
+   of it. The ball falls faster with every touch, which is what stops it going
+   on for ever — the ceiling is your reactions, not your patience.
+   Tuned by simulation to about eight in ten for a typical ten-year-old. */
+var KEEPY_TARGET = 20, KEEPY_BALLS = 3;
+var KEEPY_FLOOR = 430, KEEPY_R = 15, KEEPY_PAD = 44;   // a generous tap area on purpose
+var KEEPY_G0 = 0.00125, KEEPY_RAMP = 0.11, KEEPY_KICK = 0.60;
+
+function keepyGravity(n){ return KEEPY_G0 * (1 + n*KEEPY_RAMP); }
+function keepyDrift(n){ return 0.04 + Math.min(0.07, n*0.006); }
+
+function keepyTap(px,py){
+  var s=MINI.s;
+  if(MINI.phase!=="aim" || !s.started) return;
+  if(s.vy < -0.05) return;                              // already on its way up
+  if(Math.hypot(px-s.x, py-s.y) > KEEPY_R+KEEPY_PAD) return;
+  s.vy = -KEEPY_KICK;
+  s.vx += (Math.random()*2-1)*keepyDrift(s.touch) - (px-s.x)*0.004;
+  s.touch++; s.total++;
+  s.hitAt = MINI.t;
+  if(s.total >= KEEPY_TARGET)
+    miniFinish(true,"TWENTY UP!", pick(["Some touch, that.","Never looked like dropping it.",
+      "Head up, ball up, done."]));
+}
+function keepyStep(dt){
+  var s=MINI.s;
+  if(!s.started){ if(MINI.t - s.serveAt > 650) s.started=true; return; }
+  s.vy += keepyGravity(s.touch)*dt;
+  s.y  += s.vy*dt;
+  s.x  += s.vx*dt;
+  if(s.x < 30+KEEPY_R){ s.x = 30+KEEPY_R; s.vx = Math.abs(s.vx); }
+  if(s.x > MINI_W-30-KEEPY_R){ s.x = MINI_W-30-KEEPY_R; s.vx = -Math.abs(s.vx); }
+  if(s.y > KEEPY_FLOOR-KEEPY_R){
+    s.ball++;
+    if(s.ball >= KEEPY_BALLS){
+      miniFinish(false,"DROPPED IT","You got "+s.total+" of "+KEEPY_TARGET+
+        ". Your touches all count, so keep it going next time.");
+      return;
+    }
+    s.x=MINI_W/2; s.y=250; s.vx=0; s.vy=0; s.touch=0;
+    s.started=false; s.serveAt=MINI.t;
+    document.getElementById("miniMsg").textContent =
+      "Ball "+(s.ball+1)+" of "+KEEPY_BALLS+" — your "+s.total+" so far still count.";
+  }
+}
+function miniDrawKeepy(c){
+  var s=MINI.s;
+  miniPitch(c);
+  c.strokeStyle="rgba(255,255,255,.45)"; c.lineWidth=2;
+  c.beginPath(); c.moveTo(30,KEEPY_FLOOR); c.lineTo(MINI_W-30,KEEPY_FLOOR); c.stroke();
+  var px = Math.max(58, Math.min(MINI_W-58, s.x));
+  c.fillStyle="rgba(0,0,0,.18)";
+  c.beginPath(); c.ellipse(px, KEEPY_FLOOR+16, 15, 4, 0, 0, 6.3); c.fill();
+  var justHit = s.hitAt>0 && (MINI.t - s.hitAt) < 190;
+  drawFooballer(c, px, KEEPY_FLOOR+16, myAvatar(), justHit ? "kick" : "stand", 0, 0.86);
+  var high = Math.max(0, Math.min(1, (KEEPY_FLOOR - s.y) / 260));
+  c.fillStyle="rgba(0,0,0,"+(0.22-high*0.14).toFixed(3)+")";
+  c.beginPath(); c.ellipse(s.x, KEEPY_FLOOR+4, 16-high*7, 4.5-high*2, 0, 0, 6.3); c.fill();
+  miniBall(c, s.x, s.y, KEEPY_R);
+  c.textAlign="center";
+  c.fillStyle="rgba(255,255,255,.95)"; c.font="bold 40px -apple-system,sans-serif";
+  c.fillText(String(s.total), MINI_W/2, 86);
+  c.font="bold 14px -apple-system,sans-serif";
+  c.fillText("of "+KEEPY_TARGET, MINI_W/2, 108);
+  for(var i=0;i<KEEPY_BALLS;i++){
+    c.fillStyle = i < (KEEPY_BALLS - s.ball) ? "#F2C230" : "rgba(255,255,255,.25)";
+    c.beginPath(); c.arc(MINI_W/2-28+i*28, 128, 7, 0, 6.3); c.fill();
+  }
+  c.fillStyle="rgba(255,255,255,.9)"; c.font="bold 13px -apple-system,sans-serif";
+  c.fillText(s.started ? "tap the ball" : "here it comes…", MINI_W/2, MINI_H-24);
+  c.textAlign="start";
 }
 
 /* ---- 4. WARM-UP DRILL (Medical Room) ------------------------------------
@@ -3470,8 +3484,8 @@ function memoTap(px,py){
       MINI.hold=true; MINI.chargeT0=Date.now();
       MINI.aim=Math.max(0,Math.min(1,(p.x-72)/216));
       document.getElementById("miniMsg").textContent="Slide to aim, let go in the green.";
-    } else if(MINI.game==="solo"){
-      MINI.s.down=p;
+    } else if(MINI.game==="keepy"){
+      keepyTap(p.x, p.y);
     }
   });
   f.addEventListener("pointermove", function(ev){
@@ -3482,7 +3496,7 @@ function memoTap(px,py){
   });
   f.addEventListener("pointerup", function(ev){
     if(!MINI.live || MINI.phase!=="aim") return;
-    if(MINI.game==="warm" || MINI.game==="memo") return;   // both act on the tap down
+    if(MINI.game==="warm" || MINI.game==="memo" || MINI.game==="keepy") return;  // these act on the tap down
     ev.preventDefault();
     var p=cpt(ev), s=MINI.s;
 
@@ -3502,18 +3516,7 @@ function memoTap(px,py){
       document.getElementById("miniMsg").textContent="";
       return;
     }
-    // solo: needs a real swipe, in the window
-    var d=s.down; s.down=null;
-    if(!d) return;
-    var dx=p.x-d.x;
-    if(Math.abs(dx)<24) return;                       // a tap is not a swipe
-    if(s.rush<SOLO_WIN[0]) return miniFinish(false,"SOLD YOURSELF","You dived in before he committed.");
-    if(s.rush>SOLO_WIN[1]) return miniFinish(false,"HE IS GONE","A fraction late and he was past you.");
-    s.dir = dx>0?1:-1;
-    s.zone = dx>0?2:0;
-    s.wrongWay = (s.dir!==s.lean);            // as a defender you go where the BALL goes
-    MINI.phase="fly"; s.flight=0;
-    document.getElementById("miniMsg").textContent="";
+    // keepy-uppies acts on the tap down, nothing to do here
   });
   f.addEventListener("pointercancel", function(){ MINI.hold=false; if(MINI.s) MINI.s.down=null; });
 })();
@@ -3545,7 +3548,7 @@ function rewardPool(){
   var pool=[takePenalty, takeRun];
   if(miniUnlocked("free")) pool.push(takeFreeKick);
   if(miniUnlocked("head")) pool.push(takeHeader);
-  if(miniUnlocked("solo")) pool.push(takeSolo);
+  if(miniUnlocked("keepy")) pool.push(takeKeepy);
   if(miniUnlocked("warm")) pool.push(takeWarmUp);
   if(miniUnlocked("memo")) pool.push(takeMemory);
   return pool;
