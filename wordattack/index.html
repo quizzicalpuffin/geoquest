@@ -135,6 +135,7 @@ h3{font-size:1.05em}
 .ver{text-align:center;font-size:.70em;line-height:1.5;color:var(--muted);opacity:.6;
   margin:22px 0 10px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
 .ver b{font-weight:600}
+.decodebox,.typebox{text-align:center}
 /* ---------- pitch ---------- */
 .pitch{border:2px solid var(--pitch-dk);border-radius:var(--radius);overflow:hidden;
   margin-bottom:12px;line-height:0;background:#3E8F5C}
@@ -284,9 +285,9 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 .penres.scored{color:var(--good)}
 .penres.saved{color:var(--miss)}
 </style>
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="../icon-180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
@@ -346,9 +347,14 @@ body.theme-dark .pill.lg-weak{background:#39281A}
     <div class="card">
       <h1>Pick your game</h1>
       <p class="muted">12 attacks. Three correct in a row wins a penalty — swipe to pick your corner.</p>
+      <h2 style="margin:.2em 0 .4em;font-size:1em">Reading and spelling</h2>
+      <p class="small muted" style="margin:0 0 .6em">The rule sets from his assessment. Start here.</p>
+      <button class="btn gamebtn g-spell" data-mode="decode"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-spell"/></svg></span><span class="tx"><b>Word Attack</b><span>Sound it out, chunk by chunk</span></span></button>
+      <button class="btn gamebtn g-tricky" data-mode="encode"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-tricky"/></svg></span><span class="tx"><b>Spell It</b><span>Hear it, then write it</span></span></button>
+      <h2 style="margin:1.1em 0 .4em;font-size:1em">Vocabulary and comprehension</h2>
+      <p class="small muted" style="margin:0 0 .6em">These play to what he is already good at.</p>
       <button class="btn gamebtn g-syn" data-mode="syn"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-syn"/></svg></span><span class="tx"><b>Synonyms</b><span>Words that mean the same</span></span></button>
       <button class="btn gamebtn g-ant" data-mode="ant"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-ant"/></svg></span><span class="tx"><b>Opposites</b><span>Words that mean the reverse</span></span></button>
-      <button class="btn gamebtn g-tricky" data-mode="tricky"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-tricky"/></svg></span><span class="tx"><b>Tricky Words</b><span>Words you cannot sound out</span></span></button>
       <button class="btn gamebtn g-spell" data-mode="spell"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-spell"/></svg></span><span class="tx"><b>Set Pieces</b><span>Spelling rules that catch people out</span></span></button>
       <button class="btn gamebtn g-sent" data-mode="sent"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-sent"/></svg></span><span class="tx"><b>Build the Move</b><span>Joining sentences that make sense</span></span></button>
       <button class="btn gamebtn g-listen" data-mode="listen"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-listen"/></svg></span><span class="tx"><b>Commentary</b><span>Listen, then answer — no reading</span></span></button>
@@ -396,6 +402,22 @@ body.theme-dark .pill.lg-weak{background:#39281A}
   </section>
 
   <!-- ================= LEVEL ================= -->
+  <section class="screen" id="scRule">
+    <h1 id="ruleHead">Word Attack</h1>
+    <p class="muted">Pick a rule. You will be shown how it works, then twelve words that use it,
+      with a few from earlier rules mixed back in.</p>
+    <div id="ruleList"></div>
+    <button class="btn ghost" id="btnRuleBack">Back</button>
+  </section>
+
+  <section class="screen" id="scTeach">
+    <h1 id="teachHead">The rule</h1>
+    <div class="card"><p id="teachBody" style="font-size:1.08em;line-height:1.6"></p>
+      <p class="small muted" id="teachExamples" style="margin-bottom:0"></p></div>
+    <button class="btn primary" id="btnTeachGo">Got it — start</button>
+    <button class="btn ghost" id="btnTeachBack">Pick another rule</button>
+  </section>
+
   <section class="screen" id="scLevel">
     <div class="card">
       <h1 id="lvTitle">Synonyms</h1>
@@ -511,7 +533,14 @@ body.theme-dark .pill.lg-weak{background:#39281A}
       <div id="parentByMode"></div>
     </div>
     <div class="card">
-      <h2>Weakest items</h2>
+      <h2>Rule sets</h2>
+  <p class="small muted" style="margin-top:0">First-attempt accuracy is the honest number —
+    it excludes anything he got only after a hint. This is the view to bring to school.</p>
+  <div id="ruleTable"></div>
+  <h2>Recent errors</h2>
+  <p class="small muted" style="margin-top:0">What he actually wrote, not just right or wrong.</p>
+  <div id="errorLog"></div>
+  <h2>Weakest items</h2>
       <p class="muted small">Sorted by accuracy. These are the ones worth revisiting out loud.</p>
       <div id="parentWeak"></div>
     </div>
@@ -596,7 +625,12 @@ body.theme-dark .pill.lg-weak{background:#39281A}
     <div class="penhead" id="miniHead">Free kick</div>
     <h2 style="margin:.1em 0 .2em" id="miniTitle">Free kick</h2>
     <p class="small muted" id="miniMsg" style="margin:0"></p>
-    <div class="runfield"><canvas id="miniCanvas" width="360" height="520"></canvas></div>
+    <div class="runfield" style="position:relative">
+      <canvas id="miniCanvas" width="360" height="520"></canvas>
+      <div class="startwrap hidden" id="miniStart">
+        <button class="startbtn" id="btnMiniStart">START</button>
+      </div>
+    </div>
     <div class="penres" id="miniRes">&nbsp;</div>
   </div>
 </div>
@@ -724,6 +758,192 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 /* Squad data: 96 headwords from Rita Treacy's "Synonyms 96 most common" list.
    Synonyms filtered to age-appropriate options. t = tier (1 easy, 2 mid, 3 hard).
    s = example sentence containing the headword (used for the through-ball round). */
+/* =======================================================================
+   RULE SETS — the teaching core.
+   Built from his ten assessed Vernon errors, grouped the way the therapist
+   grouped them, not the way a word list would. Each set is taught first,
+   then drilled, then reviewed. Every item is a real word that obeys its
+   rule; the Champions League tier is the long multisyllabic version of the
+   same rule, which is where guessing from context does the most damage.
+   ch = the chunks he has to work through, in order.
+   ======================================================================= */
+const RULES = [
+{ id:"mb", n:"Silent letters: mb, kn, wr, gh",
+  teach:"Some letters are written but never said. In <b>thumb</b> the <b>b</b> is silent \u2014 you write it, you never hear it. The same happens in <b>kn</b>, <b>wr</b> and <b>gh</b>.",
+  cue:"Say the word. Which letter did you write but never say?",
+  words:[
+    {w:"thumb", ch:["th","u","mb"], lvl:1},
+    {w:"lamb", ch:["l","a","mb"], lvl:1},
+    {w:"comb", ch:["c","o","mb"], lvl:1},
+    {w:"climb", ch:["cl","i","mb"], lvl:1},
+    {w:"numb", ch:["n","u","mb"], lvl:1},
+    {w:"crumb", ch:["cr","u","mb"], lvl:1},
+    {w:"plumber", ch:["pl","u","mb","er"], lvl:1},
+    {w:"knee", ch:["kn","ee"], lvl:1},
+    {w:"knock", ch:["kn","o","ck"], lvl:1},
+    {w:"wrist", ch:["wr","i","st"], lvl:1},
+    {w:"wrong", ch:["wr","o","ng"], lvl:1},
+    {w:"honest", ch:["h","o","n","est"], lvl:1},
+    {w:"hour", ch:["h","our"], lvl:1},
+    {w:"honour", ch:["h","o","n","our"], lvl:1},
+    {w:"heir", ch:["h","eir"], lvl:1}],
+  long:[
+    {w:"acknowledge", ch:["ac","kn","ow","ledge"], lvl:3},
+    {w:"knowledgeable", ch:["kn","ow","ledge","able"], lvl:3},
+    {w:"unknown", ch:["un","kn","own"], lvl:3},
+    {w:"wristwatch", ch:["wr","ist","watch"], lvl:3},
+    {w:"dishonest", ch:["dis","h","o","nest"], lvl:3},
+    {w:"thoughtful", ch:["th","ough","t","ful"], lvl:3},
+    {w:"delightful", ch:["de","l","igh","t","ful"], lvl:3},
+    {w:"plumbing", ch:["pl","u","mb","ing"], lvl:3},
+    {w:"knowingly", ch:["kn","ow","ing","ly"], lvl:3},
+    {w:"wrestling", ch:["wr","est","ling"], lvl:3}] },
+{ id:"dbl", n:"Doubling after a prefix",
+  teach:"When a prefix meets a root, the letter often doubles. <b>ad</b> + <b>rive</b> becomes <b>arrive</b> \u2014 two r's. Listen for the prefix, then check whether the next letter doubles.",
+  cue:"Say the word. Is that letter single or double?",
+  words:[
+    {w:"arrive", ch:["a","rr","i","ve"], lvl:1},
+    {w:"arrest", ch:["a","rr","est"], lvl:1},
+    {w:"account", ch:["a","cc","ou","nt"], lvl:1},
+    {w:"appear", ch:["a","pp","ear"], lvl:1},
+    {w:"allow", ch:["a","ll","ow"], lvl:1},
+    {w:"immediate", ch:["i","mm","e","di","ate"], lvl:1},
+    {w:"million", ch:["mi","ll","i","on"], lvl:1},
+    {w:"excellent", ch:["ex","ce","ll","ent"], lvl:1},
+    {w:"brilliant", ch:["bri","ll","i","ant"], lvl:1},
+    {w:"collect", ch:["co","ll","ect"], lvl:1},
+    {w:"correct", ch:["co","rr","ect"], lvl:1},
+    {w:"suppose", ch:["su","pp","ose"], lvl:1}],
+  long:[
+    {w:"unnecessary", ch:["u","nn","e","ce","ss","ary"], lvl:3},
+    {w:"irresponsible", ch:["i","rr","e","spon","sible"], lvl:3},
+    {w:"immediately", ch:["i","mm","e","di","ate","ly"], lvl:3},
+    {w:"irregular", ch:["i","rr","e","gu","lar"], lvl:3},
+    {w:"accommodation", ch:["a","cc","o","mm","o","da","tion"], lvl:3},
+    {w:"correspondent", ch:["co","rr","e","spon","dent"], lvl:3},
+    {w:"appreciate", ch:["a","pp","re","ci","ate"], lvl:3},
+    {w:"arrangement", ch:["a","rr","ange","ment"], lvl:3},
+    {w:"aggressive", ch:["a","gg","re","ssive"], lvl:3},
+    {w:"illegible", ch:["i","ll","e","gible"], lvl:3}] },
+{ id:"vt", n:"Vowel teams: oi/oy, ui, aigh",
+  teach:"Two vowels can work as one sound. <b>oi</b> and <b>oy</b> both say the same thing \u2014 <b>oy</b> usually at the end, <b>oi</b> in the middle. <b>ui</b> says oo in <b>suitable</b>. <b>aigh</b> says ay in <b>straight</b>.",
+  cue:"Say the word. Which vowel team did you use?",
+  words:[
+    {w:"royal", ch:["r","oy","al"], lvl:1},
+    {w:"loyal", ch:["l","oy","al"], lvl:1},
+    {w:"enjoy", ch:["en","j","oy"], lvl:1},
+    {w:"boil", ch:["b","oi","l"], lvl:1},
+    {w:"spoil", ch:["sp","oi","l"], lvl:1},
+    {w:"avoid", ch:["a","v","oi","d"], lvl:1},
+    {w:"suitable", ch:["s","ui","t","able"], lvl:1},
+    {w:"fruit", ch:["fr","ui","t"], lvl:1},
+    {w:"bruise", ch:["br","ui","se"], lvl:1},
+    {w:"juice", ch:["j","ui","ce"], lvl:1},
+    {w:"straight", ch:["str","aigh","t"], lvl:1},
+    {w:"strait", ch:["str","ai","t"], lvl:1}],
+  long:[
+    {w:"disappointment", ch:["dis","a","pp","oi","nt","ment"], lvl:3},
+    {w:"appointment", ch:["a","pp","oi","nt","ment"], lvl:3},
+    {w:"unsuitable", ch:["un","s","ui","t","able"], lvl:3},
+    {w:"recruitment", ch:["re","cr","ui","t","ment"], lvl:3},
+    {w:"straightforward", ch:["str","aigh","t","for","ward"], lvl:3},
+    {w:"employment", ch:["em","pl","oy","ment"], lvl:3},
+    {w:"loyalty", ch:["l","oy","al","ty"], lvl:3},
+    {w:"avoidable", ch:["a","v","oi","d","able"], lvl:3},
+    {w:"destroyer", ch:["de","str","oy","er"], lvl:3},
+    {w:"pursuing", ch:["pur","s","ui","ng"], lvl:3}] },
+{ id:"le", n:"Word endings: -le, -el, -al",
+  teach:"Three endings that sound the same. <b>-le</b> is much the commonest (<b>table</b>, <b>simple</b>). <b>-el</b> often follows m, n, r, s, v, w (<b>shovel</b>, <b>travel</b>). <b>-al</b> is usually an adjective ending (<b>metal</b>, <b>royal</b>).",
+  cue:"Say the word. Which of the three endings does it take?",
+  words:[
+    {w:"shovel", ch:["sh","o","vel"], lvl:1},
+    {w:"travel", ch:["tr","a","vel"], lvl:1},
+    {w:"tunnel", ch:["tu","nn","el"], lvl:1},
+    {w:"model", ch:["mo","del"], lvl:1},
+    {w:"level", ch:["le","vel"], lvl:1},
+    {w:"table", ch:["ta","ble"], lvl:1},
+    {w:"simple", ch:["sim","ple"], lvl:1},
+    {w:"bottle", ch:["bo","ttle"], lvl:1},
+    {w:"middle", ch:["mi","ddle"], lvl:1},
+    {w:"metal", ch:["me","tal"], lvl:1},
+    {w:"animal", ch:["a","ni","mal"], lvl:1},
+    {w:"hospital", ch:["hos","pi","tal"], lvl:1}],
+  long:[
+    {w:"comfortable", ch:["com","for","ta","ble"], lvl:3},
+    {w:"considerable", ch:["con","si","de","ra","ble"], lvl:3},
+    {w:"vegetable", ch:["ve","ge","ta","ble"], lvl:3},
+    {w:"professional", ch:["pro","fe","ssion","al"], lvl:3},
+    {w:"experimental", ch:["ex","pe","ri","men","tal"], lvl:3},
+    {w:"traditional", ch:["tra","di","tion","al"], lvl:3},
+    {w:"personnel", ch:["per","so","nnel"], lvl:3},
+    {w:"unbelievable", ch:["un","be","lie","va","ble"], lvl:3},
+    {w:"responsible", ch:["re","spon","si","ble"], lvl:3},
+    {w:"individual", ch:["in","di","vi","du","al"], lvl:3}] },
+{ id:"cl", n:"Clusters: -ngth and ex-",
+  teach:"<b>-ngth</b> is three consonants running together \u2014 say all of them: le-ng-th, not len-th. <b>ex-</b> at the front says eks, and the letters after it still have to be sounded: ex-cept, not e-xept.",
+  cue:"Say the word slowly. Did you sound every letter in the cluster?",
+  words:[
+    {w:"length", ch:["le","ngth"], lvl:1},
+    {w:"strength", ch:["stre","ngth"], lvl:1},
+    {w:"except", ch:["ex","cept"], lvl:1},
+    {w:"expect", ch:["ex","pect"], lvl:1},
+    {w:"exit", ch:["ex","it"], lvl:1},
+    {w:"explain", ch:["ex","pl","ain"], lvl:1},
+    {w:"extra", ch:["ex","tra"], lvl:1},
+    {w:"expert", ch:["ex","pert"], lvl:1},
+    {w:"twelfth", ch:["twe","lfth"], lvl:1},
+    {w:"depth", ch:["de","pth"], lvl:1}],
+  long:[
+    {w:"strengthening", ch:["stre","ngth","en","ing"], lvl:3},
+    {w:"lengthening", ch:["le","ngth","en","ing"], lvl:3},
+    {w:"exaggerate", ch:["ex","a","gg","e","rate"], lvl:3},
+    {w:"exceptional", ch:["ex","cep","tion","al"], lvl:3},
+    {w:"extraordinary", ch:["ex","tra","or","di","nary"], lvl:3},
+    {w:"experience", ch:["ex","pe","ri","ence"], lvl:3},
+    {w:"expedition", ch:["ex","pe","di","tion"], lvl:3},
+    {w:"expectation", ch:["ex","pec","ta","tion"], lvl:3},
+    {w:"exhausted", ch:["ex","h","au","sted"], lvl:3},
+    {w:"expensive", ch:["ex","pen","sive"], lvl:3}] },
+{ id:"syl", n:"Long words: chop them into syllables",
+  teach:"A long word is only short bits joined up. Break it and it stops being frightening: in-sti-tu-tion. <b>-tion</b> and <b>-sion</b> both say shun, <b>-ture</b> says cher, <b>-cial</b> says shal. Find the chunks and read them in order.",
+  cue:"Say it again in chunks. How many syllables did you use?",
+  words:[
+    {w:"action", ch:["ac","tion"], lvl:1},
+    {w:"future", ch:["fu","ture"], lvl:1},
+    {w:"special", ch:["spe","cial"], lvl:1},
+    {w:"question", ch:["ques","tion"], lvl:1},
+    {w:"decision", ch:["de","ci","sion"], lvl:1},
+    {w:"adventure", ch:["ad","ven","ture"], lvl:1},
+    {w:"mixture", ch:["mix","ture"], lvl:1},
+    {w:"passion", ch:["pa","ssion"], lvl:1},
+    {w:"motion", ch:["mo","tion"], lvl:1},
+    {w:"section", ch:["sec","tion"], lvl:1}],
+  long:[
+    {w:"institution", ch:["in","sti","tu","tion"], lvl:3},
+    {w:"information", ch:["in","for","ma","tion"], lvl:3},
+    {w:"temperature", ch:["tem","pe","ra","ture"], lvl:3},
+    {w:"celebration", ch:["ce","le","bra","tion"], lvl:3},
+    {w:"competition", ch:["com","pe","ti","tion"], lvl:3},
+    {w:"concentration", ch:["con","cen","tra","tion"], lvl:3},
+    {w:"television", ch:["te","le","vi","sion"], lvl:3},
+    {w:"discussion", ch:["dis","cu","ssion"], lvl:3},
+    {w:"financial", ch:["fi","nan","cial"], lvl:3},
+    {w:"manufacture", ch:["ma","nu","fac","ture"], lvl:3},
+    {w:"explanation", ch:["ex","pla","na","tion"], lvl:3},
+    {w:"imagination", ch:["i","ma","gi","na","tion"], lvl:3}] }
+];
+
+/* Every drillable item, flattened, with its rule and whether it is real. */
+function ruleItems(){
+  var out=[];
+  RULES.forEach(function(r,ri){
+    r.words.forEach(function(w,wi){ out.push({r:ri, i:wi, w:w.w, ch:w.ch, real:true, lvl:1}); });
+    (r.long||[]).forEach(function(w,wi){ out.push({r:ri, i:500+wi, w:w.w, ch:w.ch, real:true, lvl:3}); });
+  });
+  return out;
+}
+var RULE_ITEMS = ruleItems();
+
 const SQUAD = [
 {w:"amazing",t:1,y:["incredible","unbelievable","wonderful","fantastic","astonishing","fabulous","astounding"],s:"That save by the keeper was amazing."},
 {w:"anger",t:3,y:["enrage","infuriate","madden","exasperate"],s:"The unfair penalty began to anger the crowd."},
@@ -1632,7 +1852,11 @@ function sSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ STORE_OK=false; M
 
 var DEFAULT_STATE = { stats:{}, season:{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}, history:[],
   pens:{taken:0,scored:0,zones:{}}, runs:{taken:0,scored:0}, xp:0, fifties:0,
-  avatar:0, rewardTurn:0, rewardBag:[], rewardBagSize:0, opens:0, days:{last:"",streak:0,best:0},
+  avatar:0, rewardTurn:0, rewardBag:[], rewardBagSize:0, opens:0,
+  errors:[],            // every mistake: target, what he produced, rule, first attempt or not
+  ruleStats:{},         // per rule: first-attempt right/seen, and after-help right/seen
+  due:{},               // spaced review: itemKey -> timestamp it is next due
+ days:{last:"",streak:0,best:0},
   club:{ name:"Word Attack FC", crest:0, c1:"#2E7D4F", c2:"#E8A317", kit:0,
          stadium:0, manager:0, squad:[], built:[], own:{kit:[0,1],crest:[0],manager:[0],player:[]} },
   tro:{ won:[], perfect:0, bestPens:0, winRun:0, bestRun:0, modes:{} },
@@ -1839,7 +2063,7 @@ function crestSVG(px){
     + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
 }
 
-var APP_NAME="Word Attack FC", APP_VER="2.4", APP_BUILD="29 Aug 2026";
+var APP_NAME="Word Attack FC", APP_VER="3.1", APP_BUILD="7 Sep 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -1848,6 +2072,9 @@ function load(){
       pens:Object.assign({taken:0,scored:0,zones:{}},o.pens||{}),
       runs:Object.assign({taken:0,scored:0},o.runs||{}),
       opens: (parseInt(o.opens,10)>0 ? parseInt(o.opens,10) : 0),
+      errors: Array.isArray(o.errors) ? o.errors.slice(-500) : [],
+      ruleStats: (o.ruleStats && typeof o.ruleStats==="object") ? o.ruleStats : {},
+      due: (o.due && typeof o.due==="object") ? o.due : {},
       xp: o.xp||0, fifties: o.fifties||0, avatar: o.avatar||0, rewardTurn: o.rewardTurn||0,
       rewardBag: Array.isArray(o.rewardBag) ? o.rewardBag.filter(function(x){return typeof x==="number" && x>=0;}) : [],
       rewardBagSize: parseInt(o.rewardBagSize,10)>0 ? parseInt(o.rewardBagSize,10) : 0,
@@ -1866,6 +2093,50 @@ function save(){ sSet("wordattack.v1", JSON.stringify(S)); }
    ======================================================================= */
 /* Synonym keys stay bare so progress saved before the other games existed
    still counts; every other mode is namespaced. */
+/* ---------------------------------------------------------------------
+   The error log. Multiple choice only ever told us right or wrong; this
+   records what he actually produced, which rule it belonged to, and whether
+   it was his first attempt or after help. That is the thing worth bringing
+   to school and to the reassessment.
+   --------------------------------------------------------------------- */
+function logAttempt(o){
+  // o = {rule, word, got, ok, firstTry, mode, real}
+  var rs = S.ruleStats[o.rule] || (S.ruleStats[o.rule] = {seen:0,right:0,firstSeen:0,firstRight:0});
+  rs.seen++; if(o.ok) rs.right++;
+  if(o.firstTry){ rs.firstSeen++; if(o.ok) rs.firstRight++; }
+  if(!o.ok){
+    S.errors.push({ d:Date.now(), r:o.rule, w:o.word, got:o.got||"", m:o.mode,
+                    real:o.real!==false, first:!!o.firstTry });
+    if(S.errors.length>500) S.errors = S.errors.slice(-500);
+  }
+  scheduleReview(o.mode+":"+o.word, o.ok);
+  save();
+}
+/* Wrong today -> back tomorrow. Right -> 1, then 3, then 7 days. */
+var REVIEW_STEPS = [1,3,7];
+function scheduleReview(key, ok){
+  var DAY = 86400000;
+  var cur = S.due[key] || {step:-1};
+  var step = ok ? Math.min(REVIEW_STEPS.length-1, (cur.step|0)+1) : 0;
+  S.due[key] = { step:step, at: Date.now() + REVIEW_STEPS[step]*DAY };
+}
+function reviewDue(key){
+  var d = S.due[key];
+  return !d || Date.now() >= d.at;         // never seen, or its interval has elapsed
+}
+/* Items that are overdue come first, then unseen, then the rest. */
+function orderByReview(mode, items, keyOf){
+  var overdue=[], fresh=[], rest=[];
+  items.forEach(function(it){
+    var k = mode+":"+keyOf(it);
+    var d = S.due[k];
+    if(!d) fresh.push(it);
+    else if(Date.now() >= d.at) overdue.push(it);
+    else rest.push(it);
+  });
+  return shuffle(overdue).concat(shuffle(fresh), shuffle(rest));
+}
+
 function statKey(mode, word){ return mode==="syn" ? word : mode+":"+word; }
 function splitKey(k){
   var i=k.indexOf(":");
@@ -1903,6 +2174,36 @@ var cap = function(s){ return s.charAt(0).toUpperCase()+s.slice(1); };
    Each mode supplies a pool of items for a level and builds a question.
    ======================================================================= */
 var MODES = {
+  decode:{
+    name:"Word Attack", sub:"Sound it out, chunk by chunk", icon:"=",
+    pool:function(lv){
+      var out=[];
+      RULE_ITEMS.forEach(function(it,i){
+        if(lv>=3){ if(it.lvl!==3) return; }       // Champions League: the long words only
+        else if(it.lvl===3) return;               // short words below that
+        if(lv===1 && it.r>2) return;              // first three rule sets at Academy
+        out.push(i);
+      });
+      return out;
+    },
+    key:function(i){ return RULE_ITEMS[i].w; },
+    build:function(i){ return buildDecode(RULE_ITEMS[i]); }
+  },
+  encode:{
+    name:"Spell It", sub:"Hear it, then write it", icon:"x",
+    pool:function(lv){
+      var out=[];
+      RULE_ITEMS.forEach(function(it,i){
+        if(lv>=3){ if(it.lvl!==3) return; }       // Champions League: the long words only
+        else if(it.lvl===3) return;
+        if(lv===1 && it.r>2) return;
+        out.push(i);
+      });
+      return out;
+    },
+    key:function(i){ return RULE_ITEMS[i].w; },
+    build:function(i){ return buildEncode(RULE_ITEMS[i]); }
+  },
   syn:{
     name:"Synonyms", sub:"Words that mean the same", icon:"=",
     pool:function(lv){ var p=[]; SQUAD.forEach(function(e,i){ if(e.t<=lv) p.push(i); }); return p; },
@@ -2103,6 +2404,84 @@ function buildQuestion(idx, kind){
 }
 
 /* =======================================================================
+   DECODE and ENCODE — the two games built on the rule sets.
+
+   Neither shows the word in a sentence, offers a picture, or gives a
+   first-letter hint. Decode reveals the word one chunk at a time and will
+   not show the whole thing until he has worked through it. Every item is a
+   real word that obeys the rule being taught; the wrong answers differ from
+   it only in that one feature, so they cannot be told apart by meaning.
+   Encode is dictation: he types it, with no options to eliminate.
+   ======================================================================= */
+/* Near-identical strings that differ ONLY in the feature the rule teaches.
+   Nothing here means anything, so elimination by meaning is impossible; the
+   only way to separate them is the orthography itself. */
+var SWAPS = {
+  mb:  [[/mb\b/,"m"], [/mb\b/,"mbe"], [/kn/,"n"], [/wr/,"r"], [/^h/,""], [/([^t])h/,"$1"],
+        [/ough/,"ow"], [/igh/,"ie"], [/mb/,"nb"]],
+  dbl: [[/rr/,"r"], [/ll/,"l"], [/pp/,"p"], [/cc/,"c"], [/mm/,"m"],
+        [/([^aeiou])\1/, "$1"], [/([bcdfglmnprst])/,"$1$1"]],
+  vt:  [[/oy/,"oi"], [/oi/,"oy"], [/ui/,"oo"], [/ui/,"ue"], [/aigh/,"ai"],
+        [/aigh/,"aigth"], [/ai\b/,"aigh"]],
+  le:  [[/le\b/,"el"], [/el\b/,"le"], [/al\b/,"el"], [/le\b/,"al"], [/el\b/,"al"]],
+  cl:  [[/ngth/,"nth"], [/ngth/,"ngh"], [/^ex/,"x"], [/^ex/,"exs"], [/pth/,"th"], [/lfth/,"lth"]],
+  syl: [[/tion\b/,"shun"], [/tion\b/,"sion"], [/sion\b/,"tion"], [/ture\b/,"cher"],
+        [/cial\b/,"shal"], [/ssion\b/,"sion"], [/tion\b/,"tian"], [/ture\b/,"tcher"]]
+};
+var REAL_TARGETS = null;
+function isRealTarget(x){
+  if(!REAL_TARGETS){
+    REAL_TARGETS={};
+    RULES.forEach(function(r){
+      r.words.forEach(function(wd){ REAL_TARGETS[wd.w]=1; });
+      (r.long||[]).forEach(function(wd){ REAL_TARGETS[wd.w]=1; });
+    });
+  }
+  return !!REAL_TARGETS[x];
+}
+function ruleNeighbours(word, ruleId){
+  var out=[], seen={};
+  seen[word]=1;
+  (SWAPS[ruleId]||[]).forEach(function(sw){
+    if(out.length>=3) return;
+    var cand = word.replace(sw[0], sw[1]);
+    if(cand!==word && !seen[cand] && !isRealTarget(cand)){ seen[cand]=1; out.push(cand); }
+  });
+  // top up with generic but plausible mutations if the rule ran out
+  var generic = [
+    word.replace(/([aeiou])/, "$1$1"),
+    word.replace(/([^aeiou])([aeiou])/, "$2$1"),
+    word + "e",
+    word.replace(/e\b/, ""),
+    word.replace(/([bcdfglmnprst])(?=[aeiou])/, "$1$1")
+  ];
+  for(var i=0;i<generic.length && out.length<3;i++){
+    var g=generic[i];
+    if(g && g!==word && !seen[g] && !isRealTarget(g)){ seen[g]=1; out.push(g); }
+  }
+  while(out.length<3) out.push(word + "x".repeat(out.length+1));   // never happens, but be safe
+  return out.slice(0,3);
+}
+
+function buildDecode(item){
+  var r = RULES[item.r];
+  var opts = shuffle([item.w].concat(ruleNeighbours(item.w, r.id)));
+  return { kind:"decode", idx:item.i, key:item.w, word:item.w, chunks:item.ch,
+           real:item.real, ruleId:r.id, ruleName:r.n, cue:r.cue,
+           help:"Sound out each bit, blend it, then find the one you read.",
+           opts:opts, answers:[item.w],
+           teach:"<b>"+item.w+"</b> — "+r.cue };
+}
+function buildEncode(item){
+  var r = RULES[item.r];
+  return { kind:"type", idx:item.i, key:item.w, word:item.w,
+           real:item.real, ruleId:r.id, ruleName:r.n,
+           help:"Listen, then write it. No choices — sound it out.",
+           opts:[], answers:[item.w],
+           teach:"<b>"+item.w+"</b> — "+r.teach };
+}
+
+/* =======================================================================
    Speech
    ======================================================================= */
 var VOICE=null;
@@ -2204,6 +2583,7 @@ function show(id){
    ======================================================================= */
 var M=null;
 var ATTACKS=12;
+var REWARD_EVERY=4;      // a minigame every four correct, however long they take
 
 function startMatch(mode, level){
   tro().modes[mode]=1;
@@ -2215,7 +2595,20 @@ function startMatch(mode, level){
   if(MINI.raf){ cancelAnimationFrame(MINI.raf); MINI.raf=null; }
   var MD=MODES[mode];
   var pool=MD.pool(level);
+  if(mode==="decode" || mode==="encode"){
+    /* One rule per session, the way a therapist would sequence it: nine from
+       the rule being taught, three overdue items from rules already met. */
+    var onRule = pool.filter(function(i){ return RULE_ITEMS[i].r === PENDING_RULE; });
+    var older  = pool.filter(function(i){ return RULE_ITEMS[i].r !== PENDING_RULE &&
+                                                 !reviewDue(mode+":"+MD.key(i)) === false; });
+    onRule = orderByReview(mode, onRule, function(i){ return MD.key(i); });
+    older  = orderByReview(mode, older,  function(i){ return MD.key(i); }).slice(0,3);
+    pool = onRule.slice(0, ATTACKS-older.length).concat(older);
+  }
 
+  // The rule games are already ordered by what is due for review, so the
+  // weighting below must not reshuffle them.
+  var byReview = (mode==="decode" || mode==="encode");
   // bias towards items he has struggled with
   var weighted=[];
   pool.forEach(function(i){
@@ -2224,7 +2617,7 @@ function startMatch(mode, level){
     if(st && st.seen>0){ var acc=st.right/st.seen; reps = acc<0.5 ? 3 : (acc<0.8 ? 2 : 1); }
     for(var r=0;r<reps;r++) weighted.push(i);
   });
-  shuffle(weighted);
+  if(!byReview) shuffle(weighted);
   var chosen=[], seen={};
   for(var k=0;k<weighted.length && chosen.length<ATTACKS;k++){
     if(!seen[weighted[k]]){ seen[weighted[k]]=1; chosen.push(weighted[k]); }
@@ -2235,6 +2628,7 @@ function startMatch(mode, level){
       queue:chosen.map(function(idx,n){ var q=MD.build(idx,n,level); q.pidx=idx; return q; }),
       pool:chosen.slice(),
       n:0, us:0, them:0, streak:0, missStreak:0, right:0, wrong:0, pens:0, pensScored:0, rewards:0,
+      startedAt:Date.now(), chunkAt:0, typed:"", decodeHelped:false,
       missed:[], retried:false, picked:[], locked:false, t0:Date.now(), timer:null };
 
   $("clockTxt").textContent = "";
@@ -2286,6 +2680,22 @@ function renderQuestion(){
       '<button class="btn ghost hidden" id="btnShowWords" style="margin:8px 0 0">Show the words</button>'+
       '<div class="passage hidden" id="passageText">'+q.passage+'</div>'+
       '</div><div class="sentence hidden" id="listenQ" style="margin-top:.7em"><b>'+q.ask+'</b></div>';
+  } else if(q.kind==="decode"){
+    stem='<div class="decodebox">'+
+      '<div class="chunks" id="chunkRow"></div>'+
+      '<button class="btn primary" id="btnChunk">Next bit</button>'+
+      '<button class="btn ghost hidden" id="btnHearWord" style="margin-left:8px">'+
+        '&#128266;&nbsp; Hear it</button>'+
+      '<p class="small muted" id="decodeHint" style="margin:.6em 0 0">'+
+        'Say each bit out loud as it appears.</p></div>';
+  } else if(q.kind==="type"){
+    stem='<div class="typebox">'+
+      '<button class="btn primary" id="btnHearIt">&#128266;&nbsp; Hear the word</button>'+
+      '<p class="small muted" style="margin:.5em 0">Listen, then write it. Ask a grown-up to '+
+      'read it if the voice is hard to follow.</p>'+
+      '<input class="typein" id="typeIn" autocomplete="off" autocorrect="off" '+
+      'autocapitalize="none" spellcheck="false" placeholder="write it here">'+
+      '</div>';
   } else if(q.plain){
     stem="";                              // the words themselves are the question
   } else if(q.spellPrompt){
@@ -2294,9 +2704,17 @@ function renderQuestion(){
     stem='<div><span class="target">'+cap(q.word)+'</span>'+speaker(q.word,1)+'</div>';
   }
   $("qStem").innerHTML=stem;
+  if(q.kind==="decode") decodeStart(q);
+  if(q.kind==="type"){ setTimeout(function(){ say(q.word); }, 350); }
 
   var html="";
-  if(q.kind==="letters"){
+  if(q.kind==="decode"){
+    html = q.opts.map(function(o,i){
+      return '<button class="btn opt" data-opt="'+i+'"><span class="txt">'+esc(o)+'</span></button>';
+    }).join("");
+  } else if(q.kind==="type"){
+    html='<button class="btn primary" id="btnCheckSpelling">Check it</button>';
+  } else if(q.kind==="letters"){
     html='<div class="letterrow">';
     q.opts.forEach(function(ch,i){ html+='<button class="lettbtn" data-opt="'+i+'">'+ch+'</button>'; });
     html+='</div>';
@@ -2425,11 +2843,32 @@ function updateBall(){
   $("ball").style.transform="translate("+x+"px,34px)";
 }
 
+$("qStem").addEventListener("click", function(ev){
+  var b=ev.target.closest("#btnChunk");
+  if(b){ decodeNext(); return; }
+  var h=ev.target.closest("#btnHearIt");
+  if(h){ var q=M&&M.queue&&M.queue[M.n]; if(q) say(q.word); return; }
+  var c=ev.target.closest("#btnCheckSpelling");
+  if(c){ typeCheck(); return; }
+});
 $("qOpts").addEventListener("click", function(ev){
   var sayEl = ev.target.closest("[data-say]");
   if(sayEl && sayEl.classList.contains("say")){ ev.stopPropagation(); say(sayEl.getAttribute("data-say")); return; }
+  if(M.locked) return;
+  var hear = ev.target.closest("#btnHearWord");       // check yourself against the voice
+  if(hear){
+    var qh = M.queue[M.n];
+    if(qh){
+      M.decodeHelped = true;
+      if(S.opts.reader || !S.opts.voice || !("speechSynthesis" in window)){
+        $("decodeHint").textContent = "Ask a grown-up to read it out for you.";
+      } else { say(qh.word); }
+    }
+    return;
+  }
+  if(ev.target.closest("#btnCheckSpelling")){ typeCheck(); return; }
   var b = ev.target.closest("[data-opt]");
-  if(!b || M.locked || b.classList.contains("gone")) return;
+  if(!b || b.classList.contains("gone")) return;
   var q=M.queue[M.n];
   var i=+b.getAttribute("data-opt");
   if(q.kind==="letters"){ M.picked=[i]; grade(); return; }
@@ -2449,13 +2888,69 @@ $("btnConfirm").addEventListener("click", function(){
   if(M.picked.length===2 && !M.locked) grade();
 });
 
+/* Reveal the word one chunk at a time. The whole word is never on screen
+   until he has worked through every bit of it. */
+function decodeStart(q){
+  M.chunkAt = 0; M.decodeHelped = false;
+  var row=$("chunkRow");
+  row.innerHTML = q.chunks.map(function(){ return '<span class="chunk ghost">•</span>'; }).join("");
+  $("btnChunk").textContent = "Next bit";
+  $("qOpts").classList.add("hidden");
+}
+function decodeNext(){
+  var q=M.queue[M.n], row=$("chunkRow");
+  if(M.chunkAt >= q.chunks.length){
+    // second press: hide the word and ask which one he read
+    row.innerHTML = q.chunks.map(function(){ return '<span class="chunk ghost">•</span>'; }).join("");
+    $("btnChunk").classList.add("hidden");
+    $("decodeHint").textContent = "Which one did you just read?";
+    $("qOpts").classList.remove("hidden");
+    return;
+  }
+  var nodes=row.children;
+  nodes[M.chunkAt].className = "chunk new";
+  nodes[M.chunkAt].textContent = q.chunks[M.chunkAt];
+  if(M.chunkAt>0) nodes[M.chunkAt-1].className="chunk";
+  M.chunkAt++;
+  if(M.chunkAt >= q.chunks.length){
+    $("btnChunk").textContent = "Say it, then choose";
+    var hw=$("btnHearWord"); if(hw) hw.classList.remove("hidden");
+    $("decodeHint").textContent = q.cue || "Now blend it and say the whole word.";
+    return;
+  }
+  if(M.chunkAt > q.chunks.length) return;
+}
+function typeCheck(){
+  if(M.locked) return;
+  var q=M.queue[M.n], el=$("typeIn");
+  M.typed = (el ? el.value : "").trim();
+  if(!M.typed) return;
+  grade();
+}
+
 function grade(){
   M.locked=true;
   $("btnFifty").classList.add("hidden");
   var q=M.queue[M.n];
   var ok, i;
 
-  if(q.kind==="letters"){
+  if(q.kind==="decode"){
+    var chosenD = M.picked.map(function(k){ return q.opts[k]; });
+    ok = chosenD.length===1 && chosenD[0]===q.word;
+    var nodesD=$("qOpts").children;
+    for(i=0;i<nodesD.length;i++){
+      if(q.opts[i]===q.word) nodesD[i].classList.add("right");
+      else if(M.picked.indexOf(i)>=0) nodesD[i].classList.add("wrongpick");
+      nodesD[i].classList.remove("picked");
+    }
+    var row=$("chunkRow");
+    if(row) row.innerHTML='<span class="chunk">'+q.word+'</span>';
+  } else if(q.kind==="type"){
+    ok = norm(M.typed) === norm(q.word);
+    var ti=$("typeIn");
+    if(ti){ ti.classList.add(ok?"right":"wrongpick"); ti.disabled=true;
+      if(!ok) ti.value = M.typed + "  →  " + q.word; }
+  } else if(q.kind==="letters"){
     ok = M.picked.length===1 && String(M.picked[0])===q.answers[0];
     var lb=$("qOpts").querySelectorAll(".lettbtn");
     for(i=0;i<lb.length;i++){
@@ -2480,14 +2975,23 @@ function grade(){
   if(!S.stats[sk]) S.stats[sk]={seen:0,right:0};
   S.stats[sk].seen++; if(ok) S.stats[sk].right++;
 
+  if(q.ruleId){                                    // the rule-set games keep a fuller record
+    logAttempt({ rule:q.ruleId, word:q.word, mode:M.mode, real:q.real,
+                 got: q.kind==="type" ? M.typed
+                      : (q.kind==="decode" ? (M.picked.map(function(k){return q.opts[k];})[0]||"") : ""),
+                 ok: ok, firstTry: !M.fiftyUsed && !M.decodeHelped });
+  }
+
   if(ok){
     M.right++; M.streak++; M.missStreak=0;
     updateDots(); updateBall();
     $("fbBox").innerHTML='<div class="feedback ok"><b>'+
       pick(["Great ball.","Lovely pass.","Perfect weight on that.","Take a bow.","Straight to feet."])+
       '</b><br><span class="small">'+q.teach+'</span></div>';
-    if(M.streak>=3){
-      M.streak=0; M.pens++;
+    // A reward every few questions, not for three in a row: a streak rewards
+    // answering fast, and answering fast is exactly the guessing behaviour.
+    if(M.right>0 && M.right % REWARD_EVERY === 0){
+      M.pens++;
       $("btnConfirm").classList.add("hidden");
       // Alternate the reward: penalty, counter attack, penalty, ...
       var pool = rewardPool();
@@ -2997,8 +3501,10 @@ function openMini(game, cb){
 
   var ctx=miniCtx();
   if(!ctx){ miniFinish(true,"GOAL!","Buried it."); return; }   // headless: never punish
-  MINI.ctx=ctx; MINI.live=true;
-  MINI.raf=requestAnimationFrame(miniStep);
+  MINI.ctx=ctx;
+  /* Nothing starts until he taps. Several of these begin timing immediately,
+     and it is not fair to lose one because he was not looking yet. */
+  miniShowStart();
 }
 /* The keeper leans towards wherever he has been putting them, so hammering
    the same side every time stops working — same idea as the penalty. */
@@ -3013,6 +3519,22 @@ function miniRemember(zone){
   var h=S.pens.mz || (S.pens.mz={});
   h[zone]=(h[zone]||0)+1;
 }
+function miniShowStart(){
+  var wrap=document.getElementById("miniStart");
+  if(!wrap){ miniBegin(); return; }
+  wrap.classList.remove("hidden");
+  MINI.live=false;
+}
+function miniBegin(){
+  var wrap=document.getElementById("miniStart");
+  if(wrap) wrap.classList.add("hidden");
+  MINI.t=0; MINI.last=0; MINI.live=true;
+  if(MINI.game==="keep") inGoalServe();
+  if(MINI.game==="keepy"){ MINI.s.serveAt=0; MINI.s.started=false; }
+  if(MINI.game==="warm"){ MINI.s.litT=0; }
+  MINI.raf=requestAnimationFrame(miniStep);
+}
+
 function miniPick3(){ return miniKeeperPick(); }
 
 function miniFinish(scored, title, msg){
@@ -3579,6 +4101,10 @@ function memoTap(px,py){
 }
 
 /* ---- input ---- */
+document.addEventListener("click", function(ev){
+  if(ev.target && ev.target.id==="btnMiniStart") miniBegin();
+});
+
 (function bindMini(){
   var f=document.getElementById("miniCanvas"); if(!f) return;
   function cpt(e){ var r=f.getBoundingClientRect();
@@ -4352,6 +4878,10 @@ function markDayPlayed(){
   save();
 }
 
+/* Rita asked that this not become a second homework. Twelve questions is
+   about ten minutes; if a session has run past that we say so at the end. */
+function sessionMinutes(){ return M ? Math.round((Date.now()-M.startedAt)/60000) : 0; }
+
 function endMatch(){
   if(M.timer) clearInterval(M.timer);
   markDayPlayed();
@@ -4509,7 +5039,38 @@ $("squadDetail").addEventListener("click",function(ev){ var s=ev.target.closest(
 /* =======================================================================
    Parent zone
    ======================================================================= */
+function ruleTableHTML(){
+  var rows = RULES.map(function(r){
+    var st = S.ruleStats[r.id] || {seen:0,right:0,firstSeen:0,firstRight:0};
+    var first = st.firstSeen ? Math.round(st.firstRight/st.firstSeen*100) : null;
+    var all   = st.seen ? Math.round(st.right/st.seen*100) : null;
+    var band  = first===null ? "" : (first>=80?"lg-strong":(first>=60?"lg-mid":"lg-weak"));
+    return '<tr><th style="text-align:left">'+r.n+'</th>'+
+      '<td class="num">'+(first===null?'<span class="muted">not yet</span>'
+        :'<span class="pill '+band+'">'+first+'%</span>')+'</td>'+
+      '<td class="num small muted">'+(all===null?'—':all+'%')+'</td>'+
+      '<td class="num small muted">'+st.firstSeen+'</td></tr>';
+  }).join("");
+  return '<table class="stats"><tr><th></th><th class="num">First try</th>'+
+    '<th class="num small">With help</th><th class="num small">Seen</th></tr>'+rows+'</table>';
+}
+function errorLogHTML(){
+  var e = (S.errors||[]).slice(-25).reverse();
+  if(!e.length) return '<p class="small muted">Nothing logged yet.</p>';
+  var name={}; RULES.forEach(function(r){ name[r.id]=r.n; });
+  return '<table class="stats">'+e.map(function(x){
+    var d=new Date(x.d), when=d.getDate()+"/"+(d.getMonth()+1);
+    return '<tr><th style="text-align:left">'+esc(x.w)+
+      (x.real===false?' <span class="small muted">(made-up word)</span>':'')+'</th>'+
+      '<td class="small">'+(x.got?esc(x.got):'—')+'</td>'+
+      '<td class="small muted">'+(name[x.r]||x.r)+'</td>'+
+      '<td class="small muted">'+when+'</td></tr>';
+  }).join("")+'</table>';
+}
+
 function renderParent(){
+  var rt=$("ruleTable"); if(rt) rt.innerHTML=ruleTableHTML();
+  var el=$("errorLog");  if(el) el.innerHTML=errorLogHTML();
   var seen=0, right=0, tried=0;
   for(var w in S.stats){ tried++; seen+=S.stats[w].seen; right+=S.stats[w].right; }
   var pc = seen?Math.round(right/seen*100):0;
@@ -4574,6 +5135,16 @@ function renderParent(){
 $("btnExport").addEventListener("click",function(){
   var lines=["Word Attack FC — progress export","Date: "+new Date().toLocaleString(),"",
     "Season: P"+S.season.p+" W"+S.season.w+" D"+S.season.d+" L"+S.season.l+" Pts"+S.season.pts,"","Word,Seen,Correct,Accuracy%"];
+  lines.push("", "RULE SETS (first-attempt accuracy)");
+  RULES.forEach(function(r){
+    var st=S.ruleStats[r.id]||{firstSeen:0,firstRight:0,seen:0,right:0};
+    lines.push(r.n+","+st.firstRight+" of "+st.firstSeen+" first try,"+st.right+" of "+st.seen+" overall");
+  });
+  lines.push("", "ERRORS (word, what he wrote, rule, date)");
+  (S.errors||[]).forEach(function(x){
+    lines.push([x.w, x.got, x.r, new Date(x.d).toISOString().slice(0,10)].join(","));
+  });
+  lines.push("", "ITEMS");
   for(var k in S.stats){ var st=S.stats[k]; lines.push(k+","+st.seen+","+st.right+","+Math.round(st.right/st.seen*100)); }
   var txt=lines.join("\n");
   try{
@@ -4654,11 +5225,46 @@ $("btnSound").addEventListener("click",function(){
    Nav
    ======================================================================= */
 var PENDING_MODE="syn";
+var PENDING_RULE=0;
+function renderRules(){
+  $("ruleHead").textContent = PENDING_MODE==="decode" ? "Word Attack" : "Spell It";
+  $("ruleList").innerHTML = RULES.map(function(r,i){
+    var st=S.ruleStats[r.id]||{firstSeen:0,firstRight:0};
+    var pc = st.firstSeen>=4 ? Math.round(st.firstRight/st.firstSeen*100) : null;
+    var band = pc===null ? "" : (pc>=80?"lg-strong":(pc>=60?"lg-mid":"lg-weak"));
+    return '<button class="btn gamebtn" data-rule="'+i+'"><span class="tx"><b>'+r.n+'</b>'+
+      '<span>'+(r.words.length+(r.long?r.long.length:0))+' words'+(pc===null?'':' · '+pc+'% first try')+'</span></span>'+
+      (pc===null?'':'<span class="pill '+band+'">'+pc+'%</span>')+'</button>';
+  }).join("");
+}
+function renderTeach(){
+  var r=RULES[PENDING_RULE];
+  $("teachHead").textContent = r.n;
+  $("teachBody").innerHTML = r.teach;
+  $("teachExamples").innerHTML = "Words in this set: " +
+    r.words.slice(0,8).map(function(w){ return "<b>"+w.w+"</b>"; }).join(", ") + "…";
+}
+$("ruleList").addEventListener("click", function(ev){
+  var b=ev.target.closest("[data-rule]"); if(!b) return;
+  PENDING_RULE = +b.getAttribute("data-rule");
+  renderTeach(); show("scTeach");
+});
+$("btnRuleBack").addEventListener("click", function(){ renderHome(); show("scHome"); });
+$("btnTeachBack").addEventListener("click", function(){ renderRules(); show("scRule"); });
+$("btnTeachGo").addEventListener("click", function(){
+  var MD=MODES[PENDING_MODE];
+  $("lvTitle").textContent=MD.name; $("lvSub").textContent=MD.sub;
+  show("scLevel");
+});
+
 var modeBtns=document.querySelectorAll("[data-mode]");
 for(var mb=0;mb<modeBtns.length;mb++){
   modeBtns[mb].addEventListener("click", function(){
     PENDING_MODE=this.getAttribute("data-mode");
     var MD=MODES[PENDING_MODE];
+    if(PENDING_MODE==="decode" || PENDING_MODE==="encode"){
+      renderRules(); show("scRule"); return;      // pick a rule, get taught it, then play
+    }
     $("lvTitle").textContent=MD.name;
     $("lvSub").textContent=MD.sub;
     show("scLevel");
