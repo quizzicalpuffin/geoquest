@@ -347,12 +347,8 @@ body.theme-dark .pill.lg-weak{background:#39281A}
     <div class="card">
       <h1>Pick your game</h1>
       <p class="muted">12 attacks. Three correct in a row wins a penalty — swipe to pick your corner.</p>
-      <h2 style="margin:.2em 0 .4em;font-size:1em">Reading and spelling</h2>
-      <p class="small muted" style="margin:0 0 .6em">The rule sets from his assessment. Start here.</p>
       <button class="btn gamebtn g-spell" data-mode="decode"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-spell"/></svg></span><span class="tx"><b>Word Attack</b><span>Sound it out, chunk by chunk</span></span></button>
       <button class="btn gamebtn g-tricky" data-mode="encode"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-tricky"/></svg></span><span class="tx"><b>Spell It</b><span>Hear it, then write it</span></span></button>
-      <h2 style="margin:1.1em 0 .4em;font-size:1em">Vocabulary and comprehension</h2>
-      <p class="small muted" style="margin:0 0 .6em">These play to what he is already good at.</p>
       <button class="btn gamebtn g-syn" data-mode="syn"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-syn"/></svg></span><span class="tx"><b>Synonyms</b><span>Words that mean the same</span></span></button>
       <button class="btn gamebtn g-ant" data-mode="ant"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-ant"/></svg></span><span class="tx"><b>Opposites</b><span>Words that mean the reverse</span></span></button>
       <button class="btn gamebtn g-spell" data-mode="spell"><span class="ic"><svg viewBox="0 0 24 24"><use href="#ic-spell"/></svg></span><span class="tx"><b>Set Pieces</b><span>Spelling rules that catch people out</span></span></button>
@@ -2063,7 +2059,7 @@ function crestSVG(px){
     + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
 }
 
-var APP_NAME="Word Attack FC", APP_VER="3.1", APP_BUILD="7 Sep 2026";
+var APP_NAME="Word Attack FC", APP_VER="3.2", APP_BUILD="7 Sep 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -2844,6 +2840,19 @@ function updateBall(){
 }
 
 $("qStem").addEventListener("click", function(ev){
+  /* The Hear it check. The button lives inside qStem, so it has to be
+     handled here — binding it to qOpts meant the click never arrived. */
+  var hw=ev.target.closest("#btnHearWord");
+  if(hw){
+    var qh=M&&M.queue&&M.queue[M.n];
+    if(qh){
+      M.decodeHelped = true;                 // counts as help, not a first try
+      if(S.opts.reader || !S.opts.voice || !("speechSynthesis" in window)){
+        $("decodeHint").textContent = "Ask a grown-up to read it out for you.";
+      } else { say(qh.word); }
+    }
+    return;
+  }
   var b=ev.target.closest("#btnChunk");
   if(b){ decodeNext(); return; }
   var h=ev.target.closest("#btnHearIt");
@@ -2855,17 +2864,6 @@ $("qOpts").addEventListener("click", function(ev){
   var sayEl = ev.target.closest("[data-say]");
   if(sayEl && sayEl.classList.contains("say")){ ev.stopPropagation(); say(sayEl.getAttribute("data-say")); return; }
   if(M.locked) return;
-  var hear = ev.target.closest("#btnHearWord");       // check yourself against the voice
-  if(hear){
-    var qh = M.queue[M.n];
-    if(qh){
-      M.decodeHelped = true;
-      if(S.opts.reader || !S.opts.voice || !("speechSynthesis" in window)){
-        $("decodeHint").textContent = "Ask a grown-up to read it out for you.";
-      } else { say(qh.word); }
-    }
-    return;
-  }
   if(ev.target.closest("#btnCheckSpelling")){ typeCheck(); return; }
   var b = ev.target.closest("[data-opt]");
   if(!b || b.classList.contains("gone")) return;
