@@ -2,7 +2,7 @@
    Lives in its own folder so it has its own scope. Sharing a folder means
    sharing one service worker, which is why offline did not work before:
    the page was registering the geography app's worker. */
-var CACHE = "wordattack-v3";
+var CACHE = "wordattack-v4";
 var SCOPE = new URL("./", self.location).href;
 var SHELL = ["./", "index.html", "manifest.webmanifest"];
 
