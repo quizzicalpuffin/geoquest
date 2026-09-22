@@ -944,7 +944,7 @@ const SQUAD = [
 {w:"amazing",t:1,y:["incredible","unbelievable","wonderful","fantastic","astonishing","fabulous","astounding"],s:"That save by the keeper was amazing."},
 {w:"anger",t:3,y:["enrage","infuriate","madden","exasperate"],s:"The unfair penalty began to anger the crowd."},
 {w:"angry",t:1,y:["mad","furious","enraged","annoyed","raging","indignant","exasperated"],s:"The manager was angry about the late goal."},
-{w:"answer",t:1,y:["reply","respond","retort","acknowledge"],s:"Tom put up his hand to answer the question."},
+{w:"answer",t:1,y:["reply","respond","retort"],s:"Tom put up his hand to answer the question."},
 {w:"ask",t:1,y:["question","enquire","request","query","quiz","demand","inquire"],s:"He wanted to ask the coach about training."},
 {w:"awful",t:1,y:["dreadful","terrible","horrible","unpleasant","bad","poor"],s:"The weather was awful for the match."},
 {w:"bad",t:1,y:["evil","wicked","rotten","poor","harmful"],s:"That was a bad tackle and he saw red."},
@@ -952,95 +952,91 @@ const SQUAD = [
 {w:"begin",t:1,y:["start","open","launch","commence","initiate","originate"],s:"The second half will begin in ten minutes."},
 {w:"big",t:1,y:["enormous","huge","immense","gigantic","vast","colossal","large","sizable","grand"],s:"There was a big crowd at the stadium."},
 {w:"brave",t:2,y:["courageous","fearless","daring","heroic","bold","valiant"],s:"It was a brave header in a crowded box."},
-{w:"break",t:1,y:["fracture","shatter","smash","snap","wreck","rupture","crash","demolish"],s:"Careful, or you might break the window."},
+{w:"break",t:1,y:["fracture","shatter","smash","snap","wreck","rupture","demolish"],s:"Careful, or you might break the window."},
 {w:"bright",t:2,y:["shining","gleaming","brilliant","vivid","glowing","shiny","sparkling","shimmering","radiant"],s:"The floodlights were very bright."},
 {w:"calm",t:2,y:["peaceful","tranquil","serene","composed","unruffled","quiet","still","mild","smooth"],s:"He stayed calm and slotted the penalty home."},
 {w:"come",t:1,y:["approach","advance","arrive","near","reach"],s:"Watch the defender come towards you."},
 {w:"cool",t:1,y:["chilly","cold","frosty","icy","wintry","frigid"],s:"The evening air was cool on the pitch."},
 {w:"crooked",t:2,y:["bent","twisted","curved","hooked","zigzag"],s:"The old goalpost looked crooked after the storm."},
-{w:"cry",t:1,y:["weep","sob","wail","bawl","howl","shout","yell","scream"],s:"He tried not to cry when they lost."},
-{w:"cut",t:1,y:["slash","slice","carve","chop","gash","prick","nick","sever"],s:"He fell and got a cut on his knee."},
+{w:"cry",t:1,y:["weep","sob","wail","bawl","howl"],s:"He tried not to cry when they lost.",sy:["weep","sob","wail","bawl"]},
+{w:"cut",t:1,y:["slash","slice","carve","chop","gash","nick","sever"],s:"Be careful not to cut your finger on the tin.",sy:["slice","gash","nick","slash"]},
 {w:"dangerous",t:2,y:["risky","unsafe","perilous","hazardous"],s:"The wet steps can be dangerous."},
 {w:"dark",t:1,y:["gloomy","dim","murky","shadowy","dusky","unlit","shaded","black"],s:"It was too dark to keep playing."},
 {w:"decide",t:1,y:["choose","settle","determine","resolve","pick"],s:"The referee had to decide quickly."},
-{w:"definite",t:3,y:["certain","sure","positive","clear","obvious","determined","distinct"],s:"That was a definite penalty."},
-{w:"delicious",t:1,y:["tasty","appetising","scrumptious","luscious","savoury","delightful","enjoyable"],s:"The pasta after training was delicious."},
-{w:"describe",t:2,y:["portray","recount","narrate","depict","relate","picture","represent","report","record"],s:"Can you describe the winning goal?"},
-{w:"destroy",t:2,y:["ruin","demolish","flatten","raze","wreck","waste","extinguish"],s:"The storm could destroy the old stand."},
+{w:"definite",t:3,y:["certain","sure","positive","clear","obvious","distinct"],s:"That was a definite penalty."},
+{w:"delicious",t:1,y:["tasty","appetising","scrumptious","luscious","savoury","delightful"],s:"The pasta after training was delicious."},
+{w:"describe",t:2,y:["portray","recount","narrate","depict","relate","picture","report"],s:"Can you describe the winning goal?"},
+{w:"destroy",t:2,y:["ruin","demolish","flatten","raze","wreck"],s:"The storm could destroy the old stand."},
 {w:"difference",t:3,y:["contrast","gap","distinction","dissimilarity"],s:"There was a big difference between the two teams."},
 {w:"do",t:1,y:["perform","complete","accomplish","achieve","execute"],s:"He had a lot of training to do."},
 {w:"dull",t:2,y:["boring","tiresome","dreary","tedious","humdrum","slow","lifeless"],s:"The first half was a dull game."},
 {w:"eager",t:2,y:["keen","enthusiastic","fervent","raring","interested"],s:"He was eager to get on the pitch."},
 {w:"end",t:1,y:["finish","conclude","close","halt","terminate"],s:"The whistle brought the game to an end."},
 {w:"enjoy",t:1,y:["relish","savour","appreciate","delight in","like"],s:"He really does enjoy playing in the rain."},
-{w:"explain",t:2,y:["clarify","define","interpret","justify","elaborate"],s:"The coach had to explain the new formation."},
+{w:"explain",t:2,y:["clarify","define","interpret"],s:"The coach had to explain the new formation."},
 {w:"fair",t:2,y:["just","impartial","unbiased","even-handed","objective","honest"],s:"The referee was fair to both sides."},
 {w:"fall",t:1,y:["drop","descend","tumble","topple","plunge"],s:"He watched the ball fall into the net."},
 {w:"false",t:2,y:["fake","untrue","counterfeit","fraudulent","bogus"],s:"That was a false start in the race."},
 {w:"famous",t:2,y:["well-known","renowned","celebrated","eminent","noted"],s:"He met a famous footballer at the ground."},
 {w:"fast",t:1,y:["quick","rapid","speedy","swift","fleet","hasty","snappy"],s:"The winger is incredibly fast."},
-{w:"fat",t:1,y:["plump","stout","chubby","tubby","rotund","chunky","burly","bulky"],s:"The cat had grown fat over the winter."},
+{w:"fat",t:1,y:["plump","stout","chubby","tubby","rotund","chunky","bulky"],s:"The cat had grown fat over the winter."},
 {w:"fear",t:2,y:["fright","dread","terror","alarm","panic","dismay","anxiety","scare"],s:"He played without any fear at all."},
 {w:"fly",t:1,y:["soar","glide","hover","sail","skim","coast","cruise"],s:"He watched the ball fly over the bar."},
 {w:"funny",t:1,y:["humorous","amusing","comical","droll","hilarious","comic","laughable","silly"],s:"His story about the goalkeeper was funny."},
-{w:"get",t:1,y:["obtain","acquire","gain","procure","secure","fetch","find","accumulate"],s:"Go and get your boots from the car."},
+{w:"get",t:1,y:["obtain","acquire","gain","procure","secure","fetch","find"],s:"Go and get your boots from the car."},
 {w:"go",t:1,y:["depart","leave","proceed","withdraw","exit","move","travel"],s:"It is time to go to training."},
 {w:"good",t:1,y:["excellent","fine","superb","splendid","first-rate","superior","wonderful","marvellous"],s:"That was a good first touch."},
-{w:"great",t:2,y:["remarkable","outstanding","mighty","grand","noteworthy","worthy","powerful"],s:"It was a great save in the last minute."},
-{w:"gross",t:3,y:["crude","coarse","vulgar","indecent","uncouth","improper","rude"],s:"He thought the joke was a bit gross."},
+{w:"great",t:2,y:["remarkable","outstanding","mighty","grand","noteworthy","powerful"],s:"It was a great save in the last minute.",sy:["remarkable","outstanding","noteworthy"]},
+{w:"gross",t:3,y:["crude","coarse","vulgar","uncouth","improper","rude"],s:"He thought the joke was a bit gross."},
 {w:"happy",t:1,y:["pleased","delighted","cheerful","joyful","glad","contented","satisfied","elated"],s:"He was happy with the result."},
-{w:"hate",t:1,y:["despise","loathe","detest","abhor","dislike","disapprove"],s:"He began to hate losing."},
-{w:"have",t:1,y:["possess","own","hold","contain","bear","acquire","gain","maintain"],s:"They have a match on Saturday."},
-{w:"help",t:1,y:["aid","assist","support","serve","befriend","encourage","relieve"],s:"The captain came over to help him up."},
-{w:"hide",t:1,y:["conceal","cover","mask","screen","camouflage","cloak"],s:"He tried to hide his disappointment."},
-{w:"hurry",t:1,y:["rush","hasten","bustle","scurry","run","speed","race","urge","accelerate"],s:"They had to hurry to catch the bus."},
-{w:"hurt",t:1,y:["injure","harm","damage","wound","afflict","distress","pain"],s:"He did not want to hurt his ankle again."},
-{w:"idea",t:2,y:["thought","notion","concept","belief","opinion","conception","plan","view"],s:"He had a clever idea for a free kick."},
-{w:"important",t:2,y:["vital","essential","significant","crucial","principal","necessary","critical","valuable","primary"],s:"It was an important match for the league."},
+{w:"hate",t:1,y:["despise","loathe","detest","abhor","dislike"],s:"He began to hate losing.",sy:["despise","loathe","detest","dislike"]},
+{w:"have",t:1,y:["possess","own","hold","contain","acquire","gain"],s:"They have two new footballs for training.",sy:["possess","own","hold"]},
+{w:"help",t:1,y:["aid","assist","support","serve","encourage","relieve"],s:"The captain came over to help him up.",sy:["aid","assist","support"]},
+{w:"hide",t:1,y:["conceal","cover","mask","screen","camouflage","cloak"],s:"He tried to hide his disappointment.",sy:["conceal","mask","cover"]},
+{w:"hurry",t:1,y:["rush","hasten","bustle","scurry","run","speed","race","accelerate"],s:"They had to hurry to catch the bus."},
+{w:"hurt",t:1,y:["injure","harm","damage","wound","afflict","distress","pain"],s:"He did not want to hurt his ankle again.",sy:["injure","harm","damage"]},
+{w:"idea",t:2,y:["thought","notion","concept","belief","opinion","plan","view"],s:"He had a clever idea for a free kick.",sy:["thought","notion","plan"]},
+{w:"important",t:2,y:["vital","essential","significant","crucial","principal","necessary","critical","valuable","primary"],s:"It was an important match for the league.",sy:["significant","crucial","vital","critical"]},
 {w:"interesting",t:3,y:["fascinating","engaging","gripping","intriguing","absorbing"],s:"The book about surfing was interesting."},
-{w:"keep",t:1,y:["retain","preserve","maintain","withhold","sustain","hold"],s:"You can keep the match ball."},
-{w:"kill",t:2,y:["slay","assassinate","murder","exterminate","destroy"],s:"A hard frost can kill the young plants."},
+{w:"keep",t:1,y:["retain","preserve","maintain","withhold","hold"],s:"You can keep the match ball.",sy:["retain","hold"]},
+{w:"kill",t:2,y:["slay","murder","exterminate","destroy"],s:"A hard frost can kill the young plants.",sy:["destroy"]},
 {w:"lazy",t:2,y:["idle","inactive","sluggish","slothful"],s:"He was too lazy to warm up properly."},
-{w:"little",t:1,y:["tiny","small","minute","petite","miniature","puny"],s:"There was only a little time left."},
-{w:"look",t:1,y:["gaze","stare","glance","peer","behold","see","watch","survey","study"],s:"Look at the space on the right wing."},
-{w:"love",t:1,y:["adore","cherish","treasure","worship","admire","like","fancy","appreciate","savour"],s:"He would love to play at Croke Park."},
-{w:"make",t:1,y:["create","build","form","produce","construct","originate","invent","design","manufacture"],s:"They can make a chance out of nothing."},
+{w:"little",t:1,y:["tiny","small","minute","petite","miniature","puny"],s:"There was only a little time left.",sy:["small","tiny"]},
+{w:"look",t:1,y:["gaze","stare","glance","peer","behold","see","watch","survey","study"],s:"Look at the space on the right wing.",sy:["glance","gaze","stare","peer"]},
+{w:"love",t:1,y:["adore","cherish","treasure","worship","admire","like","fancy","appreciate","savour"],s:"He would love to play at Croke Park.",sy:["like","adore"]},
+{w:"make",t:1,y:["create","build","form","produce","construct","originate","invent","design","manufacture"],s:"They can make a chance out of nothing.",sy:["create","produce"]},
 {w:"mark",t:2,y:["label","tag","stamp","brand","imprint","impress"],s:"There was a mark on the new ball."},
 {w:"mischievous",t:3,y:["naughty","playful","prankish","impish","roguish"],s:"His little sister had a mischievous grin."},
-{w:"move",t:1,y:["travel","shift","budge","stir","journey","go","creep","crawl","drag"],s:"He had to move quickly into space."},
+{w:"move",t:1,y:["travel","shift","budge","stir","journey","go"],s:"He had to move quickly into space.",sy:["shift","go","travel"]},
 {w:"moody",t:3,y:["grumpy","sulky","irritable","touchy","peevish","changeable","glum","sullen"],s:"He gets moody when he is tired."},
 {w:"neat",t:2,y:["tidy","orderly","trim","spruce","shipshape","clean","smart","elegant"],s:"That was a neat bit of skill."},
-{w:"new",t:1,y:["fresh","modern","recent","novel","current","original","unusual"],s:"He got new boots for his birthday."},
+{w:"new",t:1,y:["fresh","modern","recent","novel","current","original"],s:"He got new boots for his birthday."},
 {w:"old",t:1,y:["ancient","aged","elderly","antique","veteran","used","worn"],s:"The old stand was falling apart."},
 {w:"part",t:1,y:["portion","share","piece","section","fragment","fraction"],s:"He only played part of the match."},
-{w:"place",t:1,y:["spot","area","location","site","region","plot","position"],s:"The beach is his favourite place."},
+{w:"place",t:1,y:["spot","area","location","site","region","plot","position"],s:"The beach is his favourite place.",sy:["spot","location"]},
 {w:"plan",t:2,y:["scheme","design","blueprint","strategy","arrangement","plot"],s:"The coach had a plan for the second half."},
 {w:"popular",t:2,y:["well-liked","favoured","accepted","approved","favourite","celebrated","common"],s:"Surfing is popular in Strandhill."},
 {w:"predicament",t:3,y:["dilemma","quandary","plight","pickle","scrape","problem","spot","jam"],s:"Losing his boots was a real predicament."},
-{w:"put",t:1,y:["place","set","lay","position","deposit","attach","establish","assign"],s:"Put your kit in the bag."},
-{w:"quiet",t:1,y:["silent","still","hushed","soundless","mute","tranquil","peaceful","calm","restful"],s:"The whole stadium went quiet."},
-{w:"right",t:1,y:["correct","accurate","factual","proper","precise","true","just","honest"],s:"He gave the right answer."},
-{w:"run",t:1,y:["sprint","race","dash","bolt","gallop","speed","hurry","hasten","rush"],s:"He can run the length of the pitch."},
-{w:"say",t:1,y:["state","declare","utter","remark","mention"],s:"He did not say a word at half time."},
-{w:"scared",t:1,y:["afraid","frightened","alarmed","terrified","fearful","panicked","timid","shy"],s:"He was scared of the big defender."},
-{w:"show",t:1,y:["display","exhibit","present","reveal","demonstrate"],s:"Show me your new trick."},
+{w:"put",t:1,y:["place","set","lay","position","deposit","attach","establish","assign"],s:"Put your kit in the bag.",sy:["place","set","lay"]},
+{w:"quiet",t:1,y:["silent","still","hushed","soundless","mute","tranquil","peaceful","calm","restful"],s:"The whole stadium went quiet.",sy:["silent","still","hushed","mute"]},
+{w:"right",t:1,y:["correct","accurate","factual","proper","precise","true","just","honest"],s:"He gave the right answer.",sy:["correct","accurate"]},
+{w:"run",t:1,y:["sprint","race","dash","bolt","gallop","speed","hurry","hasten","rush"],s:"He can run the length of the pitch.",sy:["sprint","race","dash"]},
+{w:"say",t:1,y:["state","declare","utter","remark","mention"],s:"He did not say a word at half time.",sy:["utter"]},
+{w:"scared",t:1,y:["afraid","frightened","alarmed","terrified","fearful","panicked","timid"],s:"He was scared of the big defender."},
+{w:"show",t:1,y:["display","exhibit","present","reveal","demonstrate"],s:"Show me your new trick.",sy:["display","demonstrate","reveal"]},
 {w:"slow",t:1,y:["unhurried","gradual","leisurely","sluggish","slack","tedious"],s:"It was a slow start to the game."},
 {w:"stop",t:1,y:["cease","halt","pause","discontinue","quit","end"],s:"The referee had to stop the match."},
 {w:"story",t:1,y:["tale","myth","legend","fable","anecdote","account","narrative"],s:"He wrote a funny story about a bird."},
 {w:"strange",t:1,y:["odd","peculiar","unusual","weird","outlandish","unfamiliar","uncommon","curious"],s:"It was a strange bounce off the post."},
-{w:"take",t:1,y:["grab","seize","grasp","capture","snatch","hold","catch","acquire"],s:"He will take the free kick."},
-{w:"tell",t:1,y:["inform","notify","reveal","disclose","divulge","relate"],s:"Tell me what happened in the second half."},
-{w:"think",t:1,y:["believe","consider","reckon","judge","contemplate","assume","reflect"],s:"I think we can win this one."},
-{w:"trouble",t:2,y:["difficulty","distress","bother","hardship","misfortune","anxiety","worry"],s:"The defence was in serious trouble."},
+{w:"take",t:1,y:["grab","seize","grasp","capture","snatch","hold","catch","acquire"],s:"Try to take the ball off the defender.",sy:["grab","snatch","seize"]},
+{w:"tell",t:1,y:["inform","notify","reveal","disclose","divulge","relate"],s:"Tell the coach about your sore ankle.",sy:["inform","notify"]},
+{w:"think",t:1,y:["believe","consider","reckon","judge","contemplate","assume","reflect"],s:"I think we can win this one.",sy:["believe","reckon"]},
+{w:"trouble",t:2,y:["difficulty","distress","bother","hardship","misfortune","anxiety","worry"],s:"The defence was in serious trouble.",sy:["difficulty"]},
 {w:"true",t:1,y:["genuine","real","actual","authentic","truthful","accurate","right","proper","precise"],s:"That story is actually true."},
 {w:"ugly",t:2,y:["hideous","unsightly","grotesque","repulsive","monstrous","horrible","unpleasant"],s:"It was an ugly challenge from behind."},
-{w:"unhappy",t:1,y:["sad","miserable","gloomy","downhearted","sorrowful","unfortunate","depressed","glum"],s:"He was unhappy about being subbed."},
-{w:"use",t:2,y:["employ","utilise","expend","consume","exercise","spend"],s:"Use your left foot more often."},
+{w:"unhappy",t:1,y:["sad","miserable","gloomy","downhearted","sorrowful","depressed","glum"],s:"He was unhappy about being subbed."},
+{w:"use",t:2,y:["employ","utilise","expend","consume","exercise","spend"],s:"Use your left foot more often.",sy:["employ","utilise"]},
 {w:"wrong",t:1,y:["incorrect","inaccurate","mistaken","erroneous","improper","unsuitable"],s:"He got the answer wrong."},
-
-/* ---- Champions League extras. These sit above Rita's 96 on purpose:
-   harder vocabulary for the hardest level, in line with her advice to
-   stretch him with material pitched above his reading age. ---- */
 {w:"abundant",t:3,y:["plentiful","ample","copious","generous"],s:"There was abundant space out on the wing."},
 {w:"accurate",t:3,y:["precise","exact","correct","faultless"],s:"His passing was accurate all afternoon."},
 {w:"anxious",t:3,y:["nervous","uneasy","apprehensive","worried","fretful"],s:"The crowd grew anxious in the last ten minutes."},
@@ -1076,7 +1072,49 @@ const SQUAD = [
 {w:"precise",t:3,y:["exact","meticulous","specific","pinpoint"],s:"His crossing was precise all evening."},
 {w:"rapid",t:3,y:["swift","speedy","brisk","hurried"],s:"He made a rapid recovery from injury."},
 {w:"reveal",t:3,y:["disclose","uncover","divulge","expose"],s:"They will reveal the new kit tomorrow."},
-{w:"sturdy",t:3,y:["robust","solid","strapping","hardy"],s:"He is a sturdy centre half."}
+{w:"sturdy",t:3,y:["robust","solid","strapping","hardy"],s:"He is a sturdy centre half."},
+{w:"adequate",t:3,y:["sufficient","satisfactory","acceptable","passable"],s:"His defending was adequate but not brilliant."},
+{w:"ambitious",t:3,y:["aspiring","driven","enterprising","go-getting"],s:"She is an ambitious young player."},
+{w:"arrogant",t:3,y:["conceited","cocky","big-headed","haughty","boastful"],s:"The arrogant striker would not pass to anyone."},
+{w:"astute",t:3,y:["shrewd","canny","sharp","wise"],s:"It was an astute decision by the manager."},
+{w:"candid",t:3,y:["frank","blunt","direct","forthright"],s:"The manager gave a candid interview after the defeat."},
+{w:"chaotic",t:3,y:["disorderly","frantic","hectic","wild"],s:"It was a chaotic scramble in the six-yard box."},
+{w:"consequence",t:3,y:["result","outcome","effect","upshot"],s:"Losing was a consequence of the red card."},
+{w:"deceive",t:3,y:["trick","fool","mislead","dupe","outwit"],s:"He tried to deceive the keeper with a dummy."},
+{w:"devastated",t:3,y:["heartbroken","crushed","distraught","gutted"],s:"The players were devastated after the final."},
+{w:"diminish",t:3,y:["decrease","shrink","dwindle","lessen","fade"],s:"Their lead began to diminish in the second half."},
+{w:"flexible",t:3,y:["supple","bendy","pliable","lithe"],s:"A keeper needs to be strong and flexible."},
+{w:"frequent",t:3,y:["regular","repeated","constant","numerous"],s:"He makes frequent runs down the left."},
+{w:"humble",t:3,y:["modest","unassuming","down-to-earth","unpretentious"],s:"He stayed humble after scoring the winner."},
+{w:"jubilant",t:3,y:["overjoyed","elated","ecstatic","triumphant","thrilled"],s:"The fans were jubilant at the final whistle."},
+{w:"meagre",t:3,y:["sparse","paltry","measly","scanty"],s:"There was only a meagre crowd for the friendly.",sy:["sparse","paltry","measly"]},
+{w:"novice",t:3,y:["beginner","learner","newcomer","rookie"],s:"He is still a novice at chess."},
+{w:"ominous",t:3,y:["threatening","menacing","sinister","foreboding"],s:"Dark, ominous clouds gathered over the pitch."},
+{w:"prosper",t:3,y:["thrive","flourish","succeed","boom"],s:"The club began to prosper under the new manager."},
+{w:"resilient",t:3,y:["tough","hardy","strong","spirited"],s:"The team was resilient after going a goal down."},
+{w:"spectacular",t:3,y:["sensational","breathtaking","magnificent","stunning"],s:"He scored a spectacular overhead kick."},
+{w:"triumph",t:3,y:["victory","success","win","conquest"],s:"Winning the cup was a huge triumph for the club."},
+{w:"vacant",t:3,y:["empty","unoccupied","free","available"],s:"There was a vacant seat beside him."},
+{w:"abandon",t:3,y:["desert","forsake","give up","quit","call off"],s:"They had to abandon the match because of fog.",sy:["give up","call off","quit"]},
+{w:"boisterous",t:3,y:["rowdy","noisy","lively","unruly","loud"],s:"The boisterous crowd sang all night."},
+{w:"cunning",t:3,y:["crafty","sly","wily","artful"],s:"It was a cunning free-kick routine."},
+{w:"dismal",t:3,y:["gloomy","dreary","bleak","miserable","woeful"],s:"It was a dismal performance from the whole team.",sy:["woeful","dreary","miserable"]},
+{w:"eliminate",t:3,y:["knock out","remove","eradicate","get rid of"],s:"One more goal would eliminate them from the cup.",sy:["knock out","remove"]},
+{w:"fragile",t:3,y:["delicate","brittle","breakable","flimsy"],s:"The old trophy was very fragile."},
+{w:"immaculate",t:3,y:["spotless","pristine","flawless","perfect"],s:"The groundsman kept the pitch immaculate."},
+{w:"inferior",t:3,y:["lesser","weaker","poorer","second-rate"],s:"They were the inferior team on the day."},
+{w:"lethargic",t:3,y:["sluggish","listless","drowsy","sleepy"],s:"He felt lethargic after the long bus journey."},
+{w:"merit",t:3,y:["deserve","warrant","justify","earn"],s:"That foul did not merit a red card.",sy:["deserve","warrant","justify"]},
+{w:"obscure",t:3,y:["unknown","little-known","unheard-of","minor"],s:"He came from an obscure little club."},
+{w:"reckless",t:3,y:["careless","rash","foolhardy","heedless"],s:"It was a reckless tackle from behind."},
+{w:"relinquish",t:3,y:["give up","surrender","hand over","yield"],s:"He did not want to relinquish the captain's armband."},
+{w:"scrutinise",t:3,y:["examine","inspect","study","analyse"],s:"The referee had to scrutinise the replay."},
+{w:"adversary",t:3,y:["opponent","rival","enemy","foe"],s:"Their adversary in the final was the league champion."},
+{w:"vulnerable",t:3,y:["exposed","defenceless","unprotected","weak"],s:"The defence looked vulnerable on the counter-attack."},
+{w:"exhilarating",t:3,y:["thrilling","exciting","electrifying","stirring"],s:"It was an exhilarating finish to the match."},
+{w:"persuade",t:3,y:["convince","coax","sway","talk into"],s:"He tried to persuade the coach to let him play."},
+{w:"dispute",t:3,y:["argument","disagreement","quarrel","row"],s:"There was a dispute over the penalty."},
+{w:"reliable",t:3,y:["dependable","trustworthy","steady","consistent"],s:"He is the most reliable penalty taker in the squad."}
 ];
 
 /* ---- ANTONYMS: Rita's next step once the synonyms are learned ---- */
@@ -2059,7 +2097,7 @@ function crestSVG(px){
     + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
 }
 
-var APP_NAME="Word Attack FC", APP_VER="3.2", APP_BUILD="7 Sep 2026";
+var APP_NAME="Word Attack FC", APP_VER="3.3", APP_BUILD="22 Sep 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -2140,14 +2178,45 @@ function splitKey(k){
 }
 var norm = function(s){ return s.toLowerCase().replace(/[^a-z]/g,""); };
 var FAM = SQUAD.map(function(e){ var s={}; s[norm(e.w)]=1; e.y.forEach(function(x){s[norm(x)]=1;}); return s; });
+/* Shared stems count as overlap too: "delightful" must never be a WRONG
+   answer beside a right answer of "delight in". */
+var STEM = SQUAD.map(function(e){ var s={};
+  [e.w].concat(e.y).forEach(function(x){ var n=norm(x); if(n.length>=6) s[n.slice(0,6)]=1; });
+  return s; });
 var CONFLICT = SQUAD.map(function(){ return {}; });
 for(var i=0;i<SQUAD.length;i++){
   for(var j=i+1;j<SQUAD.length;j++){
     var hit=false;
     for(var k in FAM[i]){ if(FAM[j][k]){ hit=true; break; } }
+    if(!hit) for(var k2 in STEM[i]){ if(STEM[j][k2]){ hit=true; break; } }
     if(hit){ CONFLICT[i][j]=1; CONFLICT[j][i]=1; }
   }
 }
+/* Families that share no word but still mean nearly the same thing. Without
+   this, "remarkable" (great) could be offered as a WRONG answer for
+   "amazing" - and a child who picked it would be marked wrong for being right. */
+var SEM = [
+  ["amazing","great"],["amazing","good"],["great","good"],["anger","angry"],
+  ["do","end"],["fat","sturdy"],["big","fat"],["fear","scared"],["fear","anxious"],
+  ["scared","anxious"],["fierce","hostile"],["obstinate","persistent"],
+  ["vigilant","cautious"],["lazy","weary"],["spectacular","amazing"],
+  ["spectacular","great"],["spectacular","good"],["astute","cunning"],["fragile","feeble"],
+  ["immaculate","neat"],["inferior","feeble"],["inferior","bad"],["reckless","dangerous"],
+  ["exhilarating","interesting"],["exhilarating","amazing"],["devastated","unhappy"],
+  ["dismal","awful"],["dismal","dull"],["boisterous","chaotic"],["candid","sincere"],
+  ["candid","fair"],["lethargic","weary"],["resilient","persistent"],["meagre","little"],
+  ["arrogant","confident"],["ambitious","eager"],["deceive","cunning"],["jubilant","happy"],
+  ["reliable","competent"],["reliable","accurate"],["triumph","great"],["prosper","great"],
+  ["frequent","persistent"],["vacant","quiet"],["scrutinise","look"],["merit","get"],
+  ["humble","quiet"],["obscure","strange"],["dispute","trouble"],["adversary","hostile"]
+];
+(function(){
+  var at={}; SQUAD.forEach(function(e,i){ at[e.w]=i; });
+  SEM.forEach(function(pr){
+    var i=at[pr[0]], j=at[pr[1]];
+    if(i!=null && j!=null){ CONFLICT[i][j]=1; CONFLICT[j][i]=1; }
+  });
+})();
 function safeIdx(targetIdx, used){
   var pool=[];
   for(var n=0;n<SQUAD.length;n++){
@@ -2384,7 +2453,7 @@ function buildQuestion(idx, kind){
       opts:shuffle(opts), answers:correct2.slice(), teach:teach };
   }
   if(kind==="sentence"){
-    var ans = pick(e.y);
+    var ans = pick(e.sy || e.y);          // only synonyms that fit this sentence
     var o2=[ans];
     for(var d2=0; d2<3; d2++){ var y=distractor(); if(y) o2.push(y); }
     return { kind:"sentence", idx:idx, key:e.w, word:e.w, sentence:e.s,
