@@ -715,26 +715,55 @@ body.theme-dark .pill.lg-weak{background:#39281A}
 
         <g class="pkeeper" id="penKeeper" style="transform:translate(200px,182px)">
           <ellipse id="kshadow" cx="0" cy="37" rx="17" ry="4" fill="rgba(0,0,0,.20)"/>
-          <g class="kbody">
-            <rect x="-40" y="-21" width="27" height="10" rx="5" fill="#B8E31E"/>
-            <rect x="-40" y="-21" width="9"  height="10" rx="5" fill="#8FBE0F"/>
-            <circle cx="-41" cy="-16" r="8" fill="#F7F7F5" stroke="#C8102E" stroke-width="2.5"/>
-            <rect x="13" y="-21" width="27" height="10" rx="5" fill="#B8E31E"/>
-            <rect x="31" y="-21" width="9"  height="10" rx="5" fill="#8FBE0F"/>
-            <circle cx="41" cy="-16" r="8" fill="#F7F7F5" stroke="#C8102E" stroke-width="2.5"/>
-            <rect x="-11" y="10" width="9" height="21" rx="3" fill="#E9C39C"/>
-            <rect x="2"   y="10" width="9" height="21" rx="3" fill="#E9C39C"/>
-            <rect x="-11" y="21" width="9" height="10" rx="2" fill="#B8E31E"/>
-            <rect x="2"   y="21" width="9" height="10" rx="2" fill="#B8E31E"/>
-            <rect x="-15" y="30" width="14" height="5.5" rx="2.5" fill="#14151A"/>
-            <rect x="1"   y="30" width="14" height="5.5" rx="2.5" fill="#14151A"/>
-            <rect x="-14" y="2" width="28" height="13" rx="4" fill="#14151A"/>
-            <rect x="-15" y="-27" width="30" height="31" rx="8" fill="#B8E31E"/>
-            <path d="M-15 -21 h30 v6 h-30 z" fill="#8FBE0F" opacity=".6"/>
-            <text x="0" y="-4" text-anchor="middle" font-size="13" font-weight="800" fill="#14151A"
+          <g class="kbody" stroke-linejoin="round" stroke-linecap="round">
+            <!-- legs: thigh, sock with band, boot -->
+            <path d="M-11 13 H-2.5 L-3.3 22 H-11.5 Z" fill="#E9C39C" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <path d="M2.5 13 H11 L11.5 22 H3.3 Z" fill="#E9C39C" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <path d="M-11.6 21 H-3.2 L-3.8 31 H-11.8 Z" fill="#B8E31E" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <path d="M3.2 21 H11.6 L11.8 31 H3.8 Z" fill="#B8E31E" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <rect x="-11.6" y="21" width="8.2" height="2.2" fill="#14151A"/>
+            <rect x="3.4" y="21" width="8.2" height="2.2" fill="#14151A"/>
+            <path d="M-16.5 34.5 Q-16.5 30 -12 30 H-4 Q-2.6 30 -2.6 32 V34.5 Z" fill="#14151A" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <path d="M16.5 34.5 Q16.5 30 12 30 H4 Q2.6 30 2.6 32 V34.5 Z" fill="#14151A" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <!-- shorts -->
+            <path d="M-13.5 1 H13.5 L15 15 H1.8 L0 11 L-1.8 15 H-15 Z" fill="#14151A" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <rect x="-14.3" y="2" width="1.8" height="12" fill="#B8E31E" fill-opacity=".8"/>
+            <rect x="12.5" y="2" width="1.8" height="12" fill="#B8E31E" fill-opacity=".8"/>
+            <!-- arms: long sleeves, bent at the elbow, gloves up and open -->
+            <path d="M-12 -22 L-26 -20 L-34 -31" fill="none" stroke="#0C1014" stroke-opacity=".55" stroke-width="10.6"/>
+            <path d="M-12 -22 L-26 -20 L-34 -31" fill="none" stroke="#B8E31E" stroke-width="8.2"/>
+            <path d="M-26 -20 L-34 -31" fill="none" stroke="#A6CF17" stroke-width="7.4"/>
+            <path d="M12 -22 L26 -20 L34 -31" fill="none" stroke="#0C1014" stroke-opacity=".55" stroke-width="10.6"/>
+            <path d="M12 -22 L26 -20 L34 -31" fill="none" stroke="#B8E31E" stroke-width="8.2"/>
+            <path d="M26 -20 L34 -31" fill="none" stroke="#A6CF17" stroke-width="7.4"/>
+            <g transform="translate(-37 -36) rotate(-18)">
+              <rect x="-7" y="-9" width="14" height="16" rx="5" fill="#F4F4F2" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+              <rect x="-7" y="3" width="14" height="3.2" fill="#C8102E"/>
+              <path d="M-3.4 -8 V-3 M0 -8.5 V-3 M3.4 -8 V-3" stroke="#000" stroke-opacity=".18" stroke-width="1"/>
+            </g>
+            <g transform="translate(37 -36) rotate(18)">
+              <rect x="-7" y="-9" width="14" height="16" rx="5" fill="#F4F4F2" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+              <rect x="-7" y="3" width="14" height="3.2" fill="#C8102E"/>
+              <path d="M-3.4 -8 V-3 M0 -8.5 V-3 M3.4 -8 V-3" stroke="#000" stroke-opacity=".18" stroke-width="1"/>
+            </g>
+            <!-- shirt: shaped, not a box -->
+            <path d="M-13 -28 Q0 -30.5 13 -28 Q16.8 -24 15.2 -17.5 L13.6 1.2 Q13.2 3.6 10.6 3.6 H-10.6 Q-13.2 3.6 -13.6 1.2 L-15.2 -17.5 Q-16.8 -24 -13 -28 Z" fill="#B8E31E" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <path d="M-15.4 -12 L15.4 -19 L15.2 -14.8 L-15.2 -7.8 Z" fill="#8FBE0F" fill-opacity=".75"/>
+            <path d="M6.5 -28.6 Q13 -28 15.2 -17.5 L13.6 1.2 Q13.2 3.6 10.6 3.6 H6.5 Z" fill="#000" fill-opacity=".10"/>
+            <path d="M-6.2 -28.8 H6.2 L0 -22.2 Z" fill="#14151A"/>
+            <text x="0" y="0" text-anchor="middle" font-size="12" font-weight="800" fill="#14151A"
                   font-family="-apple-system,BlinkMacSystemFont,sans-serif">1</text>
-            <circle cx="0" cy="-36" r="9.5" fill="#E9C39C"/>
-            <path d="M-9.5 -37 a9.5 9.5 0 0 1 19 0 q-9.5 -5.5 -19 0 z" fill="#2B2118"/>
+            <!-- head -->
+            <rect x="-3" y="-33.5" width="6" height="6" fill="#D6AC84"/>
+            <ellipse cx="-8.9" cy="-38.8" rx="2.4" ry="2.8" fill="#D6AC84"/>
+            <ellipse cx="8.9" cy="-38.8" rx="2.4" ry="2.8" fill="#D6AC84"/>
+            <circle cx="0" cy="-40" r="9" fill="#E9C39C" stroke="#0C1014" stroke-opacity=".55" stroke-width="1.3"/>
+            <path d="M-9.3 -40.5 Q-9.6 -50.8 0 -50.6 Q9.6 -50.8 9.3 -40.5 Q7.8 -45.4 2.5 -45.2 Q-1 -47.4 -4.5 -45 Q-7.8 -45 -9.3 -40.5 Z" fill="#2B2118"/>
+            <circle cx="-3.3" cy="-39.6" r="1.35" fill="#15161A"/>
+            <circle cx="3.3" cy="-39.6" r="1.35" fill="#15161A"/>
+            <path d="M-5 -42.6 H-1.6 M1.6 -42.6 H5" stroke="#15161A" stroke-opacity=".55" stroke-width="1"/>
+            <path d="M0 -38.6 L0.8 -36.4" stroke="#000" stroke-opacity=".22" stroke-width="1"/>
+            <path d="M-2.8 -34.6 Q0 -32.8 2.8 -34.6" fill="none" stroke="#6A3A32" stroke-opacity=".7" stroke-width="1.1"/>
           </g>
         </g>
 
@@ -2097,7 +2126,7 @@ function crestSVG(px){
     + ' font-family="-apple-system,BlinkMacSystemFont,sans-serif">'+esc(ini)+'</text></svg>';
 }
 
-var APP_NAME="Word Attack FC", APP_VER="3.3", APP_BUILD="22 Sep 2026";
+var APP_NAME="Word Attack FC", APP_VER="3.4", APP_BUILD="23 Sep 2026";
 var S = load();
 function load(){
   try{ var raw=sGet("wordattack.v1"); if(raw){ var o=JSON.parse(raw);
@@ -3684,19 +3713,15 @@ function miniGoal(c){
   c.strokeStyle="rgba(255,255,255,.75)"; c.lineWidth=2.5;
   c.strokeRect(30,150,300,74);
 }
-var KEEPER_AV = { n:"Keeper", no:1, kit:"#B8E31E", trim:"#8FBE0F", shorts:"#14151A",
-                  socks:"#B8E31E", skin:"#E9C39C", hair:"#2B2118", style:"plain" };
+var KEEPER_AV = { n:"Keeper", no:1, kit:"#B8E31E", trim:"#14151A", shorts:"#14151A",
+                  socks:"#B8E31E", skin:"#E9C39C", hair:"#2B2118", style:"plain", gloves:"#F4F4F2" };
 function miniKeeper(c,x,y,scale,dive){
   scale=scale||1;
-  c.save(); c.translate(x,y); c.rotate(dive||0);
+  c.save(); c.translate(x,y);
   c.fillStyle="rgba(0,0,0,.20)";
   c.beginPath(); c.ellipse(0,14*scale,17*scale,5*scale,0,0,6.3); c.fill();
-  drawFooballer(c, 0, 12*scale, KEEPER_AV, dive ? "jump" : "stand", 0, scale*0.62);
-  // gloves, so it still reads as a keeper at this size
-  c.fillStyle="#F7F7F5"; c.strokeStyle="rgba(12,16,20,.5)"; c.lineWidth=1.2;
-  [[-17,-24],[17,-24]].forEach(function(g){
-    c.beginPath(); c.arc(g[0]*scale, g[1]*scale, 5.4*scale, 0, 6.3); c.fill(); c.stroke();
-  });
+  c.rotate((dive||0)*1.5);                      // lay the dive out properly
+  drawFooballer(c, 0, 12*scale, KEEPER_AV, dive ? "dive" : "ready", 0, scale*0.62);
   c.restore();
 }
 function miniBall(c,x,y,r){
@@ -4541,15 +4566,10 @@ function runDrawKeeper(c){
     pos={ x:home.x+(p.x-home.x)*Math.min(1,t*1.5), y:home.y+(p.y-home.y)*Math.min(1,t*1.5) };
     dive = (p.x<home.x?-1:(p.x>home.x?1:0)) * Math.min(1,t*1.5) * 0.7;
   }
+  runShadow(c,pos.x,pos.y+8,20,.18);
   c.save();
-  c.translate(pos.x,pos.y); c.rotate(dive);
-  c.fillStyle="#B8E31E"; c.fillRect(-30,-26,60,9);                 // arms
-  c.fillStyle="#F7F7F5"; c.beginPath(); c.arc(-32,-21,6,0,6.3); c.fill();
-  c.beginPath(); c.arc(32,-21,6,0,6.3); c.fill();
-  c.fillStyle="#B8E31E"; c.fillRect(-13,-28,26,26);                // shirt
-  c.fillStyle="#14151A"; c.fillRect(-12,-4,10,12); c.fillRect(2,-4,10,12);
-  c.fillStyle="#E9C39C"; c.beginPath(); c.arc(0,-36,8,0,6.3); c.fill();
-  c.fillStyle="#2B2118"; c.beginPath(); c.arc(0,-38,8,3.35,6.07); c.fill();
+  c.translate(pos.x,pos.y); c.rotate(dive*1.5);
+  drawFooballer(c, 0, 8, KEEPER_AV, dive ? "dive" : "ready", 0, 0.86);
   c.restore();
 }
 
@@ -4577,28 +4597,15 @@ function runHead(c,x,y,r){
 
 /* Standing defender — arms out, blocking the channel. */
 function runDrawStander(c,x,y,kit){
-  runShadow(c,x,y+4,24,.20);
-  c.fillStyle=kit||RUN_KIT;
-  c.fillRect(x-32,y-42,64,10);                    // outstretched arms
-  c.fillRect(x-18,y-48,36,34);                    // shirt
-  c.fillStyle="rgba(0,0,0,.14)"; c.fillRect(x-18,y-48,36,7);
-  c.fillStyle="#14151A"; c.fillRect(x-16,y-16,13,14); c.fillRect(x+3,y-16,13,14);
-  c.fillStyle=kit||RUN_KIT; c.fillRect(x-16,y-6,13,6); c.fillRect(x+3,y-6,13,6);
-  c.fillStyle="#14151A"; c.fillRect(x-19,y-2,16,5); c.fillRect(x+3,y-2,16,5);
-  runHead(c,x,y-58,10);
+  runShadow(c,x,y+4,26,.20);
+  drawTackler(c,x,y+2,kit||RUN_KIT,"block",1.05);
 }
 
 /* Sliding defender — low along the ground, hurdle him. */
 function runDrawSlider(c,x,y,kit){
   // kept inside his own channel so it is never unclear which one he is in
   c.fillStyle="rgba(0,0,0,.16)"; c.beginPath(); c.ellipse(x,y+5,34,7,0,0,6.3); c.fill();
-  c.fillStyle=kit||RUN_KIT;
-  c.fillRect(x-24,y-19,46,19);                    // body along the turf
-  c.fillStyle="rgba(255,255,255,.16)"; c.fillRect(x-24,y-19,46,5);
-  c.fillStyle="#14151A"; c.fillRect(x+14,y-19,14,10);   // trailing leg
-  c.fillRect(x+24,y-22,12,7);                          // boot
-  runHead(c,x-30,y-10,8);
-  c.fillStyle=kit||RUN_KIT; c.fillRect(x-20,y-26,20,8);      // trailing arm
+  drawTackler(c,x+2,y+4,kit||RUN_KIT,"slide",0.82);
   runArrow(c,x,y-44,"up");
 }
 function runArrow(c,x,y,dir){
@@ -4623,7 +4630,7 @@ function runBall(c,x,y,r){
    pose: 'run' | 'jump' | 'slide' | 'stand' | 'kick'  */
 function drawFooballer(c, x, y, a, pose, phase, scale){
   scale=scale||1; phase=phase||0;
-  c.save(); c.translate(x,y); c.scale(scale,scale);
+  c.save(); c.translate(x,y); c.scale(scale*(a.face<0?-1:1),scale);   // face:-1 looks left
   c.lineJoin="round"; c.lineCap="round";
 
   var OUT="rgba(12,16,20,.55)";                 // a thin outline holds the shape together
@@ -4747,35 +4754,97 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
     boot(footX+dir*1.5, footY+3, dir);
   }
 
+  /* Arms: sleeve to the elbow, then forearm, then a real hand. A keeper
+     (a.gloves) gets long sleeves and proper gloves on the ends of his arms. */
+  function hand(hx,hy,ang){
+    if(a.gloves){
+      c.save(); c.translate(hx,hy); c.rotate(ang||0);
+      c.beginPath();
+      if(c.roundRect) c.roundRect(-4.6,-5.6,9.2,10.4,3.6); else c.rect(-4.6,-5.6,9.2,10.4);
+      c.fillStyle=a.gloves; c.fill(); c.strokeStyle=OUT; c.lineWidth=1.1; c.stroke();
+      c.fillStyle=a.trim; c.fillRect(-4.6,1.8,9.2,2.2);                // wrist strap
+      c.strokeStyle="rgba(0,0,0,.18)"; c.lineWidth=0.8;                 // fingers
+      for(var f=-2.2;f<=2.3;f+=2.2){ c.beginPath(); c.moveTo(f,-5.2); c.lineTo(f,-1.6); c.stroke(); }
+      c.restore();
+    } else {
+      c.beginPath(); c.arc(hx,hy,2.9,0,6.3);
+      c.fillStyle=SKIN; c.fill(); c.strokeStyle=OUT; c.lineWidth=1; c.stroke();
+    }
+  }
+  function arm(sx,sy,ex,ey,hx,hy){
+    limb(sx,sy,ex,ey,6.4,a.kit);                                        // sleeve
+    if(!a.gloves){                                                      // cuff band
+      c.strokeStyle=a.trim; c.lineWidth=6.2; c.lineCap="butt";
+      c.beginPath(); c.moveTo(sx+(ex-sx)*0.72,sy+(ey-sy)*0.72); c.lineTo(sx+(ex-sx)*0.86,sy+(ey-sy)*0.86); c.stroke();
+      c.lineCap="round";
+    }
+    limb(ex,ey,hx,hy,5.2, a.gloves ? shade(a.kit,.06) : SKIN);          // forearm
+    hand(hx,hy, Math.atan2(hy-ey,hx-ex)+Math.PI/2);
+  }
+  function legsWide(hipY,spread,bend){                                  // planted, knees bent
+    legDown(-4,hipY+2, -8-spread,hipY+13, -10-spread*1.5,hipY+25, -1, 7.8);
+    legDown( 4,hipY+2,  8+spread,hipY+13,  10+spread*1.5,hipY+25,  1, 8.2);
+  }
+
   if(pose==="slide"){
     // low to the ground, one leg stretched out, body leaning back
     var by0=-9;
+    arm(-29,by0-16, -35,by0-9, -40,by0-3);                // back arm, propping him up
     legDown(-6,by0-6,  10,by0-4,  26,by0-3, 1, 8);       // the leg that goes in
     legDown(-8,by0-3,   2,by0+5,  13,by0+7, 1, 7.6);     // trailing leg tucked under
     shortsAt(-12,by0-13,17,11);
     torso(-21,by0-18, 27, 23, -0.34);
-    limb(-27,by0-27, -12,by0-30, 6.4, a.kit);            // arms out to balance
-    limb(-12,by0-30, -2,by0-29, 6.0, SKIN);
-    limb(-29,by0-16, -38,by0-8, 6.2, a.kit);
+    arm(-27,by0-27, -15,by0-31, -4,by0-30);              // front arm out for balance
     head(-30,by0-32, -0.40);
     c.fillStyle="rgba(255,255,255,.32)";                 // spray off the grass
     for(var s2=0;s2<5;s2++){ c.beginPath(); c.arc(26+s2*6, by0+2+((s2%2)?3:-2), 2.4-s2*0.32, 0, 6.3); c.fill(); }
 
   } else if(pose==="kick"){
     var g0=-2;
+    arm(12,g0-66, 22,g0-72, 31,g0-76);                   // far arm up
     legDown(-6,g0-34, -9,g0-19, -11,g0-4, -1, 8);        // standing leg, planted
     legDown(-2,g0-35,  9,g0-37,  23,g0-33, 1, 8.4);      // striking leg swung through
     shortsAt(-4,g0-45,19,12);
     torso(-4,g0-56, 30, 26, 0.13);
-    limb(-17,g0-64, -30,g0-52, 6.2, a.kit);              // arms out for balance
-    limb(-30,g0-52, -37,g0-42, 5.8, SKIN);
-    limb(12,g0-66, 24,g0-74, 6.2, a.kit);
+    arm(-17,g0-64, -28,g0-55, -35,g0-44);                // near arm out for balance
     head(-2,g0-76, 0.12);
 
+  } else if(pose==="block"){
+    // a defender: low, feet wide, arms spread to close the gap
+    var hb=-19;
+    legsWide(hb,4);
+    shortsAt(0,hb-9,20,12);
+    torso(0,hb-22, 31, 26, 0.04);
+    arm(-12,hb-32, -24,hb-27, -33,hb-19);
+    arm( 12,hb-32,  24,hb-27,  33,hb-19);
+    head(0,hb-44, 0);
+
+  } else if(pose==="ready"){
+    // a keeper set for the shot: knees bent, gloves up and open
+    var hr=-19;
+    legsWide(hr,3);
+    shortsAt(0,hr-9,20,12);
+    torso(0,hr-22, 31, 26, 0);
+    arm(-12,hr-32, -22,hr-29, -25,hr-41);
+    arm( 12,hr-32,  22,hr-29,  25,hr-41);
+    head(0,hr-44, 0);
+
+  } else if(pose==="dive"){
+    // full stretch: body straight, both arms reaching past his head.
+    // The caller rotates the whole figure to lay it out along the dive.
+    var hd=-22;
+    legDown(-3,hd+2, -4,hd+13, -5,hd+25, -1, 7.8);
+    legDown( 3,hd+2,  5,hd+13,  7,hd+24,  1, 8.2);
+    shortsAt(0,hd-9,19,12);
+    arm(-11,hd-33, -10,hd-46, -8,hd-58);
+    torso(0,hd-22, 30, 26, 0);
+    arm( 11,hd-33,  11,hd-46,  9,hd-58);
+    head(0,hd-44, 0);
+
   } else {
-    var air=(pose==="jump");
-    var sw=air?0:Math.sin(phase);                        // stride swing
-    var bob=air?0:Math.abs(Math.cos(phase))*1.6;
+    var air=(pose==="jump"), still=(pose==="stand");
+    var sw=(air||still)?0:Math.sin(phase);               // stride swing
+    var bob=(air||still)?0:Math.abs(Math.cos(phase))*1.6;
     var hipY=-22+bob;
     if(air){
       // knees tucked up, arms driving upwards
@@ -4783,25 +4852,44 @@ function drawFooballer(c, x, y, a, pose, phase, scale){
       legDown( 4,hipY+2,  13,hipY+12,  15,hipY+22,  1, 8);
       shortsAt(0,hipY-9,19,12);
       torso(0,hipY-22, 30, 26, 0.05);
-      limb(-12,hipY-33, -20,hipY-44, 6.2, a.kit);
-      limb(-20,hipY-44, -23,hipY-54, 5.6, SKIN);
-      limb(12,hipY-33, 20,hipY-44, 6.2, a.kit);
-      limb(20,hipY-44, 23,hipY-54, 5.6, SKIN);
+      arm(-12,hipY-33, -19,hipY-44, -22,hipY-54);
+      arm( 12,hipY-33,  19,hipY-44,  22,hipY-54);
       head(1,hipY-44, 0.03);
+    } else if(still){
+      legDown(-3,hipY+2, -5,hipY+14, -7,hipY+26, -1, 7.4);
+      legDown( 3,hipY+2,  5,hipY+14,  7,hipY+26,  1, 7.8);
+      shortsAt(0,hipY-9,19,12);
+      torso(0,hipY-22, 30, 26, 0.02);
+      arm(-12,hipY-32, -16,hipY-20, -17,hipY-9);
+      arm( 12,hipY-32,  16,hipY-20,  17,hipY-9);
+      head(0,hipY-44, 0.04);
     } else {
-      // back leg first so the near one overlaps it
+      // arms bent at the elbow and pumping against the legs
+      var la=-sw, ra=sw;
+      arm(-11,hipY-32, -15+la*6,hipY-21, -12+la*13,hipY-17-la*6);   // far arm behind the body
       legDown(-3,hipY+2, -6-sw*8,hipY+14-Math.abs(sw)*2, -8-sw*12,hipY+26-Math.abs(sw)*5, -1, 7.2);
       legDown( 3,hipY+2,  6+sw*8,hipY+14+Math.abs(sw)*1,  9+sw*12,hipY+26-Math.abs(sw)*3,  1, 7.8);
       shortsAt(0,hipY-9,19,12);
       torso(0,hipY-22, 30, 26, 0.15);
-      limb(-12,hipY-32, -19+sw*9, hipY-20, 6.2, a.kit);
-      limb(-19+sw*9,hipY-20, -23+sw*13, hipY-10, 5.6, SKIN);
-      limb(12,hipY-32, 19-sw*9, hipY-20, 6.2, a.kit);
-      limb(19-sw*9,hipY-20, 23-sw*13, hipY-10, 5.6, SKIN);
+      arm( 13,hipY-32,  17+ra*6,hipY-21,  14+ra*13,hipY-17-ra*6);
       head(1,hipY-44, 0.11);
     }
   }
   c.restore();
+}
+
+/* Opponents: same figure as the player, so everyone on the pitch is drawn
+   to the same standard. They face him, and vary in look. */
+var TACKLER_LOOKS=[{skin:"#E9C39C",hair:"#2B2118"},{skin:"#C68C5A",hair:"#1A1410"},
+                   {skin:"#8D5A3B",hair:"#141010"},{skin:"#F1D0B0",hair:"#B5651D"}];
+function tacklerAv(kit,seed){
+  var l=TACKLER_LOOKS[Math.abs(seed|0)%TACKLER_LOOKS.length];
+  var dark=(kit==="#14151A");
+  return { n:"", no:4, kit:kit, trim:dark?"#E8A317":"#FFFFFF", shorts:dark?"#FFFFFF":"#14151A",
+           socks:kit, skin:l.skin, hair:l.hair, style:"plain", face:-1 };
+}
+function drawTackler(c,x,y,kit,pose,scale,seed){
+  drawFooballer(c,x,y,tacklerAv(kit,seed==null?x:seed), pose, 0, scale||1);
 }
 
 function runDrawPlayer(c){
